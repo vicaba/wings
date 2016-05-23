@@ -4,20 +4,18 @@ import java.util.UUID
 
 import akka.actor._
 import akka.event.Logging
-import akka.remote.RemoteScope
 import org.eclipse.paho.client.mqttv3._
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import play.api.libs.json._
-import wings.actor.cluster.pubsub.PSMediator
 import wings.enrichments.UUIDHelper
 import wings.enrichments.UUIDHelper._
 import wings.actor.adapter.mqtt.paho
 import wings.actor.adapter.mqtt.paho.{MqttMessage, ActorPahoMqttAdapter}
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
+import wings.actor.mqtt.{MqttTopics => Topics}
 
 import wings.m2m.conf.model._
 import wings.model.virtual.virtualobject.VOIdentityManager
-import wings.utils.test.{RandomActor, SuperRandomActor}
 
 import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.{Failure, Success, Try}
@@ -50,14 +48,6 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   protected val connOpts = new MqttConnectOptions()
   protected val broker = "tcp://192.168.33.10:1883"
 
-  protected def configOutTopic = "+/i/config/out"
-
-  protected def configOutTopic(id: String) = s"$id/i/config/out"
-
-  protected def configInTopic = "+/i/config/in"
-
-  protected def configInTopic(id: String) = s"$id/i/config/in"
-
   protected var mqttAsyncClient: MqttAsyncClient = new MqttAsyncClient(broker, id.toBase64, persistence)
 
   override def preStart(): Unit = {
@@ -70,8 +60,8 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
       override def onFailure(iMqttToken: IMqttToken, throwable: Throwable): Unit = {}
 
       override def onSuccess(iMqttToken: IMqttToken): Unit = {
-        mqttAsyncClient.subscribe(configOutTopic, 2)
-        logger.debug(s"Subscribed to: $configOutTopic")
+        mqttAsyncClient.subscribe(Topics.generalConfigOutTopic, 2)
+        logger.debug("Subscribed to: {}", Topics.generalConfigOutTopic)
       }
     })
     mqttAsyncClient.setCallback(this)
@@ -106,7 +96,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
                   // Send a Reject message
                   logger.debug("Contains identity")
                   val message =
-                    MqttMessage(configInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
+                    MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
                   mqttAsyncClient.publish(message.topic, message)
                 case false =>
                   // Send an ACK message
@@ -114,13 +104,13 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
                   val actor = context.actorOf(MqttActor.props(identity.copy, broker))
                   registerVirtualObject(identity, actor)
                   val message =
-                    MqttMessage(configInTopic(v), Json.toJson[Config](NameAcquisitionAck("")).toString().getBytes, 2, false, false)
+                    MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionAck("")).toString().getBytes, 2, false, false)
                   mqttAsyncClient.publish(message.topic, message)
               }
             case Failure(e) =>
               logger.debug(s"$e")
               val message =
-                MqttMessage(configInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
+                MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
               mqttAsyncClient.publish(message.topic, message)
           }
       }

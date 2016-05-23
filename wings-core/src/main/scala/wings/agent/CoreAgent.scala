@@ -3,7 +3,7 @@ package wings.agent
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import akka.actor.{Props, ActorRef, Actor}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.event.Logging
 import play.api.libs.json.Json
 import wings.actor.pipeline.MsgEnv
@@ -14,16 +14,15 @@ import wings.collection.mutable.tree.Tree
 import wings.m2m.VOMessage
 import wings.model.lookup.database.mongodb.ActorSimpleLookupService
 import wings.model.virtual.operations.{VoActuate, VoWatch}
-import wings.model.virtual.virtualobject.metadata.{VOMetadataIdentityManager, VOMetadata}
-import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.model.virtual.virtualobject.{VOTree, VO, VOIdentityManager}
-import wings.model.virtual.virtualobject.services.db.mongo.{VOMetadataMongoService, VirtualObjectMongoService}
+import wings.model.virtual.virtualobject.metadata.{VOMetadata, VOMetadataIdentityManager}
+import wings.model.virtual.virtualobject.sensed.{SensedValue, SensedValueIdentityManager}
+import wings.model.virtual.virtualobject.{VO, VOIdentityManager, VOTree}
+import wings.model.virtual.virtualobject.services.db.mongo.{SensedValueMongoService, VOMetadataMongoService, VirtualObjectMongoService}
 import wings.services.db.MongoEnvironment
 
 import scala.concurrent.duration._
-
-import scala.concurrent.{Promise, Future}
-import scala.util.{Success, Failure}
+import scala.concurrent.{Future, Promise}
+import scala.util.{Failure, Success}
 
 case class PipelineEndpoints(toDevice: ActorRef, toArchitecture: ActorRef) {
   def !(message: Any)(implicit sender: ActorRef = Actor.noSender): Unit = {
@@ -159,6 +158,8 @@ trait CoreAgent extends Actor with ActorUtilities {
       case vom: VOMetadata =>
       case sensedValue: SensedValue =>
         logger.debug(s"From $name to arch: Received: $sensedValue")
+        val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
+        sensedValueService.create(sensedValue)
         toArchitecture ! MsgEnv.ToArch(sensedValue)
       case voWatch: VoWatch =>
         logger.debug(s"From $name to arch: Received: $voWatch")

@@ -33,30 +33,13 @@ case class MqttDriver(virtualObjectId: UUID, broker: String, continuation: Actor
 
   override type DeviceMessageType = MqttMessage
 
-  /**
-    * Gets the dataOut topic
-    *
-    * @return
-    */
-  protected val DataOutTopic: String = virtualObjectId.toString + "/data/out"
+  lazy val DataOutTopic: String = MqttTopics.dataOutTopic(virtualObjectId)
 
+  lazy val DataInTopic: String = MqttTopics.dataInTopic(virtualObjectId)
 
-  protected val DataInTopic: String = virtualObjectId.toString + "/data/in"
+  lazy val ConfigInTopic: String = MqttTopics.configInTopic(virtualObjectId)
 
-
-  /**
-    * Gets the configIn topic
-    *
-    * @return
-    */
-  protected val ConfigInTopic: String = virtualObjectId.toString + "/config/in"
-
-  /**
-    * Gets the configOutTopic
-    *
-    * @return
-    */
-  protected val ConfigOutTopic: String = virtualObjectId.toString + "/config/out"
+  lazy val ConfigOutTopic: String = MqttTopics.configOutTopic(virtualObjectId)
 
   override def preStart(): Unit = {
     connectToBroker()

@@ -41,7 +41,10 @@ object WingsBuild extends Build {
     akkaClusterTools,
     akkaClusterMetrics,
     playJson,
-    playReactiveMongo
+    playReactiveMongo,
+    akkaSlf4j,
+    scalaLogging,
+    logback
   ))
 
   lazy val http = Project(
@@ -86,7 +89,8 @@ object WingsBuild extends Build {
   lazy val clusterSeed = Project(
     id = "wings-clusterseed",
     base = file("wings-clusterseed"),
-    settings = commonSettings
+    settings = commonSettings,
+    dependencies = Seq(core)
   )
     .settings(clusterSeedDependencies:_*)
 
@@ -94,6 +98,27 @@ object WingsBuild extends Build {
     akkaCluster,
     akkaClusterTools,
     akkaClusterMetrics
+  ))
+
+  lazy val test = Project(
+    id = "wings-test",
+    base = file("wings-test"),
+    settings = commonSettings,
+    dependencies = Seq(core, mqtt)
+  )
+    .settings(testDependencies)
+
+  lazy val testDependencies = Seq(libraryDependencies ++= Seq(
+    playWs,
+    playJson,
+    eclipsePaho,
+    akkaActor,
+    akkaRemote,
+    akkaTestKit,
+    playReactiveMongo24,
+    typesafeConfig,
+    jettyWebSocket,
+    playScalaTest
   ))
 
 }

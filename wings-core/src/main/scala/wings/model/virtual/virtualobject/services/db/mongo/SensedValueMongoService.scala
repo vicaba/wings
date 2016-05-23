@@ -10,9 +10,7 @@ import wings.services.db.CRUDService
 
 import scala.concurrent.ExecutionContext
 
-/**
- * Created by vicaba on 12/10/15.
- */
+
 case class SensedValueMongoService(db: DB)(identityManger: IdentityManager[SensedValue, UUID])(implicit ec: ExecutionContext) extends CRUDService[SensedValue, UUID](identityManger) {
   override val collection: JSONCollection = db.collection("sensed")
 }

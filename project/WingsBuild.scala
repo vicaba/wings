@@ -55,7 +55,7 @@ object WingsBuild extends Build {
   )
     .enablePlugins(PlayScala)
     .settings(httpDependencies: _*)
-    .settings(routesGenerator := InjectedRoutesGenerator, fork in sbt.Keys.run := true)
+    .settings(routesGenerator := InjectedRoutesGenerator, fork in sbt.Keys.run := false)
 
   lazy val httpDependencies = Seq(libraryDependencies ++= Seq(
     jdbc,

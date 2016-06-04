@@ -70,7 +70,7 @@ trait CoreAgent extends Actor with ActorUtilities {
     voService.findOneByCriteria(Json.obj(VO.VOIDKey -> vo.voId)).flatMap {
       // TODO: Handle the case where a virtualObject is found!
       case None =>
-        logger.debug(s"Virtual Object with id $virtualObjectId not found")
+        logger.debug("Virtual Object with id {} not found", virtualObjectId)
         val newVirtualObject = VO(
           Some(UUID.randomUUID()), vo.voId, vo.pVoId, Some(remoteAddress), vo.children,
           vo.path, None, ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
@@ -78,12 +78,12 @@ trait CoreAgent extends Actor with ActorUtilities {
         voService.create(newVirtualObject).map {
 
           case Right(o) =>
-            logger.debug(s"inserted $newVirtualObject")
+            logger.debug("Inserted {}", newVirtualObject)
             Some(o)
           case _ => None
         }
 
-      case _ => Future {None}
+      case _ => Future(None)
 
     }
   }
@@ -91,7 +91,7 @@ trait CoreAgent extends Actor with ActorUtilities {
   def state1(toDevice: ActorRef): Receive = {
 
     val toDeviceReceive: PartialFunction[Any, Unit] = {
-      case a: Any => // Do nothing
+      case a: Any => println("Device. Received Any")
     }
 
     val toArchReceive: PartialFunction[Any, Unit] = {
@@ -110,14 +110,15 @@ trait CoreAgent extends Actor with ActorUtilities {
                 become(state2(tree, endpoints))
             }
         }
-      case a: Any => // Do nothing
+      case a: Any => println("Arch. Received Any")
+
     }
 
     val receive: PartialFunction[Any, Unit] = {
       case MsgEnv.ToDevice(msg) => toDeviceReceive(msg)
       case MsgEnv.ToArch(msg) => toArchReceive(msg)
       case ToDeviceActor => sender ! toDevice
-      case a: Any => // Do nothing
+      case a: Any => println("All. Received Any")
     }
 
     receive
@@ -130,10 +131,10 @@ trait CoreAgent extends Actor with ActorUtilities {
     val toDeviceReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
       case voActuate: VoActuate =>
-        logger.debug(s"From $name to device: Received: $voActuate")
+        logger.debug("Sending an {} from {} to Device", voActuate.getClass, name)
         toDevice ! MsgEnv.ToDevice(voActuate)
       case sensedValue: SensedValue =>
-        logger.debug(s"From $name to device: Received: $sensedValue")
+        logger.debug("Sending an {} from {} to Device", sensedValue.getClass, name)
         toDevice ! MsgEnv.ToDevice(sensedValue)
     }
 
@@ -157,15 +158,15 @@ trait CoreAgent extends Actor with ActorUtilities {
         }
       case vom: VOMetadata =>
       case sensedValue: SensedValue =>
-        logger.debug(s"From $name to arch: Received: $sensedValue")
+        logger.debug("Sending an {} from {} to Arch", sensedValue.getClass, name)
         val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
         sensedValueService.create(sensedValue)
         toArchitecture ! MsgEnv.ToArch(sensedValue)
       case voWatch: VoWatch =>
-        logger.debug(s"From $name to arch: Received: $voWatch")
+        logger.debug("Sending an {} from {} to Arch", voWatch.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voWatch)
       case voActuate: VoActuate =>
-        logger.debug(s"From $name to arch: Received: $voActuate")
+        logger.debug("Sending an {} from {} to Arch", voActuate.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voActuate)
 
     }

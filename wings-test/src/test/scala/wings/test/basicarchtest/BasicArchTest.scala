@@ -1,12 +1,9 @@
 package wings.test.basicarchtest
 
-import java.net.{HttpCookie, URI}
-
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKitBase}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import org.eclipse.jetty.websocket.client._
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.eclipse.paho.client.mqttv3.{MqttAsyncClient, MqttConnectOptions}
 import org.scalatest.FreeSpec
@@ -16,8 +13,6 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws._
 import play.api.test.FakeApplication
-import play.modules.reactivemongo.json._
-import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.commands.WriteResult
 import wings.actor.adapter.mqtt.paho.MqttMessage
 import wings.actor.mqtt.MqttConnection
@@ -36,11 +31,9 @@ import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.test.helper.database.MongoEnvironment
-
-import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import wings.test.prebuilt.{Http, WebSocket}
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BasicArchTest
   extends FreeSpec
@@ -154,39 +147,12 @@ class BasicArchTest
   }
 
   object HttpGlobals {
-
-    val playSessionKey = "PLAY_SESSION"
-
     var serverResponse: WSResponse = null
-
-    object Request {
-      def userRegistration: WSRequest = {
-        val jsonBody = Json.obj(
-          "username" -> "david",
-          "email" -> "d@d.d",
-          "passwd" -> "davidvernet",
-          "passwdConf" -> "davidvernet"
-        )
-        val request =
-          WS.url("http://localhost:9000/api/user/").
-            withHeaders("Content-Type" -> "application/json").
-            withBody(jsonBody).
-            withMethod("POST")
-        request
-      }
-    }
   }
 
-  def cleanMongoDatabase: Future[WriteResult] = {
-    val selector = Json.obj()
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
-    val userCollection: JSONCollection = MongoEnvironment.db1.collection("webusers")
-    virtualObjectService.delete(Json.obj())
-    userCollection.remove(Json.obj())
-  }
 
   info("cleaning databases")
-  val f = cleanMongoDatabase
+  val f = wings.test.database.mongodb.cleanMongoDatabase
   whenReady(f) {
     case wr: WriteResult => assert(wr.ok === true)
     case _ => fail()
@@ -194,7 +160,7 @@ class BasicArchTest
 
   "A User should be able to register receiving a 201 Http status" in {
     // Maybe the HTTP application isn't compiled yet, give the test an extraPatience
-    val futureResponse = HttpGlobals.Request.userRegistration.execute()
+    val futureResponse = Http.Request.userRegistration.execute()
     whenReady(futureResponse) {
       response =>
         HttpGlobals.serverResponse = response
@@ -202,21 +168,12 @@ class BasicArchTest
     }(extraPatience)
   }
 
-  s"The response should have a cookie with name ${HttpGlobals.playSessionKey}" in {
-    HttpGlobals.serverResponse.cookie(HttpGlobals.playSessionKey) shouldBe defined
+  s"The response should have a cookie with name ${Http.playSessionKey}" in {
+    HttpGlobals.serverResponse.cookie(Http.playSessionKey) shouldBe defined
   }
 
   "The User (an HTTP device) should be able to establish a WebSocket connection" in {
-    val webSocketServerUri = new URI(WebSocketGlobals.webSocketUrl)
-    val webSocketClient = new WebSocketClient()
-    val sessionCookie = HttpGlobals.serverResponse.cookie(HttpGlobals.playSessionKey).get.value.get
-
-    val webSocketRequest = new ClientUpgradeRequest()
-    val httpCookie = new HttpCookie(HttpGlobals.playSessionKey, sessionCookie)
-    webSocketRequest.setCookies(List(httpCookie).asJava)
-    webSocketClient.start()
-    val webSocketActor = system.actorOf(WebSocketTestActor.props(webSocketClient, webSocketServerUri, webSocketRequest, self))
-    WebSocketGlobals.testActor = webSocketActor
+    WebSocketGlobals.testActor = WebSocket.getConnection(HttpGlobals.serverResponse, self)(system)
   }
 
   "The HTTP device should be able to send a NameAcquisitionRequest" in {
@@ -238,7 +195,7 @@ class BasicArchTest
 
   "After 0.8 second the Virtual Object (HTTP) metadata is saved into the database" in {
 
-    Thread.sleep(800)
+    Thread.sleep(1000)
 
     val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
 
@@ -281,7 +238,7 @@ class BasicArchTest
 
 
   "An MQTT device should be able to send it's metadata" in {
-    Thread.sleep(500)
+    Thread.sleep(800)
     MqttGlobals.testActor ! MqttTestActor.Messages.Publish(
       MqttGlobals.configOutTopic,
       Json.toJson(MqttGlobals.Messages.metadata).toString
@@ -307,7 +264,7 @@ class BasicArchTest
 
 
   "An MQTT2 device should be able to send it's metadata" in {
-    Thread.sleep(500)
+    Thread.sleep(800)
     MqttGlobals.testActor ! MqttTestActor.Messages.Publish(
       MqttGlobals.configOutTopic,
       Json.toJson(MqttGlobals2.Messages.metadata).toString

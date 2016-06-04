@@ -15,6 +15,6 @@ object MongoEnvironment extends wings.services.db.MongoEnvironment {
   override lazy val db1: DB = {
     val config = ConfigFactory.load("app")
     val connection = driver1.connection(config.getStringList("mongodb.servers"), MongoConnectionOptions())
-    connection.db(config.getString("mongodb.db"))
+    connection(config.getString("mongodb.db"))
   }
 }

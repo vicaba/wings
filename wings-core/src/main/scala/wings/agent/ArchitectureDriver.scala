@@ -19,6 +19,7 @@ import wings.model.virtual.virtualobject.sensed.SensedValue
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
+  val name = "ArchitectureDriver"
 }
 
 case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) extends Actor {
@@ -43,10 +44,10 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
       case m: VOMessage =>
       case vom: VOMetadata =>
       case sv: SensedValue =>
-        logger.debug(s"Sensed Value received: $sv")
+        logger.debug("{}. Sensed Value received: {}", ArchitectureDriver.name, sv)
         continuation ! MsgEnv.ToDevice(sv)
       case voActuate: VoActuate =>
-        logger.debug(s"VoACtuate received: $voActuate")
+        logger.debug("{}. VoActuate received: {}", ArchitectureDriver.name, voActuate)
         continuation ! MsgEnv.ToDevice(voActuate)
       case a: Any => println(s"Message not known $a")
     }
@@ -57,13 +58,14 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
       case vom: VOMetadata =>
       case sv: SensedValue =>
         mediator ! PublishMsg(sv.voId.toString, sv)
-        logger.debug("Sensed Valaue Published")
+        logger.debug("{}. Sensed Value Published", ArchitectureDriver.name)
       case voWatch: VoWatch =>
         mediator ! Subscribe(voWatch.path, self)
-        logger.debug(s"Subscribed to path ${voWatch.path}")
+        logger.debug("{}. Subscribed to path {}", ArchitectureDriver.name, voWatch.path)
       case voActuate: VoActuate =>
-        mediator ! PublishMsg(voActuate.path + "/a", voActuate)
-        logger.debug(s"Published to path ${voActuate.path + "/a"}")
+        val actuatePath = voActuate.path + "/a"
+        mediator ! PublishMsg(actuatePath, voActuate)
+        logger.debug("{}. Published to path {}", ArchitectureDriver.name, actuatePath)
       case a: Any => println(s"Message not known $a")
     }
 

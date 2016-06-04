@@ -7,6 +7,9 @@ import wings.actor.pipeline.MsgEnv
 import wings.agent.commands.{RemoveVo, CreateVo, VoManagementCommand}
 import scala.reflect.ClassTag
 
+object DeviceDriver {
+  val name = "DeviceDriver"
+}
 
 /**
   * Abstraction over Actors that directly communicate with device protocols
@@ -28,17 +31,18 @@ trait DeviceDriver extends Actor {
   /**
     * Provides basic implementation of how messages should be handled in a bidirectional manner.
     *
-    * @param dc The device connection context.
+    * @param dc           The device connection context.
     * @param continuation The continuation Actor to forward a message received from the device to.
     * @return A PartialFunction (Receive) that handles messages going on both directions.
     */
   def driverState(dc: DeviceConnectionContext, continuation: ActorRef)(implicit t: ClassTag[DeviceMessageType]): Receive = {
     case deviceMsg: DeviceMessageType =>
-      logger.info(s"Message: $deviceMsg received from ${sender.path}, forwarding to architecture with path: ${continuation.path}")
-      logger.info(s"Class of Message is ${deviceMsg.getClass.getName}; Class of device message type is ${deviceMsg.getClass.getName}")
+      logger.debug("{}. Message: {} received from {}, forwarding to architecture with path: {}", DeviceDriver
+        .name, deviceMsg, sender.path, continuation.path)
+      logger.debug("{}. Class of Message is {}", DeviceDriver.name, deviceMsg.getClass.getName)
       toArchitectureReceive(dc, continuation)(deviceMsg)
     case MsgEnv.ToDevice(msg) =>
-      logger.info(s"Message: $msg received from ${sender.path}, forwarding to device")
+      logger.debug("{}. Message: {} received from {}, forwarding to device", DeviceDriver.name, msg, sender.path)
       msg match {
         case command: VoManagementCommand => onVoManageCommand(command)
         case _ => toDeviceReceive(dc)(msg)
@@ -63,7 +67,7 @@ trait DeviceDriver extends Actor {
   /**
     * All messages that come from the device are handled by this method.
     *
-    * @param dc The device connection context if needed.
+    * @param dc           The device connection context if needed.
     * @param continuation The continuation Actor towards the inner layers of the Architecture.
     * @return A PartialFunction that knows how to handle this Kind of messages.
     */

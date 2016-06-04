@@ -7,9 +7,11 @@ import akka.testkit.TestProbe
 import org.eclipse.paho.client.mqttv3.{MqttAsyncClient, MqttConnectOptions}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import play.api.libs.json.Json
+import play.api.libs.ws.WSResponse
 import wings.actor.mqtt.MqttConnection
 import wings.client.actor.mqtt.MqttTestActor
 import wings.client.actor.mqtt.MqttTestActor.Messages.Subscribe
+import wings.client.actor.websocket.ActorJettyWebSocketAdapter
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.NameAcquisitionRequest
@@ -18,14 +20,17 @@ import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.enrichments.UUIDHelper._
 import wings.model.virtual.operations.{VoActuate, VoWatch}
+import wings.test.prebuilt.{Http, WebSocket}
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.concurrent.duration._
 
 
 object Main {
 
-  object Mqtt {
+  object MqttGlobals {
 
     val broker = "tcp://192.168.33.10:1883"
 
@@ -58,7 +63,7 @@ object Main {
 
   }
 
-  object WebSocket {
+  object WebSocketGlobals {
 
     val voId = "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
     val voIdUUID = UUIDHelper.tryFromString("73f86a2e-1004-4011-8a8f-3f78cdd6113c").get
@@ -82,48 +87,71 @@ object Main {
 
   def main(args: Array[String]) {
 
+    import wings.test.database.mongodb._
+
+    cleanMongoDatabase
+
     implicit val system = ActorSystem("system-test1")
 
     val uuidList = 0 until 10 map (_ => UUID.randomUUID())
     val actorList = uuidList.map { uuid =>
 
       val mqttConnection = MqttConnection(
-        new MqttAsyncClient(Mqtt.broker, uuid.toBase64, new MemoryPersistence()), new MemoryPersistence(), new MqttConnectOptions()
+        new MqttAsyncClient(MqttGlobals.broker, uuid.toBase64, new MemoryPersistence()), new MemoryPersistence(), new MqttConnectOptions()
       )
-      (uuid, system.actorOf(MqttTestActor.props(Mqtt.broker, mqttConnection, TestProbe().ref)))
+      (uuid, system.actorOf(MqttTestActor.props(MqttGlobals.broker, mqttConnection, TestProbe().ref)))
 
     }
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      println(uuid)
-
-      actorRef ! Subscribe(Mqtt.generalConfigInTopic(uuid))
+      actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
       actorRef ! MqttTestActor.Messages.Publish(
-        Mqtt.generalConfigOutTopic(uuid), Json.toJson(NameAcquisitionRequest(uuid.toString)).toString()
+        MqttGlobals.generalConfigOutTopic(uuid), Json.toJson(NameAcquisitionRequest(uuid.toString)).toString()
       )
 
     }
 
-    Thread.sleep(1000)
+    Thread.sleep(10000)
 
     actorList.foreach { case (uuid, actorRef) =>
-
-      println("Sending Metadata")
 
         actorRef ! MqttTestActor.Messages.Publish.apply(
-          Mqtt.configOutTopic(uuid),
-          Json.toJson(Mqtt.Messages.metadata(uuid))
+          MqttGlobals.configOutTopic(uuid),
+          Json.toJson(MqttGlobals.Messages.metadata(uuid))
         )
 
     }
+
+    println("Metadata Sent")
+
+
+    // Request a WebSocket connection and watch sensed messages
+
+/*    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
+
+    val webSocketActor = WebSocket.getConnection(userRegisteredResponse)(system)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(WebSocketGlobals.Messages.metadata).toString
+    )*/
+
+/*    actorList.foreach { case (uuid, actorRef) =>
+
+      webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+        Json.toJson(WebSocketGlobals.Messages.watch(uuid.toString)).toString
+      )
+
+    }*/
+
+    // Schedule MQTT clients to send sensed messages every period of time
 
     actorList.foreach { case (uuid, actorRef) =>
 
       system.scheduler.schedule(20 seconds, 10 seconds, actorRef,
         MqttTestActor.Messages.Publish.apply(
-          Mqtt.dataOutTopic(uuid),
-        Json.toJson(Mqtt.Messages.sensedValue(uuid))))
+          MqttGlobals.dataOutTopic(uuid),
+        Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
 
     }
 

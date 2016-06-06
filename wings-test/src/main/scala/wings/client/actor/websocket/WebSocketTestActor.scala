@@ -19,9 +19,18 @@ case class WebSocketTestActor(client: WebSocketClient, serverUri: URI, wsRequest
 
   import context._
 
-  override def preStart() = {
-    client.connect(this, serverUri, wsRequest)
+  @throws(classOf[Exception]) // when changing this you MUST also change UntypedActorDocTest
+  //#lifecycle-hooks
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
+    context.children foreach { child ⇒
+      context.unwatch(child)
+      context.stop(child)
+    }
+    postStop()
   }
+
+  override def preStart() =
+    client.connect(this, serverUri, wsRequest)
 
   override def receive: Receive = {
     case Connect(session) =>
@@ -32,17 +41,24 @@ case class WebSocketTestActor(client: WebSocketClient, serverUri: URI, wsRequest
 
   def connectedState(session: Session): Receive = {
     case Send(text) =>
+      println(s"Sending $text")
       Try(session.getRemote.sendString(text)) recover { case t: Throwable => println(t) }
       sender ! MessageSent
     case GracefulShutdown =>
-      deallocateWebsocketResources(session)
+      deallocateWebSocketResources(session)
       sender ! MessageSent
     case Text(text) => testSender ! text
     case _ =>
   }
 
-  private def deallocateWebsocketResources(session: Session): Unit = {
+  override def postStop() = {
+    println("Stopping")
+  }
+
+  private def deallocateWebSocketResources(session: Session): Unit = {
     Try(session.close()) recover { case t: Throwable => println(t) }
   }
+
+
 
 }

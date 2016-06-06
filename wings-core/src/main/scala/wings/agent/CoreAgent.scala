@@ -166,7 +166,7 @@ trait CoreAgent extends Actor with ActorUtilities {
         logger.debug("Sending an {} from {} to Arch", voWatch.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voWatch)
       case voActuate: VoActuate =>
-        logger.debug("Sending an {} from {} to Arch", voActuate.getClass, name)
+        logger.info("Sending an {} from {} to Arch", voActuate.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voActuate)
 
     }

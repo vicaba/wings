@@ -14,7 +14,8 @@ object WebSocket {
 
   val webSocketUrl = "ws://localhost:9000/api/admin/ws/socket/"
 
-  def getConnection(response: WSResponse, testActor: ActorRef = ActorRef.noSender)(actorSystem: ActorSystem = ActorSystem()) = {
+  def getConnection(response: WSResponse, testActor: ActorRef = ActorRef.noSender)(actorSystem: ActorSystem = ActorSystem())
+  = {
     val webSocketServerUri = new URI(webSocketUrl)
     val webSocketClient = new WebSocketClient()
     val sessionCookie = response.cookie(Http.playSessionKey).get.value.get
@@ -24,9 +25,12 @@ object WebSocket {
     webSocketRequest.setCookies(List(httpCookie).asJava)
     webSocketClient.start()
 
-    actorSystem.actorOf(WebSocketTestActor.props(webSocketClient, webSocketServerUri, webSocketRequest, testActor))
+
+    // Look here!!!!!!!
+    val realTestActor = if (testActor == ActorRef.noSender) actorSystem.deadLetters else testActor
+
+    actorSystem.actorOf(WebSocketTestActor.props(webSocketClient, webSocketServerUri, webSocketRequest, realTestActor))
 
   }
-
 
 }

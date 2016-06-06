@@ -15,7 +15,7 @@ import play.api.libs.ws._
 import play.api.test.FakeApplication
 import reactivemongo.api.commands.WriteResult
 import wings.actor.adapter.mqtt.paho.MqttMessage
-import wings.actor.mqtt.MqttConnection
+import wings.actor.mqtt.{MqttConnection, MqttTopics}
 import wings.client.actor.ActorTestMessages.{GracefulShutdown, MessageSent}
 import wings.client.actor.mqtt.MqttTestActor
 import wings.client.actor.mqtt.MqttTestActor.Messages.Subscribe
@@ -32,6 +32,7 @@ import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoSer
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.test.helper.database.MongoEnvironment
 import wings.test.prebuilt.{Http, WebSocket}
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -55,7 +56,7 @@ class BasicArchTest
 
     var testActor: ActorRef = null
     val voId = "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
-    val voIdUUID = UUIDHelper.tryFromString("73f86a2e-1004-4011-8a8f-3f78cdd6113c").get
+    val voIdUUID = UUIDHelper.tryFromString(voId).get
 
     val webSocketUrl = "ws://localhost:9000/api/admin/ws/socket/"
 
@@ -84,18 +85,18 @@ class BasicArchTest
 
     var testActor: ActorRef = null
     val voId = "0958232f-93c0-4559-9752-a362da8e07d3"
-    val voIdUUID = UUIDHelper.tryFromString("0958232f-93c0-4559-9752-a362da8e07d3").get
+    val voIdUUID = UUIDHelper.tryFromString(voId).get
 
     val broker = "tcp://192.168.33.10:1883"
 
-    val generalConfigInTopic = s"$voId/i/config/in"
-    val generalConfigOutTopic = s"$voId/i/config/out"
+    val generalConfigInTopic = MqttTopics.provisionalConfigInTopic(voId)
+    val generalConfigOutTopic = MqttTopics.provisionalConfigOutTopic(voId)
 
-    val configInTopic = s"$voId/config/in"
-    val configOutTopic = s"$voId/config/out"
+    val configInTopic = MqttTopics.configInTopic(voId)
+    val configOutTopic = MqttTopics.configOutTopic(voId)
 
-    val dataInTopic = s"$voId/data/in"
-    val dataOutTopic = s"$voId/data/out"
+    val dataInTopic = MqttTopics.dataInTopic(voId)
+    val dataOutTopic = MqttTopics.dataOutTopic(voId)
 
     object Messages {
       val metadata = VOMessage(
@@ -121,14 +122,14 @@ class BasicArchTest
     val voId = "45c0ad7e-609e-429a-962a-a42ab1114584"
     val voIdUUID = UUIDHelper.tryFromString("45c0ad7e-609e-429a-962a-a42ab1114584").get
 
-    val generalConfigInTopic = s"$voId/i/config/in"
-    val generalConfigOutTopic = s"$voId/i/config/out"
+    val generalConfigInTopic = MqttTopics.provisionalConfigInTopic(voId)
+    val generalConfigOutTopic = MqttTopics.provisionalConfigOutTopic(voId)
 
-    val configInTopic = s"$voId/config/in"
-    val configOutTopic = s"$voId/config/out"
+    val configInTopic = MqttTopics.configInTopic(voId)
+    val configOutTopic = MqttTopics.configOutTopic(voId)
 
-    val dataInTopic = s"$voId/data/in"
-    val dataOutTopic = s"$voId/data/out"
+    val dataInTopic = MqttTopics.dataInTopic(voId)
+    val dataOutTopic = MqttTopics.dataOutTopic(voId)
 
     object Messages {
 
@@ -236,7 +237,6 @@ class BasicArchTest
     expectMsg(MessageSent)
   }
 
-
   "An MQTT device should be able to send it's metadata" in {
     Thread.sleep(800)
     MqttGlobals.testActor ! MqttTestActor.Messages.Publish(
@@ -261,7 +261,6 @@ class BasicArchTest
         r.get shouldBe a[VO]
     }
   }
-
 
   "An MQTT2 device should be able to send it's metadata" in {
     Thread.sleep(800)

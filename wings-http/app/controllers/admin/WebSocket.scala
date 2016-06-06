@@ -3,7 +3,7 @@ package controllers.admin
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
 import com.google.inject.Inject
 import common.JsonTemplates
@@ -13,6 +13,7 @@ import database.mongodb.MongoEnvironment
 import models.user.UserIdentityManager
 import models.user.services.db.mongo.UserMongoService
 import play.api.libs.json.Json
+import play.api.libs.streams.ActorFlow
 import play.api.mvc.{Controller, WebSocket}
 import websocket.WebSocketHandler
 import wings.actor.websocket.WebSocketActor
@@ -22,7 +23,7 @@ import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoSer
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class WebSocket @Inject() (implicit val mat: Materializer) extends Controller {
+class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materializer) extends Controller {
 
   def createAPI = CanBeAuthenticatedAction.async(parse.json) {
     request =>
@@ -67,34 +68,7 @@ class WebSocket @Inject() (implicit val mat: Materializer) extends Controller {
       }
   }
 
-  def connectAPI = WebSocket.tryAcceptWithActor[String, String] {
-    request =>
-
-      AuthenticatedAction.sessionAuthenticate(request) match {
-
-        case Some((name, uuid)) =>
-          val userService = new UserMongoService(MongoEnvironment.db1)(UserIdentityManager)
-
-          userService.findOneByCriteria(Json.obj(UserIdentityManager.name -> uuid)).flatMap {
-            case Some(user) =>
-              println(Json.obj(VO.VOIDKey -> user.virtualObjectId).toString())
-
-              VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager).findOneByCriteria(Json.obj(VO.VOIDKey -> user.virtualObjectId)).map {
-                case Some(vo) => println("WebSocket resource found"); Right(WebSocketActor.props(vo.voId, user) _)
-                case _ => Left(Forbidden)
-              }
-          }
-        case _ => Future {
-          Left(Unauthorized(""))
-        }
-      }
-  }
-
-
-  def socketAPI = WebSocket.tryAcceptWithActor[String, String] {
-    request =>
-    
-    println("I'm here")
+  def socketAPI = WebSocket.acceptOrResult[String, String] { request =>
 
       AuthenticatedAction.sessionAuthenticate(request) match {
 
@@ -103,9 +77,8 @@ class WebSocket @Inject() (implicit val mat: Materializer) extends Controller {
 
           userService.findOneByCriteria(Json.obj(UserIdentityManager.name -> uuid)).map {
             case Some(user) =>
-              println(Json.obj(VO.VOIDKey -> user.virtualObjectId).toString())
               val coreAgentProps = (voId: UUID, out: ActorRef) => WebSocketActor.props(voId, user)(out)
-              Right(out => WebSocketHandler.props(coreAgentProps, out))
+              Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out)))
             case _ => Left(Unauthorized(""))
 
           }

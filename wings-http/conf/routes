@@ -13,8 +13,6 @@ DELETE        /api/user/session/                      controllers.User.logoutAPI
 
 POST          /api/admin/ws/                          controllers.admin.WebSocket.createAPI
 
-GET           /api/admin/ws/connect/                  controllers.admin.WebSocket.connectAPI
-
 GET           /api/admin/ws/socket/                   controllers.admin.WebSocket.socketAPI
 
 

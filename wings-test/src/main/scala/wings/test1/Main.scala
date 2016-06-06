@@ -83,6 +83,7 @@ object Main {
       def watch(path: String) = VoWatch(path = path)
 
     }
+
   }
 
   def main(args: Array[String]) {
@@ -93,7 +94,7 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    val uuidList = 0 until 10 map (_ => UUID.randomUUID())
+    val uuidList = 0 until 1 map (_ => UUID.randomUUID())
     val actorList = uuidList.map { uuid =>
 
       val mqttConnection = MqttConnection(
@@ -112,37 +113,44 @@ object Main {
 
     }
 
-    Thread.sleep(10000)
+    Thread.sleep(5000)
 
     actorList.foreach { case (uuid, actorRef) =>
 
-        actorRef ! MqttTestActor.Messages.Publish.apply(
-          MqttGlobals.configOutTopic(uuid),
-          Json.toJson(MqttGlobals.Messages.metadata(uuid))
-        )
+      actorRef ! MqttTestActor.Messages.Publish.apply(
+        MqttGlobals.configOutTopic(uuid),
+        Json.toJson(MqttGlobals.Messages.metadata(uuid))
+      )
 
     }
 
     println("Metadata Sent")
 
-
     // Request a WebSocket connection and watch sensed messages
 
-/*    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
+    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
 
     val webSocketActor = WebSocket.getConnection(userRegisteredResponse)(system)
 
     webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(WebSocketGlobals.Messages.metadata).toString
-    )*/
+      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
+    )
 
-/*    actorList.foreach { case (uuid, actorRef) =>
+    Thread.sleep(500)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(WebSocketGlobals.Messages.metadata).toString
+    )
+
+    Thread.sleep(500)
+
+    actorList.foreach { case (uuid, actorRef) =>
 
       webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
         Json.toJson(WebSocketGlobals.Messages.watch(uuid.toString)).toString
       )
 
-    }*/
+    }
 
     // Schedule MQTT clients to send sensed messages every period of time
 
@@ -151,7 +159,7 @@ object Main {
       system.scheduler.schedule(20 seconds, 10 seconds, actorRef,
         MqttTestActor.Messages.Publish.apply(
           MqttGlobals.dataOutTopic(uuid),
-        Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
+          Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
 
     }
 

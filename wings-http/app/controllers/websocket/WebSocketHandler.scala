@@ -26,11 +26,15 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
 
 
   override def preStart() = {
+    logger.debug("WebSocketHandler Deployed")
     become(onStartReceive)
   }
 
+  override def receive: Receive = onStartReceive
+
   def onStartReceive: Receive = {
     case msg: String =>
+      logger.debug("onStartReceive: {}", msg)
       msgToJson(msg).map(validateJson(_).map {
         case cnf: NameAcquisitionRequest =>
           // TODO: Perform name resolution here
@@ -43,25 +47,20 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
     case _ => stash()
   }
 
-  def becomeBridge(toDevice: ActorRef) = {
-    become(bridgeReceive(toDevice))
-  }
+  def becomeBridge(toDevice: ActorRef) = become(bridgeReceive(toDevice))
 
   def waitForFirstToDeviceMessage(tickToQueryForToDeviceActor: Cancellable): Receive = {
     case toDeviceActor: ActorRef =>
       tickToQueryForToDeviceActor.cancel()
       unstashAll()
       becomeBridge(toDeviceActor)
-    case _ => stash()
+    case anyMsg: Any => stash(); logger.debug("Stashing Message: {}", anyMsg)
+
   }
 
   def bridgeReceive(toDevice: ActorRef): Receive = {
-    case msg: String => toDevice ! msg
-    case _ => logger.debug("WebSocket Handler received an unkown message")
-  }
-
-  override def receive: Receive = {
-    case msg: String => println(s"Message $msg received")
+    case msg: String => toDevice ! msg; logger.debug("Forwarding message to Device: {}", msg)
+    case _ => logger.debug("WebSocket Handler received an unknown message")
   }
 
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))

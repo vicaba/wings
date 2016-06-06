@@ -21,11 +21,13 @@ object MqttTopics {
   def configOutTopic(voId: UUID): String = configOutTopic(voId.toString)
 
 
-  def generalConfigOutTopic: String = "+/i/config/out"
+  val generalConfigOutTopic: String = "+/i/config/out"
+
+  val ConfigOutTopicPattern = "(.+)/i/config/out".r
 
   def provisionalConfigOutTopic(voId: String): String = s"$voId/i/config/out"
 
-  def generalConfigInTopic: String = "+/i/config/in"
+  val generalConfigInTopic: String = "+/i/config/in"
 
   def provisionalConfigInTopic(voId: String): String = s"$voId/i/config/in"
 

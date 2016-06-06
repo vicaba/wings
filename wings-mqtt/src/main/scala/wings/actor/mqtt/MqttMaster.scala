@@ -28,6 +28,8 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
 
   val logger = Logging(context.system, this)
 
+  private val ConfigOutTopic = Topics.generalConfigOutTopic
+
   /**
    * This actor id
    */
@@ -48,10 +50,9 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   protected val connOpts = new MqttConnectOptions()
   protected val broker = "tcp://192.168.33.10:1883"
 
-  protected var mqttAsyncClient: MqttAsyncClient = new MqttAsyncClient(broker, id.toBase64, persistence)
+  protected var mqttAsyncClient: MqttAsyncClient = _
 
-  override def preStart(): Unit = {
-
+  def connectToMqttBroker(): Unit = {
     mqttAsyncClient = new MqttAsyncClient(broker, id.toBase64, persistence)
     connOpts.setCleanSession(true)
 
@@ -67,14 +68,14 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
     mqttAsyncClient.setCallback(this)
   }
 
+  override def preStart(): Unit = connectToMqttBroker()
+
   def receive = {
     case msg @ MqttMessage(topic, payload, qos, retained, duplicate) =>
-      println("message received")
       topic match {
-        case configOutTopic =>
-          onConfigOutTopic(msg)
+        case Topics.ConfigOutTopicPattern(id) => onConfigOutTopic(msg)
       }
-    case _ => println("nada")
+    case _ => logger.debug("Mqtt Master has received an unknown message")
   }
 
   override def connectionLost(throwable: Throwable): Unit = {}
@@ -86,38 +87,38 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
     Try(Json.parse(mqttMsg.payloadAsString())).map { msg =>
       msg.validate[Config].map {
         case NameAcquisitionRequest(v) =>
-          logger.debug("Received NameAcquisitionRequest")
-
+          logger.debug("MqttMaster has received a NameAcquisitionRequest")
           // Create VirtualIdentity
           UUIDHelper.tryFromString(v) match {
             case Success(identity) =>
               usedIdentities contains identity match {
                 case true =>
-                  // Send a Reject message
-                  logger.debug("Contains identity")
-                  val message =
-                    MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
-                  mqttAsyncClient.publish(message.topic, message)
+                  logger.debug("MqttMaster has detected that identity already exists: {}", identity)
+                  sendMqttMessage(mqttAsyncClient, rejectMessage(v))
                 case false =>
-                  // Send an ACK message
-                  logger.debug("Creating proxy actor")
+                  logger.debug("MqttMaster creates proxy actor")
                   val actor = context.actorOf(MqttActor.props(identity.copy, broker))
                   registerVirtualObject(identity, actor)
-                  val message =
-                    MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionAck("")).toString().getBytes, 2, false, false)
-                  mqttAsyncClient.publish(message.topic, message)
+                  sendMqttMessage(mqttAsyncClient, ackMessage(v))
               }
             case Failure(e) =>
-              logger.debug(s"$e")
-              val message =
-                MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config](NameAcquisitionReject("")).toString().getBytes, 2, false, false)
-              mqttAsyncClient.publish(message.topic, message)
+              logger.debug(s"MqttMaster has failed to convert identity to an UUID, error message: {}", e)
+              sendMqttMessage(mqttAsyncClient, rejectMessage(v))
           }
       }
     }
   }
 
-  def registerVirtualObject(id: UUID, ref: ActorRef): Unit = {
+  private def sendMqttMessage(mqttAsyncClient: MqttAsyncClient, message: MqttMessage) =
+    mqttAsyncClient.publish(message.topic, message)
+
+  private def rejectMessage(v: String) = MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config]
+    (NameAcquisitionReject("")).toString().getBytes, 2, false, false)
+
+  private def ackMessage(v: String) = MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config]
+    (NameAcquisitionAck("")).toString().getBytes, 2, false, false)
+
+  private def registerVirtualObject(id: UUID, ref: ActorRef): Unit = {
     usedIdentities += id
     childs += (id -> ref)
   }

@@ -1,6 +1,5 @@
 package wings.test.websockettest
 
-<<<<<<< Updated upstream
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKitBase}
 import akka.util.Timeout
@@ -40,8 +39,7 @@ class WebSocketTest
   extends FreeSpec
   with ScalaFutures
   with TestKitBase
-  with ImplicitSender
-{
+  with ImplicitSender {
 
 
   object WebSocketGlobals {
@@ -65,6 +63,7 @@ class WebSocketTest
       val watchItself = VoWatch(path = voId)
 
     }
+
   }
 
   object HttpGlobals {
@@ -130,11 +129,5 @@ class WebSocketTest
     WebSocketGlobals.testActor ! GracefulShutdown
     expectMsg(MessageSent)
   }
-=======
-/**
-  * Created by vicaba on 06/06/16.
-  */
-class WebSocketTest {
->>>>>>> Stashed changes
 
 }

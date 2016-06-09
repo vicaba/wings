@@ -105,10 +105,12 @@ case class MqttDriver(virtualObjectId: UUID, broker: String, continuation: Actor
       msg.topic match {
         case ConfigOutTopic =>
           logger.debug("Forwarding message to architecture")
-          parsedMsg map(validateJsonForConfig(_) map{continuation ! MsgEnv.ToArch(_)})
+          parsedMsg map (validateJsonForConfig(_) map {
+            continuation ! MsgEnv.ToArch(_)
+          })
         case DataOutTopic =>
           logger.debug("Forwarding message to architecture")
-          parsedMsg map(validateJsonForData(_) map(continuation ! MsgEnv.ToArch(_)))
+          parsedMsg map (validateJsonForData(_) map (continuation ! MsgEnv.ToArch(_)))
         case _ => println("Cannot understand message")
       }
   }

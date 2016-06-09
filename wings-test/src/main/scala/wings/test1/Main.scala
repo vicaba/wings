@@ -19,12 +19,13 @@ import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateStat
 import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.enrichments.UUIDHelper._
-import wings.model.virtual.operations.{VoActuate, VoWatch}
+import wings.model.virtual.operations.VoWatch
 import wings.test.prebuilt.{Http, WebSocket}
+import akka.testkit.TestProbe
+
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 import scala.concurrent.duration._
 
 
@@ -68,8 +69,6 @@ object Main {
     val voId = "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
     val voIdUUID = UUIDHelper.tryFromString("73f86a2e-1004-4011-8a8f-3f78cdd6113c").get
 
-    val webSocketUrl = "ws://localhost:9000/api/admin/ws/socket/"
-
     object Messages {
       val metadata = VOMessage(
         voIdUUID,
@@ -94,7 +93,9 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    val uuidList = 0 until 1 map (_ => UUID.randomUUID())
+    val numberOfSenders = 10
+
+    val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
     val actorList = uuidList.map { uuid =>
 
       val mqttConnection = MqttConnection(
@@ -128,9 +129,11 @@ object Main {
 
     // Request a WebSocket connection and watch sensed messages
 
+    val receiverProbe = TestProbe()(system)
+
     val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
 
-    val webSocketActor = WebSocket.getConnection(userRegisteredResponse)(system)
+    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
 
     webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
       Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
@@ -156,15 +159,17 @@ object Main {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      system.scheduler.schedule(20 seconds, 10 seconds, actorRef,
+      system.scheduler.schedule(5 seconds, 2 seconds, actorRef,
         MqttTestActor.Messages.Publish.apply(
           MqttGlobals.dataOutTopic(uuid),
           Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
-
     }
 
-    println("Done")
+    println("HERE")
+    assert(receiverProbe.receiveN(numberOfSenders, 6 seconds).length == numberOfSenders)
+
 
   }
+
 
 }

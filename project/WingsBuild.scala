@@ -83,7 +83,10 @@ object WingsBuild extends Build {
     playReactiveMongo,
     playJson,
     slf4j,
-    eclipsePaho
+    eclipsePaho,
+    scalatest % Test,
+    scalactic % Test,
+    akkaTestKit % Test
   ))
 
   lazy val clusterSeed = Project(

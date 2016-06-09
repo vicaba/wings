@@ -51,10 +51,6 @@ case class WebSocketTestActor(client: WebSocketClient, serverUri: URI, wsRequest
     case _ =>
   }
 
-  override def postStop() = {
-    println("Stopping")
-  }
-
   private def deallocateWebSocketResources(session: Session): Unit = {
     Try(session.close()) recover { case t: Throwable => println(t) }
   }

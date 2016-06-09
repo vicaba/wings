@@ -1,7 +1,7 @@
 package wings.test.basicarchtest
 
 import akka.actor.{ActorRef, ActorSystem}
-import akka.testkit.{ImplicitSender, TestKitBase}
+import akka.testkit.{ImplicitSender, TestKitBase, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence

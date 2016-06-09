@@ -41,5 +41,9 @@ object Dependencies {
   lazy val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
 
   lazy val logback = "ch.qos.logback" %  "logback-classic" % "1.1.7"
+
+  lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.6"
+
+  lazy val scalactic = "org.scalactic" %% "scalactic" % "2.2.6"
 }
 

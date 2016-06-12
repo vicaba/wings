@@ -10,19 +10,28 @@ import scala.util.Try
 
 
 /**
- * Wrapper for the Java MQTT message
- * @param topic the topic
- * @param payload the payload
- * @param qos the QoS level
- * @param retained is retained?
- * @param duplicate is a duplicate?
- */
-case class MqttMessage(topic: String = "", payload: Array[Byte], qos: Int, retained: Boolean, duplicate: Boolean) {
+  * Wrapper for the Java MQTT message
+  *
+  * @param topic     the topic
+  * @param payload   the payload
+  * @param qos       the QoS level
+  * @param retained  is retained?
+  * @param duplicate is a duplicate?
+  */
+case class MqttMessage(
+                        topic: String = "",
+                        payload: Array[Byte],
+                        qos: Int = 2,
+                        retained: Boolean = false,
+                        duplicate:
+                        Boolean = false
+                      ) {
 
   /**
-   * Converts a Scala MQTT message to a Paho Java MQTT message
-   * @return  a Paho MQTT message
-   */
+    * Converts a Scala MQTT message to a Paho Java MQTT message
+    *
+    * @return a Paho MQTT message
+    */
   def toJava: mqttv3.MqttMessage = {
     PahoMqttAdapter.scalaMqttMessage2JavaMqttMessage(this)
   }
@@ -34,8 +43,8 @@ case class MqttMessage(topic: String = "", payload: Array[Byte], qos: Int, retai
 }
 
 /**
- * Companion object for the Scala MQTT message
- */
+  * Companion object for the Scala MQTT message
+  */
 object MqttMessage {
 
   def validateQos(qos: Int) = mqttv3.MqttMessage.validateQos(qos)
@@ -43,8 +52,8 @@ object MqttMessage {
 }
 
 /**
- * MQTT adapter for actors
- */
+  * MQTT adapter for actors
+  */
 trait ActorPahoMqttAdapter extends MqttCallback with Actor {
 
   def connectionLost(throwable: Throwable)
@@ -58,18 +67,19 @@ trait ActorPahoMqttAdapter extends MqttCallback with Actor {
 }
 
 /**
- * MQTT adapter helper methods
- */
+  * MQTT adapter helper methods
+  */
 object PahoMqttAdapter {
 
   def msgToJson(msg: MqttMessage): Try[JsValue] = Try(Json.parse(msg.payloadAsString()))
 
   /**
-   * Converts a Java Paho MQTT message to a Scala MQTT message
-   * @param javaMqttMessage the Java MQTT message
-   * @param topic the topic
-   * @return a Scala MQTT message
-   */
+    * Converts a Java Paho MQTT message to a Scala MQTT message
+    *
+    * @param javaMqttMessage the Java MQTT message
+    * @param topic           the topic
+    * @return a Scala MQTT message
+    */
   implicit def javaMqttMessage2ScalaMqttMessage(javaMqttMessage: mqttv3.MqttMessage, topic: String = ""): MqttMessage =
     MqttMessage(
       topic,
@@ -80,10 +90,11 @@ object PahoMqttAdapter {
     )
 
   /**
-   * Converts a Scala MQTT message to a Java Paho MQTT message
-   * @param scalaMqttMessage the scala MQTT message
-   * @return a Java PAho MQTT message
-   */
+    * Converts a Scala MQTT message to a Java Paho MQTT message
+    *
+    * @param scalaMqttMessage the scala MQTT message
+    * @return a Java PAho MQTT message
+    */
   implicit def scalaMqttMessage2JavaMqttMessage(scalaMqttMessage: MqttMessage): mqttv3.MqttMessage = {
     val message = new mqttv3.MqttMessage()
     message setPayload scalaMqttMessage.payload
@@ -93,24 +104,27 @@ object PahoMqttAdapter {
   }
 
   /**
-   * Java Paho MQTT message implicit improvements
-   * @param msg the Java Paho MQTT message
-   */
+    * Java Paho MQTT message implicit improvements
+    *
+    * @param msg the Java Paho MQTT message
+    */
   implicit class PahoMqttMessageImprovements(msg: mqttv3.MqttMessage) {
 
     /**
-     * Converts a Java Paho MQTT message to a Scala MQTT message
-     * @return  a Scala MQTT message
-     */
+      * Converts a Java Paho MQTT message to a Scala MQTT message
+      *
+      * @return a Scala MQTT message
+      */
     def toScala: MqttMessage = {
       PahoMqttAdapter.javaMqttMessage2ScalaMqttMessage(msg)
     }
 
     /**
-     * Converts a Java Paho MQTT message to a Scala MQTT message
-     * @param topic the topic of the message
-     * @return  a Scala MQTT message
-     */
+      * Converts a Java Paho MQTT message to a Scala MQTT message
+      *
+      * @param topic the topic of the message
+      * @return a Scala MQTT message
+      */
     def toScala(topic: String): MqttMessage = {
       PahoMqttAdapter.javaMqttMessage2ScalaMqttMessage(msg, topic)
     }

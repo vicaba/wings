@@ -9,9 +9,9 @@ import scala.collection.immutable.HashMap
 
 object MqttRouter {
 
-  def props(broker: String) = Props(MqttRouter(broker))
-
   type Dictionary = Map[String, ActorRef]
+
+  def props(broker: String) = Props(MqttRouter(broker))
 
   trait RoutingMessage
 
@@ -47,7 +47,7 @@ case class MqttRouter(broker: String)
     case s: Subscribe => conn ! s
     case us: Unsubscribe => conn ! us
     case p: Publish => conn ! p
-    case mqttMsg: MqttMessage => routeeMap.get(mqttMsg.topic).foreach(_ ! mqttMsg); wildcardWkr ! (routeeMap, mqttMsg)
+    case mqttMsg: MqttMessage => routeeMap.get(mqttMsg.topic).foreach(_ ! mqttMsg); wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
   }
 
   override def receive = router(HashMap[String, ActorRef]())
@@ -55,21 +55,29 @@ case class MqttRouter(broker: String)
 }
 
 private[router] object WildcardWorker {
+
   def props() = Props(WildcardWorker())
+
+  case class Work(dic: MqttRouter.Dictionary, msg: MqttMessage)
+
 }
 
 private[router] case class WildcardWorker() extends Actor {
 
   override def receive: Receive = {
-    case msg: (MqttRouter.Dictionary, MqttMessage) => onMqttMessage(msg._1, msg._2)
+    case work: WildcardWorker.Work => onMqttMessage(work)
   }
 
-  def onMqttMessage(dic: MqttRouter.Dictionary, msg: MqttMessage) = {
+  def onMqttMessage(work: WildcardWorker.Work) = {
+
+    val msg = work.msg
+    val dic = work.dic
     val topic = msg.topic
+
     dic.foreach { case (t, ref) =>
       val regex = t.replace("+", "(.+)").r
       t match {
-        case regex(_*) => ref ! msg
+        case regex(all@_*) => all.foreach(part => if (!part.contains("/")) ref ! msg)
         case _ =>
       }
     }

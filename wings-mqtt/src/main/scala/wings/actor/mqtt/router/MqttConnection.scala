@@ -24,8 +24,12 @@ case class MqttConnection(broker: String, router: ActorRef)
 
   case class Connection(client: IMqttAsyncClient, connOpts: MqttConnectOptions)
 
-  val id: UUID = UUID.randomUUID()
   val logger = Logging(context.system, this)
+
+  val id: UUID = UUID.randomUUID()
+  val topicCounter = Map[String, Int]()
+
+
 
   def connectToBroker() = {
     val conn = Connection(
@@ -43,7 +47,7 @@ case class MqttConnection(broker: String, router: ActorRef)
       override def onSuccess(iMqttToken: IMqttToken): Unit = {
         logger.debug("Connected to broker with ip: {}", broker)
         unstashAll()
-        become(connected(conn))
+        become(connected(conn, topicCounter))
       }
     })
   }
@@ -54,9 +58,17 @@ case class MqttConnection(broker: String, router: ActorRef)
     case _ => stash()
   }
 
-  def connected(conn: Connection): Receive = {
-    case Subscribe(topic) => conn.client.subscribe(topic, 2)
-    case Unsubscribe(topic) => conn.client.unsubscribe(topic)
+  def connected(conn: Connection, topicCounter: Map[String, Int]): Receive = {
+    case Subscribe(topic) =>
+      conn.client.subscribe(topic, 2)
+      val count = topicCounter.getOrElse(topic, 0) + 1
+      val tCounter = topicCounter + (topic -> count)
+      become(connected(conn, tCounter))
+    case Unsubscribe(topic) =>
+      conn.client.unsubscribe(topic)
+      val count = topicCounter.getOrElse(topic, 0) - 1
+      val tCounter = if (count == -1) topicCounter - topic else topicCounter + (topic -> count)
+      become(connected(conn, tCounter))
     case Publish(msg) => conn.client.publish(msg.topic, msg)
     case msg: MqttMessage => router ! msg
     case _ =>

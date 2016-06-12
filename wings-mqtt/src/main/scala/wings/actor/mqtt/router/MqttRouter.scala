@@ -9,19 +9,19 @@ import scala.collection.immutable.HashMap
 
 object MqttRouter {
 
-  type Dictionary = Map[String, ActorRef]
+  type Dictionary = Map[String, List[ActorRef]]
 
   def props(broker: String) = Props(MqttRouter(broker))
 
   trait RoutingMessage
 
-  case class AddRoutee(ref: ActorRef, topic: String) extends RoutingMessage
+  case class Subscribe(topic: String, ref: ActorRef) extends RoutingMessage
 
-  case class RemoveRoutee(topic: String) extends RoutingMessage
+  case class Unsubscribe(topic: String, ref: ActorRef) extends RoutingMessage
 
 }
 
-object MqttMessages {
+private[router] object MqttMessages {
 
   case class Subscribe(topic: String)
 
@@ -42,15 +42,23 @@ case class MqttRouter(broker: String)
   val wildcardWkr = context.actorOf(WildcardWorker.props())
 
   def router(routeeMap: Dictionary): Receive = {
-    case AddRoutee(ref, topic) => become(router(routeeMap + (topic -> ref)))
-    case RemoveRoutee(topic) => become(router(routeeMap - topic))
-    case s: Subscribe => conn ! s
-    case us: Unsubscribe => conn ! us
+    case MqttRouter.Subscribe(topic, ref) =>
+      conn ! MqttMessages.Subscribe(topic)
+      val list = ref :: routeeMap.getOrElse(topic, Nil)
+      val map = routeeMap + (topic -> list)
+      become(router(map));
+    case MqttRouter.Unsubscribe(topic, ref) =>
+      conn ! MqttMessages.Unsubscribe(topic)
+      val list = routeeMap.getOrElse(topic, Nil).filter(_ != ref)
+      val map = if (list.isEmpty) routeeMap - topic else routeeMap + (topic -> list)
+      become(router(map));
     case p: Publish => conn ! p
-    case mqttMsg: MqttMessage => routeeMap.get(mqttMsg.topic).foreach(_ ! mqttMsg); wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
+    case mqttMsg: MqttMessage =>
+      routeeMap.get(mqttMsg.topic).foreach(_.foreach(_ ! mqttMsg))
+      wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
   }
 
-  override def receive = router(HashMap[String, ActorRef]())
+  override def receive = router(HashMap[String, List[ActorRef]]())
 
 }
 
@@ -74,10 +82,10 @@ private[router] case class WildcardWorker() extends Actor {
     val dic = work.dic
     val topic = msg.topic
 
-    dic.foreach { case (t, ref) =>
+    dic.foreach { case (t, refList) =>
       val regex = t.replace("+", "(.+)").r
       t match {
-        case regex(all@_*) => all.foreach(part => if (!part.contains("/")) ref ! msg)
+        case regex(all@_*) => all.foreach(part => if (!part.contains("/")) refList.foreach(_ ! msg))
         case _ =>
       }
     }

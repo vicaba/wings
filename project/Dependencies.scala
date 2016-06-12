@@ -30,7 +30,7 @@ object Dependencies {
 
   lazy val playReactiveMongo24 = "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11-play24"
 
-  lazy val slf4j = "org.slf4j" % "slf4j-simple" % "1.7.21"
+  lazy val slf4j = "org.slf4j" % "slf4j-api" % "1.7.21"
 
   lazy val eclipsePaho = "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.2"
 

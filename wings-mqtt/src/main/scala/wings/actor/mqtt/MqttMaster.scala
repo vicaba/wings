@@ -5,13 +5,11 @@ import java.util.UUID
 import akka.actor._
 import akka.event.Logging
 import org.eclipse.paho.client.mqttv3._
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import play.api.libs.json._
 import wings.enrichments.UUIDHelper
 import wings.enrichments.UUIDHelper._
 import wings.actor.adapter.mqtt.paho
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
-import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
 import wings.actor.mqtt.router.{MqttMessages, MqttRouter}
 import wings.actor.mqtt.{MqttTopics => Topics}
 import wings.m2m.conf.model._
@@ -50,13 +48,15 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   val mqttConection = context.actorOf(MqttRouter.props(broker))
 
   override def preStart(): Unit = {
-    mqttConection ! MqttMessages.Subscribe(Topics.generalConfigOutTopic)
+    mqttConection ! MqttRouter.Subscribe(Topics.generalConfigOutTopic, self)
+    logger.debug("Sending subscription to topic: {}", Topics.generalConfigOutTopic)
   }
 
   def receive = {
     case msg @ MqttMessage(topic, payload, qos, retained, duplicate) =>
       topic match {
         case Topics.ConfigOutTopicPattern(id) => onConfigOutTopic(msg)
+        case m => logger.debug("Received not matching topic message from topic: {}", m)
       }
     case _ => logger.debug("Mqtt Master has received an unknown message")
   }
@@ -71,21 +71,21 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
       msg.validate[Config].map {
         case NameAcquisitionRequest(v) =>
           logger.debug("MqttMaster has received a NameAcquisitionRequest")
-          // Create VirtualIdentity
           UUIDHelper.tryFromString(v) match {
             case Success(identity) =>
               usedIdentities contains identity match {
                 case true =>
                   logger.debug("MqttMaster has detected that identity already exists: {}", identity)
-                  mqttConection ! rejectMessage(v)
+                  mqttConection ! MqttRouter.Publish(rejectMessage(v))
                 case false =>
                   logger.debug("MqttMaster creates proxy actor")
-                  val actor = context.actorOf(MqttActor.props(identity.copy, broker))
+                  val actor = context.actorOf(MqttActor.props(identity.copy, mqttConection), "MqttActor")
                   registerVirtualObject(identity, actor)
-                  mqttConection ! ackMessage(v)
+                  mqttConection ! MqttRouter.Publish(ackMessage(v))
               }
             case Failure(e) =>
               logger.debug(s"MqttMaster has failed to convert identity to an UUID, error message: {}", e)
+              mqttConection ! MqttRouter.Publish(rejectMessage(v))
           }
       }
     }

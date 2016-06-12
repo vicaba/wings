@@ -8,6 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.eclipse.paho.client.mqttv3._
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.enrichments.UUIDHelper.UUIDEnrichment
+import wings.util.actor.Stash
 
 object MqttConnection {
   def props(broker: String, router: ActorRef) = Props(MqttConnection(broker, router))
@@ -29,8 +30,6 @@ case class MqttConnection(broker: String, router: ActorRef)
   val id: UUID = UUID.randomUUID()
   val topicCounter = Map[String, Int]()
 
-
-
   def connectToBroker() = {
     val conn = Connection(
       new MqttAsyncClient(broker, id.toBase64, new MemoryPersistence()), new MqttConnectOptions()
@@ -46,7 +45,7 @@ case class MqttConnection(broker: String, router: ActorRef)
 
       override def onSuccess(iMqttToken: IMqttToken): Unit = {
         logger.debug("Connected to broker with ip: {}", broker)
-        unstashAll()
+        self ! Stash.UnStash
         become(connected(conn, topicCounter))
       }
     })
@@ -55,7 +54,10 @@ case class MqttConnection(broker: String, router: ActorRef)
   override def preStart(): Unit = connectToBroker()
 
   def notConnected: Receive = {
-    case _ => stash()
+    case Stash.UnStash => unstashAll()
+    case m: Any =>
+      logger.debug("Still not connected to broker, stashing message: {}", m.toString)
+      stash()
   }
 
   def connected(conn: Connection, topicCounter: Map[String, Int]): Receive = {
@@ -64,12 +66,16 @@ case class MqttConnection(broker: String, router: ActorRef)
       val count = topicCounter.getOrElse(topic, 0) + 1
       val tCounter = topicCounter + (topic -> count)
       become(connected(conn, tCounter))
+      logger.debug("Subscribed to topic {}", topic)
     case Unsubscribe(topic) =>
       conn.client.unsubscribe(topic)
       val count = topicCounter.getOrElse(topic, 0) - 1
       val tCounter = if (count == -1) topicCounter - topic else topicCounter + (topic -> count)
       become(connected(conn, tCounter))
-    case Publish(msg) => conn.client.publish(msg.topic, msg)
+      logger.debug("UnSubscribed from topic {}", topic)
+    case MqttRouter.Publish(msg) =>
+      conn.client.publish(msg.topic, msg)
+      logger.debug("Published at topic: {} message:\n{}", msg.topic, msg)
     case msg: MqttMessage => router ! msg
     case _ =>
   }

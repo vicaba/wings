@@ -7,7 +7,7 @@ object Main {
   def main(args: Array[String]) {
     val mqttSystem = ActorSystem("MqttSystem", ConfigFactory.load("playsystem"))
 
-    val mqttMaster = mqttSystem.actorOf(MqttMaster.props())
+    val mqttMaster = mqttSystem.actorOf(MqttMaster.props(), "MqttMaster")
 
   }
 }

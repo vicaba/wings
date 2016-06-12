@@ -110,7 +110,7 @@ trait CoreAgent extends Actor with ActorUtilities {
                 become(state2(tree, endpoints))
             }
         }
-      case a: Any => println("Arch. Received Any")
+      case a: Any => logger.debug("Arch. Received Any: {}", a)
 
     }
 

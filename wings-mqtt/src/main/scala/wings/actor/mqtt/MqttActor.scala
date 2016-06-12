@@ -12,19 +12,15 @@ import wings.services.db.MongoEnvironment
 
 
 object MqttActor {
-  /**
-   *
-   * @param virtualObjectId the VirtualObject Id associated with this actor
-   * @param broker the broker to connect to
-   * @return a Props for creating this actor
-   */
-  def props(virtualObjectId: UUID, broker: String): Props = Props(new MqttActor(virtualObjectId, broker))
+
+  def props(virtualObjectId: UUID, conn: ActorRef): Props = Props(new MqttActor(virtualObjectId, conn))
 }
 
-class MqttActor(val virtualObjectId: UUID, val broker: String)
+case class MqttActor(virtualObjectId: UUID, conn: ActorRef)
+
   extends CoreAgent with ActorUtilities {
 
-  override val toDeviceProps: Props = MqttDriver.props(virtualObjectId, broker, self)
+  override val toDeviceProps: Props = MqttDriver.props(virtualObjectId, conn, self)
 
   override val mongoEnvironment: MongoEnvironment = MongoEnvironment
 

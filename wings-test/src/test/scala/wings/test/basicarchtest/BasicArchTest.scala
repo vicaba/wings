@@ -228,7 +228,7 @@ class BasicArchTest
     expectMsg(MessageSent)
     receiveOne(1 second) match {
       case m: MqttMessage => println(m)
-      case _ => fail
+      case _ => fail("MQTT device should have received a MqttMessage")
     }
 
     MqttGlobals.testActor ! Subscribe(MqttGlobals.configInTopic)

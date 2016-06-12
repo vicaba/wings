@@ -1,9 +1,8 @@
 package wings.actor.mqtt.router
 
-import akka.actor.Actor.Receive
 import akka.actor.{Actor, ActorRef, Props, Stash}
+import akka.event.Logging
 import wings.actor.adapter.mqtt.paho.MqttMessage
-import wings.actor.mqtt.router.MqttMessages.{Publish, Subscribe, Unsubscribe}
 
 import scala.collection.immutable.HashMap
 
@@ -19,6 +18,8 @@ object MqttRouter {
 
   case class Unsubscribe(topic: String, ref: ActorRef) extends RoutingMessage
 
+  case class Publish(msg: MqttMessage)
+
 }
 
 private[router] object MqttMessages {
@@ -26,8 +27,6 @@ private[router] object MqttMessages {
   case class Subscribe(topic: String)
 
   case class Unsubscribe(topic: String)
-
-  case class Publish(msg: MqttMessage)
 
 }
 
@@ -38,6 +37,8 @@ case class MqttRouter(broker: String)
   import MqttRouter._
   import context._
 
+  val logger = Logging(context.system, this)
+
   val conn: ActorRef = context.actorOf(MqttConnection.props(broker, self))
   val wildcardWkr = context.actorOf(WildcardWorker.props())
 
@@ -47,13 +48,18 @@ case class MqttRouter(broker: String)
       val list = ref :: routeeMap.getOrElse(topic, Nil)
       val map = routeeMap + (topic -> list)
       become(router(map));
+      logger.debug("{} subscribed to topic {}", ref.path, topic)
     case MqttRouter.Unsubscribe(topic, ref) =>
       conn ! MqttMessages.Unsubscribe(topic)
       val list = routeeMap.getOrElse(topic, Nil).filter(_ != ref)
       val map = if (list.isEmpty) routeeMap - topic else routeeMap + (topic -> list)
       become(router(map));
-    case p: Publish => conn ! p
+    case p: Publish =>
+      conn ! p
+      logger.debug("Received publish message: {}", p)
+
     case mqttMsg: MqttMessage =>
+      logger.debug("Message received at topic: {}.\nTopic exists in map: {}", mqttMsg.topic, routeeMap)
       routeeMap.get(mqttMsg.topic).foreach(_.foreach(_ ! mqttMsg))
       wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
   }

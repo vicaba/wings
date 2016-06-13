@@ -78,8 +78,8 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
                   logger.debug("MqttMaster has detected that identity already exists: {}", identity)
                   mqttConection ! MqttRouter.Publish(rejectMessage(v))
                 case false =>
-                  logger.debug("MqttMaster creates proxy actor")
-                  val actor = context.actorOf(MqttActor.props(identity.copy, mqttConection), "MqttActor")
+                  logger.debug("MqttMaster creates proxy actor with identity: {}", identity)
+                  val actor = context.actorOf(MqttActor.props(identity.copy, mqttConection), s"MqttActor-${identity.toString}")
                   registerVirtualObject(identity, actor)
                   mqttConection ! MqttRouter.Publish(ackMessage(v))
               }

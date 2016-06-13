@@ -20,8 +20,7 @@ import wings.model.virtual.virtualobject.sensed.SensedValue
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 
 object MqttDriver {
-  def props(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef) = Props(MqttDriver(virtualObjectId, conn,
-    continuation))
+  def props(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef) = Props(MqttDriver(virtualObjectId, conn, continuation))
 }
 
 case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef)
@@ -44,9 +43,9 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
   lazy val ConfigOutTopic: String = MqttTopics.configOutTopic(virtualObjectId)
 
   override def preStart(): Unit = {
-    logger.debug(s"MqttDriver with id ${virtualObjectId} subscribing to $ConfigOutTopic")
+    logger.debug(s"MqttDriver with id {} subscribing to {}", virtualObjectId, ConfigOutTopic)
     conn ! MqttRouter.Subscribe(ConfigOutTopic, self)
-    logger.debug(s"MqttDriver with id ${virtualObjectId} subscribing to $DataOutTopic")
+    logger.debug(s"MqttDriver with id {} subscribing to {}", virtualObjectId, DataOutTopic)
     conn ! MqttRouter.Subscribe(DataOutTopic, self)
     become(driverState(conn, continuation))
   }

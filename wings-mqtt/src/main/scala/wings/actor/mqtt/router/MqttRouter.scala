@@ -46,8 +46,9 @@ case class MqttRouter(broker: String)
     case MqttRouter.Subscribe(topic, ref) =>
       conn ! MqttMessages.Subscribe(topic)
       val list = ref :: routeeMap.getOrElse(topic, Nil)
+      logger.debug("Adding routee. Ref added: {}, list: {}", ref, list)
       val map = routeeMap + (topic -> list)
-      become(router(map));
+      become(router(map))
       logger.debug("{} subscribed to topic {}", ref.path, topic)
     case MqttRouter.Unsubscribe(topic, ref) =>
       conn ! MqttMessages.Unsubscribe(topic)

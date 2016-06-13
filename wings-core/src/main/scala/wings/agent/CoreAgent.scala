@@ -96,20 +96,32 @@ trait CoreAgent extends Actor with ActorUtilities {
 
     val toArchReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
-        saveOrUpdateVo(m).onComplete {
+/*        saveOrUpdateVo(m).onComplete {
           case Failure(e) => //TODO: handle Failure
           case Success(optVo) =>
             optVo match {
               case None => //TODO: handle Failure
               case Some(vo) =>
-                val toArchitecture = actorOf(toArchitectureProps)
-                val createVo = CreateVo(virtualObjectId.toString)
-                val endpoints = PipelineEndpoints(toDevice, toArchitecture)
-                endpoints ! createVo
-                val tree = VOTree(vo)
-                become(state2(tree, endpoints))
+        val toArchitecture = actorOf(toArchitectureProps)
+        val createVo = CreateVo(virtualObjectId.toString)
+        val endpoints = PipelineEndpoints(toDevice, toArchitecture)
+        endpoints ! createVo
+        val tree = VOTree(vo)
+        become(state2(tree, endpoints))
             }
-        }
+        }*/
+        val vo = VO(
+          Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
+          m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
+        )
+
+        val toArchitecture = actorOf(toArchitectureProps)
+        val createVo = CreateVo(virtualObjectId.toString)
+        val endpoints = PipelineEndpoints(toDevice, toArchitecture)
+        endpoints ! createVo
+        val tree = VOTree(vo)
+
+        become(state2(tree, endpoints))
       case a: Any => logger.debug("Arch. Received Any: {}", a)
 
     }
@@ -159,8 +171,8 @@ trait CoreAgent extends Actor with ActorUtilities {
       case vom: VOMetadata =>
       case sensedValue: SensedValue =>
         logger.debug("Sending an {} from {} to Arch", sensedValue.getClass, name)
-        val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
-        sensedValueService.create(sensedValue)
+        //val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
+        //sensedValueService.create(sensedValue)
         toArchitecture ! MsgEnv.ToArch(sensedValue)
       case voWatch: VoWatch =>
         logger.debug("Sending an {} from {} to Arch", voWatch.getClass, name)

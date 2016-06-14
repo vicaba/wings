@@ -4,7 +4,7 @@ import java.net.URI
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props, Stash}
 import akka.event.Logging
 import play.api.libs.json.Json
 import wings.actor.pipeline.MsgEnv
@@ -45,7 +45,7 @@ object CoreAgent {
   val name = "CoreAgent"
 }
 
-trait CoreAgent extends Actor with ActorUtilities {
+trait CoreAgent extends Actor with Stash with ActorUtilities {
 
   import context._
 
@@ -115,11 +115,14 @@ trait CoreAgent extends Actor with ActorUtilities {
                 endpoints ! createVo
                 val tree = VOTree(vo)
                 logger.info("Setup completed, becoming state2. I can handle messages now")
+                unstashAll()
                 become(state2(tree, endpoints))
             }
         }
 
-      case a: Any => logger.debug("Arch. Received Any: {}", a)
+      case a: Any =>
+        stash()
+        logger.debug("Arch. Received Any: {}", a)
 
     }
 

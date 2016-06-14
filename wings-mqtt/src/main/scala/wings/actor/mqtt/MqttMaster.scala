@@ -50,6 +50,8 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
 
   val mqttConection = context.actorOf(MqttRouter.props(broker))
 
+  var count = 0
+
   override def preStart(): Unit = {
     mqttConection ! MqttRouter.Subscribe(Topics.generalConfigOutTopic, self)
     logger.debug("Sending subscription to topic: {}", Topics.generalConfigOutTopic)
@@ -58,7 +60,10 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   def receive = {
     case msg @ MqttMessage(topic, payload, qos, retained, duplicate) =>
       topic match {
-        case Topics.ConfigOutTopicPattern(id) => onConfigOutTopic(msg)
+        case Topics.ConfigOutTopicPattern(id) =>
+          onConfigOutTopic(msg)
+          count = count + 1
+          logger.info("Deployed Actors: {}", count)
         case m => logger.debug("Received non matching topic message from topic: {}", m)
       }
     case _ => logger.debug("Mqtt Master has received an unknown message")

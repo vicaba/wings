@@ -3,11 +3,9 @@ package wings.actor.websocket
 import java.util.UUID
 
 import akka.actor._
-import database.mongodb.MongoEnvironment
 import models.user.WebUser
 import wings.actor.util.ActorUtilities
 import wings.agent.{ArchitectureDriver, CoreAgent}
-import wings.services.db.MongoEnvironment
 
 object WebSocketActor {
 
@@ -26,8 +24,6 @@ class WebSocketActor(val virtualObjectId: UUID, user: WebUser, out: ActorRef)
   with ActorUtilities {
 
   override val toDeviceProps: Props = WebSocketDriver.props(virtualObjectId, out, self)
-
-  override val mongoEnvironment: MongoEnvironment = MongoEnvironment
 
   override val toArchitectureProps: Props = ArchitectureDriver.props(virtualObjectId, self)
 }

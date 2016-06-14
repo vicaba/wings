@@ -7,7 +7,7 @@ import wings.utils.test.SuperRandomActor
 /**
   * Created by vicaba on 16/10/15.
   */
-object Main {
+object  Main {
 
   def main(args: Array[String]) {
 

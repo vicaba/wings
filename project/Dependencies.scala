@@ -45,5 +45,8 @@ object Dependencies {
   lazy val scalatest = "org.scalatest" %% "scalatest" % "2.2.6"
 
   lazy val scalactic = "org.scalactic" %% "scalactic" % "2.2.6"
+
+  lazy val scaldi = "org.scaldi" %% "scaldi" % "0.5.7"
+
 }
 

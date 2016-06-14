@@ -1,42 +1,31 @@
 package wings.test.database
 
-import com.typesafe.config.ConfigFactory
 import play.api.libs.json.Json
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.api.{DB, MongoConnectionOptions, MongoDriver}
-import reactivemongo.play.json.collection.JSONCollection
 import play.modules.reactivemongo.json._
+import reactivemongo.api.commands.WriteResult
+import reactivemongo.play.json.collection.JSONCollection
+import scaldi.Injectable._
+import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.VOIdentityManager
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.services.db.MongoEnvironment
 
-import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 package object mongodb {
 
-  object MongoEnvironment extends wings.services.db.MongoEnvironment {
-
-    override val driver1 = MongoDriver() // first pool
-
-    override lazy val config = ConfigFactory.load
-
-    override lazy val db1: DB = {
-      val config = ConfigFactory.load("app")
-      val connection = driver1.connection(config.getStringList("mongodb.servers"), MongoConnectionOptions())
-      connection(config.getString("mongodb.db"))
-    }
-  }
+  val mongoEnv: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
 
   def cleanMongoDatabase: Future[WriteResult] = {
     val selector = Json.obj()
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
-    val userCollection: JSONCollection = MongoEnvironment.db1.collection("webusers")
+    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val userCollection: JSONCollection = mongoEnv.mainDb.collection("webusers")
     virtualObjectService.delete(Json.obj())
     userCollection.remove(Json.obj())
 
-    val sensedCollection: JSONCollection = MongoEnvironment.db1.collection("sensed")
+    val sensedCollection: JSONCollection = mongoEnv.mainDb.collection("sensed")
     sensedCollection.remove(Json.obj())
   }
 }

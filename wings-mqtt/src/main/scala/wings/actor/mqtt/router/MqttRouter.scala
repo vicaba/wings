@@ -58,9 +58,8 @@ case class MqttRouter(broker: String)
     case p: Publish =>
       conn ! p
       logger.debug("Received publish message: {}", p)
-
     case mqttMsg: MqttMessage =>
-      logger.debug("Message received at topic: {}.\nTopic exists in map: {}", mqttMsg.topic, routeeMap)
+      logger.debug("Message received at topic: {}.\nTopic exists in map: {}", mqttMsg.topic, routeeMap.get(mqttMsg.topic))
       routeeMap.get(mqttMsg.topic).foreach(_.foreach(_ ! mqttMsg))
       wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
   }
@@ -79,6 +78,8 @@ private[router] object WildcardWorker {
 
 private[router] case class WildcardWorker() extends Actor {
 
+  val logger = Logging(context.system, this)
+
   override def receive: Receive = {
     case work: WildcardWorker.Work => onMqttMessage(work)
   }
@@ -90,11 +91,17 @@ private[router] case class WildcardWorker() extends Actor {
     val topic = msg.topic
 
     dic.foreach { case (t, refList) =>
-      val regex = t.replace("+", "(.+)").r
-      t match {
-        case regex(all@_*) => all.foreach(part => if (!part.contains("/")) refList.foreach(_ ! msg))
-        case _ =>
+
+      // TODO: Improve condition and regex
+      if (t.contains("*") || t.contains("+")) {
+        val regex = t.replace("+", "(.+)").r
+        logger.debug("topic: {}. regex: {}.", topic, regex)
+        topic match {
+          case regex(all@_*) => all.foreach(part => if (!part.contains("/")) refList.foreach(_ ! msg))
+          case _ =>
+        }
       }
+
     }
 
   }

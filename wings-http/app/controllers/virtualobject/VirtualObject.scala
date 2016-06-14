@@ -1,16 +1,17 @@
 package controllers.virtualobject
 
 import common.request.AuthenticatedAction
-import database.mongodb.MongoEnvironment
 import play.api.libs.iteratee.Enumeratee
-import play.api.libs.json.{JsObject, JsArray, Json}
+import play.api.libs.json.{JsArray, JsObject, Json}
 import play.api.mvc.Controller
+import scaldi.Injectable._
+import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.sense.SenseCapability
-import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
+import wings.services.db.MongoEnvironment
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 /**
@@ -31,6 +32,8 @@ object VOFinder {
   */
 class VirtualObject extends Controller {
 
+  val mongoEnv: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
+
   def searchStreamAPI = AuthenticatedAction.async(parse.json) {
     request =>
       request.body.validate[VOFinder].asOpt match {
@@ -38,7 +41,7 @@ class VirtualObject extends Controller {
           BadRequest
         }
         case Some(finder) =>
-          val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+          val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
           val query = Json.obj(
             "$or" -> JsArray(Seq(
               Json.obj(s"${VO.SenseCapabilityKey}.${SenseCapability.NameKey}" -> finder.path),
@@ -62,7 +65,7 @@ class VirtualObject extends Controller {
 
   def searchStreamTestAPI = AuthenticatedAction.async {
     request =>
-      val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+      val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
       val query = Json.obj()
       val toResponse: Enumeratee[VO, JsObject] = Enumeratee.map[VO] {
         vo =>
@@ -90,7 +93,7 @@ class VirtualObject extends Controller {
           BadRequest
         }
         case Some(finder) =>
-          val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+          val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
           val query = Json.obj(
             "$or" -> JsArray(Seq(
               Json.obj(s"${VO.SenseCapabilityKey}.${SenseCapability.NameKey}" -> finder.path),
@@ -113,7 +116,7 @@ class VirtualObject extends Controller {
   }
 
   def searchTestAPI = AuthenticatedAction.async {
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
     val query = Json.obj()
     virtualObjectService.findByCriteria(query).map {
       list =>

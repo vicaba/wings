@@ -1,5 +1,6 @@
 package wings.actor.mqtt
 
+import java.net.URI
 import java.util.UUID
 
 import akka.actor._
@@ -10,10 +11,12 @@ import wings.enrichments.UUIDHelper
 import wings.enrichments.UUIDHelper._
 import wings.actor.adapter.mqtt.paho
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
-import wings.actor.mqtt.router.{MqttMessages, MqttRouter}
+import wings.actor.mqtt.router.MqttRouter
 import wings.actor.mqtt.{MqttTopics => Topics}
 import wings.m2m.conf.model._
 import wings.model.virtual.virtualobject.VOIdentityManager
+import scaldi.Injectable._
+import wings.config.DependencyInjector._
 
 import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.{Failure, Success, Try}
@@ -43,7 +46,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
    */
   var childs = new HashMap[UUID, ActorRef]
 
-  val broker = "tcp://192.168.33.10:1883"
+  val broker = inject[URI](identified by 'MqttBroker).toString
 
   val mqttConection = context.actorOf(MqttRouter.props(broker))
 
@@ -56,7 +59,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
     case msg @ MqttMessage(topic, payload, qos, retained, duplicate) =>
       topic match {
         case Topics.ConfigOutTopicPattern(id) => onConfigOutTopic(msg)
-        case m => logger.debug("Received not matching topic message from topic: {}", m)
+        case m => logger.debug("Received non matching topic message from topic: {}", m)
       }
     case _ => logger.debug("Mqtt Master has received an unknown message")
   }
@@ -70,7 +73,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
     Try(Json.parse(mqttMsg.payloadAsString())).map { msg =>
       msg.validate[Config].map {
         case NameAcquisitionRequest(v) =>
-          logger.debug("MqttMaster has received a NameAcquisitionRequest")
+          logger.info("MqttMaster has received a NameAcquisitionRequest")
           UUIDHelper.tryFromString(v) match {
             case Success(identity) =>
               usedIdentities contains identity match {

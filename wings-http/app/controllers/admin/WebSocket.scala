@@ -8,32 +8,35 @@ import akka.stream.Materializer
 import com.google.inject.Inject
 import common.JsonTemplates
 import common.request.{AuthenticatedAction, CanBeAuthenticatedAction}
-import play.api.Play.current
-import database.mongodb.MongoEnvironment
 import models.user.UserIdentityManager
 import models.user.services.db.mongo.UserMongoService
 import play.api.libs.json.Json
 import play.api.libs.streams.ActorFlow
 import play.api.mvc.{Controller, WebSocket}
+import scaldi.Injectable._
 import websocket.WebSocketHandler
 import wings.actor.websocket.WebSocketActor
-import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
+import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
+import wings.services.db.MongoEnvironment
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materializer) extends Controller {
+
+  val mongoEnvironment: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
 
   def createAPI = CanBeAuthenticatedAction.async(parse.json) {
     request =>
       CanBeAuthenticatedAction.Fold(request) {
         implicit ar =>
 
-          val userService = new UserMongoService(MongoEnvironment.db1)(UserIdentityManager)
+          val userService = new UserMongoService(mongoEnvironment.mainDb)(UserIdentityManager)
           userService.findOneByCriteria(Json.obj(UserIdentityManager.name -> request.session.get(UserIdentityManager.name))).flatMap {
             case Some(user) =>
-              val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+              val virtualObjectService = new VirtualObjectMongoService(mongoEnvironment.mainDb)(VOIdentityManager)
               val voId = VOIdentityManager.next
               val voIdOpt = Some(voId)
               if (user.virtualObjectId.isEmpty) {
@@ -73,7 +76,7 @@ class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materiali
       AuthenticatedAction.sessionAuthenticate(request) match {
 
         case Some((name, uuid)) =>
-          val userService = new UserMongoService(MongoEnvironment.db1)(UserIdentityManager)
+          val userService = new UserMongoService(mongoEnvironment.mainDb)(UserIdentityManager)
 
           userService.findOneByCriteria(Json.obj(UserIdentityManager.name -> uuid)).map {
             case Some(user) =>

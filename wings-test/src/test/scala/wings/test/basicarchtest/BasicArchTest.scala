@@ -1,5 +1,7 @@
 package wings.test.basicarchtest
 
+import java.net.URI
+
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKitBase, TestProbe}
 import akka.util.Timeout
@@ -30,8 +32,10 @@ import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
-import wings.test.helper.database.MongoEnvironment
 import wings.test.prebuilt.{Http, WebSocket}
+import scaldi.Injectable._
+import wings.config.DependencyInjector._
+import wings.services.db.MongoEnvironment
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,6 +55,8 @@ class BasicArchTest
   val extraPatience = PatienceConfig(timeout = 10 seconds)
 
   implicit val defaultTimeout = Timeout(1 second)
+
+  val mongoEnv: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
 
   object WebSocketGlobals {
 
@@ -87,7 +93,7 @@ class BasicArchTest
     val voId = "0958232f-93c0-4559-9752-a362da8e07d3"
     val voIdUUID = UUIDHelper.tryFromString(voId).get
 
-    val broker = "tcp://192.168.33.10:1883"
+    val broker = inject[URI](identified by 'MqttBroker).toString
 
     val generalConfigInTopic = MqttTopics.provisionalConfigInTopic(voId)
     val generalConfigOutTopic = MqttTopics.provisionalConfigOutTopic(voId)
@@ -198,7 +204,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> WebSocketGlobals.voId
@@ -250,7 +256,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> MqttGlobals.voId
@@ -275,7 +281,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(MongoEnvironment.db1)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> MqttGlobals2.voId

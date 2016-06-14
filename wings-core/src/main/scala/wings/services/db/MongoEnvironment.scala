@@ -9,8 +9,6 @@ trait MongoEnvironment {
 
   val driver1: MongoDriver // first pool
 
-  val config: Config
-
-  val db1: DB
+  val mainDb: DB
 
 }

@@ -37,6 +37,7 @@ object WingsBuild extends Build {
   ).settings(coreDependencies: _*)
 
   lazy val coreDependencies = Seq(libraryDependencies ++= Seq(
+    scaldi,
     akkaCluster,
     akkaClusterTools,
     akkaClusterMetrics,

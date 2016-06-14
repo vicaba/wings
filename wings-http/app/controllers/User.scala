@@ -2,7 +2,6 @@ package controllers
 
 
 import common.JsonTemplates
-import database.mongodb.MongoEnvironment
 import models.user.services.db.mongo.UserMongoService
 import models.user.{User => UserM}
 import models.user.UserIdentityManager
@@ -12,9 +11,13 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import wings.services.db.MongoEnvironment
+import scaldi.Injectable._
+import wings.config.DependencyInjector._
+
+
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 object User {
@@ -44,6 +47,8 @@ object User {
 class User
   extends Controller {
 
+  val mongoEnvironment: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
+
   def signInAPI = Action.async(parse.json) {
     implicit request =>
       User.userSignInForm.bindFromRequest().fold(
@@ -53,7 +58,7 @@ class User
           }
         },
         success => {
-          val userService = new UserMongoService(MongoEnvironment.db1)(UserIdentityManager)
+          val userService = new UserMongoService(mongoEnvironment.mainDb)(UserIdentityManager)
           userService.findOneByCriteria(Json.obj(UserM.emailKey -> success._2, UserM.usernameKey -> success._1, UserM.passwordKey -> success._3)) map {
             case Some(user) =>
               Created.addingToSession(UserIdentityManager.name -> user.id.get.toString, UserM.usernameKey -> user.username)
@@ -75,7 +80,7 @@ class User
         },
         success => {
           val identity = UserIdentityManager.next
-          val userService = new UserMongoService(MongoEnvironment.db1)(UserIdentityManager)
+          val userService = new UserMongoService(mongoEnvironment.mainDb)(UserIdentityManager)
           userService.findOneByCriteria(Json.obj(models.user.User.usernameKey -> success._1)).flatMap {
             _.fold
             {

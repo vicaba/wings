@@ -10,6 +10,7 @@ import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.enrichments.UUIDHelper.UUIDEnrichment
 import wings.util.actor.Stash
 
+
 object MqttConnection {
   def props(broker: String, router: ActorRef) = Props(MqttConnection(broker, router))
 }

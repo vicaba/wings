@@ -2,9 +2,9 @@ import sbt._
 
 object Dependencies {
 
-  lazy val akkaVersion = "2.4.4"
+  lazy val akkaVersion = "2.4.9"
 
-  lazy val playVersion = "2.5.3"
+  lazy val playVersion = "2.5.6"
 
   lazy val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
 
@@ -26,9 +26,9 @@ object Dependencies {
 
   lazy val playScalaTest = "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test"
 
-  lazy val playReactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11"
+  lazy val playReactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14"
 
-  lazy val playReactiveMongo24 = "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11-play24"
+  lazy val playReactiveMongo24 = "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14-play24"
 
   lazy val slf4j = "org.slf4j" % "slf4j-api" % "1.7.21"
 

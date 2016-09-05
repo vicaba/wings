@@ -81,7 +81,7 @@ class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materiali
           userService.findOneByCriteria(Json.obj(UserIdentityManager.name -> uuid)).map {
             case Some(user) =>
               val coreAgentProps = (voId: UUID, out: ActorRef) => WebSocketActor.props(voId, user)(out)
-              Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out)))
+              Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out), Int.MaxValue))
             case _ => Left(Unauthorized(""))
 
           }

@@ -1,33 +1,29 @@
+# GUI
+
+GET           /                                  controllers.Index.apply
+
 # User
+
 #API
-POST          /api/user/                              controllers.User.signUpAPI
+POST          /api/user/                         controllers.User.signUpAPI
 
-POST          /api/user/session/                      controllers.User.signInAPI
+POST          /api/user/session/                 controllers.User.signInAPI
 
-DELETE        /api/user/session/                      controllers.User.logoutAPI
+DELETE        /api/user/session/                 controllers.User.logoutAPI
 
 
 # Admin
 
 # API
 
-POST          /api/admin/ws/                          controllers.admin.WebSocket.createAPI
-
-GET           /api/admin/ws/socket/                   controllers.admin.WebSocket.socketAPI
+GET           /api/admin/ws/socket/              controllers.admin.WebSocket.socketAPI
 
 
 # Search
 
-POST          /api/vo/search/                         controllers.virtualobject.VirtualObject.searchAPI
+POST          /api/vo/search/                    controllers.virtualobject.VirtualObject.searchAPI
 
-GET           /api/vo/search/test/                    controllers.virtualobject.VirtualObject.searchTestAPI
-
-POST          /api/vo/search/stream/                  controllers.virtualobject.VirtualObject.searchStreamAPI
-
-GET           /api/vo/search/stream/test/             controllers.virtualobject.VirtualObject.searchStreamTestAPI
-
-GET           /api/vo/mock/                           controllers.virtualobject.Mocks.generateVOs
-
+GET           /api/vo/search/test/               controllers.virtualobject.VirtualObject.searchTestAPI
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

@@ -30,7 +30,7 @@ import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
-import wings.test.helper.database.MongoEnvironment
+// import wings.test.helper.database.MongoEnvironment
 import wings.test.prebuilt.{Http, WebSocket}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global

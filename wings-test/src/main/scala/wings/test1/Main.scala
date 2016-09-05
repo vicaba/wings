@@ -89,7 +89,7 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    val numberOfSenders = 1500
+    val numberOfSenders = 150
 
     val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
     val router = system.actorOf(MqttRouter.props(inject[URI](identified by 'MqttBroker).toString))

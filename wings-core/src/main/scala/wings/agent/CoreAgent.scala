@@ -102,8 +102,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
           m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
-        Future.successful[Option[VO]](Some(voTemp)).onComplete {
-        //saveOrUpdateVo(m).onComplete {
+        //Future.successful[Option[VO]](Some(voTemp)).onComplete {
+        saveOrUpdateVo(m).onComplete {
           case Failure(e) => //TODO: handle Failure
           case Success(optVo) =>
             optVo match {
@@ -161,7 +161,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           Future.successful[Option[VO]](Some(voTemp)).onComplete {
             //val voTree = parentVoTree.get
           //saveOrUpdateVo(m).onComplete {
-            case Failure(e) => //TODO: handle Failure
+            case Failure(e) => logger.error("Error saving vo with id: {}", m.voId.toString)
             case Success(optVo) =>
               optVo match {
                 case None => //TODO: handle Failure

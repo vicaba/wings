@@ -19,11 +19,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ShowVirtualObjectController
   extends Controller {
 
-  val virtualObjectUseCase: ShowVirtualObject.UseCase = inject[ShowVirtualObject.UseCase](identified by 'ShowVirtualObjectUseCase)
+  val showVirtualObjectUseCase: ShowVirtualObject.UseCase = inject[ShowVirtualObject.UseCase](identified by 'ShowVirtualObjectUseCase)
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 
   def apply(id: String) = Action.async {
-    virtualObjectUseCase.execute(ShowVirtualObject.Message(id)).map {
+    showVirtualObjectUseCase.execute(ShowVirtualObject.Message(id)).map {
       httpErrorHandler.handle(_) {
         case Some(virtualObject) => Ok(Json.toJson(virtualObject));
         case None => NotFound

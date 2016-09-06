@@ -10,4 +10,8 @@ trait VirtualObjectRepository {
 
   def findById(id: UUID): Future[Option[VO]]
 
+  def findAll(): Future[List[VO]]
+
+  def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VO]]
+
 }

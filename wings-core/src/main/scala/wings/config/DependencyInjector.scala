@@ -7,7 +7,7 @@ import scaldi.Injectable._
 
 import scala.collection.JavaConverters._
 import scaldi.Module
-import wings.virtualobject.application.usecase.ShowVirtualObject
+import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
 import wings.model.virtual.virtualobject.VOIdentityManager
@@ -40,6 +40,8 @@ object DependencyInjector {
     bind[VirtualObjectRepository] identifiedBy 'VirtualObjectRepository to VirtualObjectRepositoryImpl(inject[VirtualObjectMongoService](identified by 'VirtualObjectMongoService))
 
     bind[ShowVirtualObject.UseCase] identifiedBy 'ShowVirtualObjectUseCase to ShowVirtualObject.UseCase(inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
+
+    bind[ListVirtualObject.UseCase] identifiedBy 'ListVirtualObjectUseCase to ListVirtualObject.UseCase(inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
 
   }
 

@@ -17,4 +17,10 @@ case class VirtualObjectRepositoryImpl
   override def findById(id: UUID): Future[Option[VO]] =
     virtualObjectMongoRepository.findById(id)
 
+  override def findAll(): Future[List[VO]] =
+    virtualObjectMongoRepository.findAll()
+
+
+  override def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VO]] =
+    virtualObjectMongoRepository.findAll(skip, limit)
 }

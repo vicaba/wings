@@ -4,9 +4,10 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.modules.reactivemongo.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.ReadPreference
+import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.api.commands.WriteResult
-import wings.model.{IdentityManager, HasIdentity}
+import wings.model.virtual.virtualobject.VO
+import wings.model.{HasIdentity, IdentityManager}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +43,18 @@ abstract class CRUDService[E <: HasIdentity[ID], ID](identityManager: IdentityMa
       find(criteria).
       one[E]
   }
+
+  def findAll(skip: Option[Int], limit: Option[Int]): Future[List[E]] = {
+    val skipN = skip.getOrElse(0)
+    val limitN = limit.getOrElse(0)
+    collection.
+      find(Json.obj()).
+      options(QueryOpts(skipN, limitN)).
+      cursor[E](readPreference = ReadPreference.primary).
+      collect[List]()
+  }
+
+  def findAll(): Future[List[E]] = findAll(None, None)
 
   def create(o: E): Future[Either[WriteResult, E]] = {
     collection.insert(o).map {

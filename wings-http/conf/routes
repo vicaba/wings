@@ -18,6 +18,8 @@ DELETE        /api/user/session/           controllers.User.logoutAPI
 
 GET           /api/admin/ws/socket/        controllers.admin.WebSocket.socketAPI
 
+GET           /api/v1/vo                   wings.virtualobject.infrastructure.http.api.controller.ListVirtualObjectController.apply()
+
 GET           /api/v1/vo/:id               wings.virtualobject.infrastructure.http.api.controller.ShowVirtualObjectController.apply(id: String)
 
 

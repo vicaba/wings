@@ -45,7 +45,8 @@ object WingsBuild extends Build {
     playReactiveMongo,
     akkaSlf4j,
     scalaLogging,
-    logback
+    logback,
+    scalactic
   ))
 
   lazy val http = Project(
@@ -62,7 +63,6 @@ object WingsBuild extends Build {
     jdbc,
     cache,
     ws,
-    specs2 % Test,
     playReactiveMongo,
     akkaRemote
   ))
@@ -119,7 +119,6 @@ object WingsBuild extends Build {
     playReactiveMongo24,
     typesafeConfig,
     jettyWebSocket,
-    playScalaTest,
     akkaSlf4j
   ))
 

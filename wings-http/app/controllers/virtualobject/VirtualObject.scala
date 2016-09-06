@@ -3,7 +3,7 @@ package controllers.virtualobject
 import common.request.AuthenticatedAction
 import play.api.libs.iteratee.Enumeratee
 import play.api.libs.json.{JsArray, JsObject, Json}
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.sense.SenseCapability
@@ -34,8 +34,14 @@ class VirtualObject extends Controller {
 
   val mongoEnv: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
 
+
+  def apply = Action.async {
+    Future(Ok)
+  }
+
+
   /**
-    * API method to search for VirtualOBjects
+    * API method to search for VirtualObjects
     * @return
     */
   def searchAPI = AuthenticatedAction.async(parse.json) {

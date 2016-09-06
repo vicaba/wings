@@ -1,10 +1,10 @@
-package wings.hexagonal.virtualobject.application.usecase
+package wings.virtualobject.application.usecase
 
 import java.util.UUID
 
 import org.scalactic._
-import wings.hexagonal.toolkit.error.application.Types.{AppError, FormatError}
-import wings.hexagonal.virtualobject.domain.repository.VirtualObjectRepository
+import wings.toolkit.error.application.Types.{AppError, FormatError}
+import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.model.virtual.virtualobject.VO
 
 import scala.concurrent.Future

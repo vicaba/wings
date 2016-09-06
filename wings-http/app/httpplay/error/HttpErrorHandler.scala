@@ -2,7 +2,7 @@ package httpplay.error
 
 import org.scalactic._
 import play.api.mvc.{Controller, Result}
-import wings.hexagonal.toolkit.error.application.Types.AppError
+import wings.toolkit.error.application.Types.AppError
 
 import scala.concurrent.Future
 

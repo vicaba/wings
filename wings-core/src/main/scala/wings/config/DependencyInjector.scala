@@ -7,9 +7,9 @@ import scaldi.Injectable._
 
 import scala.collection.JavaConverters._
 import scaldi.Module
-import wings.hexagonal.virtualobject.application.usecase.ShowVirtualObject
-import wings.hexagonal.virtualobject.domain.repository.VirtualObjectRepository
-import wings.hexagonal.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
+import wings.virtualobject.application.usecase.ShowVirtualObject
+import wings.virtualobject.domain.repository.VirtualObjectRepository
+import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
 import wings.model.virtual.virtualobject.VOIdentityManager
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
 import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}

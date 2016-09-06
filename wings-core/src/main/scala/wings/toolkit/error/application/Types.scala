@@ -1,4 +1,4 @@
-package wings.hexagonal.toolkit.error.application
+package wings.toolkit.error.application
 
 object Types {
 

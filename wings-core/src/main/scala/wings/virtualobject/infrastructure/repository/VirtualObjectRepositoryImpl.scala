@@ -1,8 +1,8 @@
-package wings.hexagonal.virtualobject.infrastructure.repository
+package wings.virtualobject.infrastructure.repository
 
 import java.util.UUID
 
-import wings.hexagonal.virtualobject.domain.repository.VirtualObjectRepository
+import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.model.virtual.virtualobject.VO
 import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
 

@@ -1,9 +1,9 @@
-package wings.hexagonal.toolkit.error.infrastructure.serialization.json
+package wings.toolkit.error.infrastructure.serialization.json
 
 import play.api.libs.json._
-import wings.hexagonal.toolkit.error.application.Types
-import wings.hexagonal.toolkit.error.application.Types.AppError
-import wings.hexagonal.toolkit.error.infrastructure.keys.AppErrorKeys
+import wings.toolkit.error.application.Types
+import wings.toolkit.error.application.Types.AppError
+import wings.toolkit.error.infrastructure.keys.AppErrorKeys
 
 // JSON library
 

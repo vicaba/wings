@@ -1,4 +1,4 @@
-package wings.hexagonal.virtualobject.domain.repository
+package wings.virtualobject.domain.repository
 
 import java.util.UUID
 

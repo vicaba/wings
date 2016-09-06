@@ -1,4 +1,4 @@
-package wings.hexagonal.toolkit.error.infrastructure.serialization.json
+package wings.toolkit.error.infrastructure.serialization.json
 
 object Implicits {
 

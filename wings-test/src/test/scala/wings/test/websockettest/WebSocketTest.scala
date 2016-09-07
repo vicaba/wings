@@ -1,3 +1,4 @@
+/*
 package wings.test.websockettest
 
 import akka.actor.{ActorRef, ActorSystem}
@@ -131,3 +132,4 @@ class WebSocketTest
   }
 
 }
+*/

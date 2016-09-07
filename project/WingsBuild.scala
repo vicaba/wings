@@ -119,7 +119,8 @@ object WingsBuild extends Build {
     playReactiveMongo24,
     typesafeConfig,
     jettyWebSocket,
-    akkaSlf4j
+    akkaSlf4j,
+    scalatest
   ))
 
 }

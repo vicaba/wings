@@ -6,8 +6,7 @@ import reactivemongo.api.commands.WriteResult
 import reactivemongo.play.json.collection.JSONCollection
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
-import wings.model.virtual.virtualobject.VOIdentityManager
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
+import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
 import wings.services.db.MongoEnvironment
 
 import scala.concurrent.ExecutionContext.Implicits.global

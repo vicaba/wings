@@ -1,13 +1,11 @@
 package controllers.admin
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
 import com.google.inject.Inject
-import common.JsonTemplates
-import common.request.{AuthenticatedAction, CanBeAuthenticatedAction}
+import common.request.AuthenticatedAction
 import models.user.UserIdentityManager
 import models.user.services.db.mongo.UserMongoService
 import play.api.libs.json.Json
@@ -17,9 +15,8 @@ import scaldi.Injectable._
 import websocket.WebSocketHandler
 import wings.actor.websocket.WebSocketActor
 import wings.config.DependencyInjector._
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
-import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.services.db.MongoEnvironment
+import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

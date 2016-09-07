@@ -2,13 +2,12 @@ package wings.model.virtual.virtualobject.sensed
 
 import java.util.UUID
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json._
 import wings.model.virtual.virtualobject.actuate.ActuateState
-
-import wings.model.virtual.virtualobject.VO
 import wings.model.{HasIdentity, IdentityManager}
+import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 
 
 object SensedValueIdentityManager extends IdentityManager[SensedValue, UUID] {
@@ -33,7 +32,7 @@ object SensedValue {
 
   val sensedValueReads: Reads[SensedValue] = (
       (__ \ SensedValueIdentityManager.name).readNullable[UUID] and
-      (__ \ VO.VOIDKey).read[UUID] and
+      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
       (__ \ ValueKey).read[String] and
       (__ \ "unit").readNullable[String] and
         (__ \ ActuateState.StateIdKey).readNullable[String]
@@ -41,7 +40,7 @@ object SensedValue {
 
   val sensedValueWrites: OWrites[SensedValue] = (
       (__ \ SensedValueIdentityManager.name).writeNullable[UUID] and
-      (__ \ VO.VOIDKey).write[UUID] and
+      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
       (__ \ ValueKey).write[String] and
       (__ \ "unit").writeNullable[String] and
         (__ \ ActuateState.StateIdKey).writeNullable[String]

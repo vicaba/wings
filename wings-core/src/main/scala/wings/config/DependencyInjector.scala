@@ -10,8 +10,7 @@ import scaldi.Module
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
-import wings.model.virtual.virtualobject.VOIdentityManager
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
+import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
 import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}
 
 import scala.concurrent.ExecutionContext.Implicits.global

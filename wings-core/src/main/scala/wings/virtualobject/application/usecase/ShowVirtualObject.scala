@@ -5,7 +5,7 @@ import java.util.UUID
 import org.scalactic._
 import wings.toolkit.error.application.Types.{AppError, FormatError}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
-import wings.model.virtual.virtualobject.VO
+import wings.virtualobject.domain.VirtualObject
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -23,7 +23,7 @@ object ShowVirtualObject {
 
   case class UseCase(virtualObjectRepository: VirtualObjectRepository) {
 
-    def execute(message: ShowVirtualObject.Message): Future[Option[VO] Or Every[AppError]] = {
+    def execute(message: ShowVirtualObject.Message): Future[Option[VirtualObject] Or Every[AppError]] = {
       Try(UUID.fromString(message.virtualObjectId)) match {
         case Success(id) => virtualObjectRepository.findById(id).map(Good(_))
         case Failure(e) => Future.successful(Bad(One(FormatError.UUID)))

@@ -2,12 +2,11 @@ package wings.model.virtual.virtualobject.actuated
 
 import java.util.UUID
 
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
-
-import wings.model.virtual.virtualobject.VO
+import play.api.libs.json._
 import wings.model.virtual.virtualobject.actuate.ActuateState
 import wings.model.{HasIdentity, IdentityManager}
+import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 
 object ActuatedValueIdentityManager extends IdentityManager[ActuatedValue, UUID] {
   override def name: String = "_id"
@@ -28,13 +27,13 @@ object ActuatedValue {
 
   val actuatedValueReads: Reads[ActuatedValue] = (
     (__ \ ActuatedValueIdentityManager.name).readNullable[UUID] and
-    (__ \ VO.VOIDKey).read[UUID] and
+    (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
       (__ \ ActuateState.StateIdKey).read[String]
     )(ActuatedValue.apply _)
 
   val actuatedValueWrites: OWrites[ActuatedValue] = (
     (__ \ ActuatedValueIdentityManager.name).writeNullable[UUID] and
-      (__ \ VO.VOIDKey).write[UUID] and
+      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
       (__ \ ActuateState.StateIdKey).write[String]
     )(unlift(ActuatedValue.unapply _))
 

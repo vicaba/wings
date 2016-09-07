@@ -5,22 +5,32 @@ import java.util.UUID
 import reactivemongo.api.DB
 import reactivemongo.play.json.collection.JSONCollection
 import wings.model.IdentityManager
-import wings.model.virtual.virtualobject.VO
 import wings.toolkit.db.mongodb.service.MongoCrudRepository
+import wings.virtualobject.domain.VirtualObject
+import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
 import scala.concurrent.ExecutionContext
+
+object VOIdentityManager extends IdentityManager[VirtualObject, UUID] {
+
+  override def name: String = "_id"
+
+  override def next: UUID = UUID.randomUUID()
+
+  override def of(entity: VirtualObject): Option[UUID] = entity.id
+}
 
 case class VirtualObjectMongoRepository
 (
   db: DB
 )
 (
-  identityManger: IdentityManager[VO, UUID]
+  identityManger: IdentityManager[VirtualObject, UUID]
 )
 (
   implicit ec: ExecutionContext
 )
-  extends MongoCrudRepository[VO, UUID](identityManger) {
+  extends MongoCrudRepository[VirtualObject, UUID](identityManger) {
 
   override val collection: JSONCollection = db.collection("virtualObjects")
 

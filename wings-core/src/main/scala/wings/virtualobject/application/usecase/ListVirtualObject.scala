@@ -1,7 +1,7 @@
 package wings.virtualobject.application.usecase
 
 import org.scalactic.{Every, Good, Or}
-import wings.model.virtual.virtualobject.VO
+import wings.virtualobject.domain.VirtualObject
 import wings.toolkit.error.application.Types.AppError
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 
@@ -15,7 +15,7 @@ object ListVirtualObject {
 
   case class UseCase(virtualObjectRepository: VirtualObjectRepository) {
 
-    def execute(message: ListVirtualObject.Message): Future[List[VO] Or Every[AppError]] =
+    def execute(message: ListVirtualObject.Message): Future[List[VirtualObject] Or Every[AppError]] =
       virtualObjectRepository.findAll(message.skip, message.limit).map(Good(_))
 
   }

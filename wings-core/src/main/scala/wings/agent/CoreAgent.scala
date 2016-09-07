@@ -16,11 +16,13 @@ import wings.m2m.VOMessage
 import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.model.virtual.virtualobject.{VO, VOIdentityManager, VOTree}
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
+import wings.model.virtual.virtualobject.VOTree
+import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.services.db.MongoEnvironment
+import wings.virtualobject.domain.VirtualObject
+import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
@@ -67,13 +69,13 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
     become(state1(toDevice))
   }
 
-  def saveOrUpdateVo(vo: VOMessage): Future[Option[VO]] = {
+  def saveOrUpdateVo(vo: VOMessage): Future[Option[VirtualObject]] = {
     val voService = new VirtualObjectMongoRepository(mongoEnvironment.mainDb)(VOIdentityManager)
-    voService.findOneByCriteria(Json.obj(VO.VOIDKey -> vo.voId)).flatMap {
+    voService.findOneByCriteria(Json.obj(VirtualObjectKeys.VOIDKey -> vo.voId)).flatMap {
       // TODO: Handle the case where a virtualObject is found!
       case None =>
         logger.debug("Virtual Object with id {} not found", virtualObjectId)
-        val newVirtualObject = VO(
+        val newVirtualObject = VirtualObject(
           Some(UUID.randomUUID()), vo.voId, vo.pVoId, Some(remoteAddress), vo.children,
           vo.path, None, ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
         )
@@ -98,11 +100,11 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
     val toArchReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
-        val voTemp = VO(
+        val voTemp = VirtualObject(
           Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
           m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
-        //Future.successful[Option[VO]](Some(voTemp)).onComplete {
+        //Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
         saveOrUpdateVo(m).onComplete {
           case Failure(e) => //TODO: handle Failure
           case Success(optVo) =>
@@ -136,7 +138,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
     receive
   }
 
-  def state2(voTree: Tree[VO], endpoints: PipelineEndpoints): Receive = {
+  def state2(voTree: Tree[VirtualObject], endpoints: PipelineEndpoints): Receive = {
     val toDevice = endpoints.toDevice
     val toArchitecture = endpoints.toArchitecture
 
@@ -154,11 +156,11 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case m: VOMessage =>
         val parentVoTree = m.pVoId.flatMap(pVoId => voTree.getWhere(_.voId == pVoId))
         if (parentVoTree.isDefined) {
-          val voTemp = VO(
+          val voTemp = VirtualObject(
             Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
             m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
           )
-          Future.successful[Option[VO]](Some(voTemp)).onComplete {
+          Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
             //val voTree = parentVoTree.get
           //saveOrUpdateVo(m).onComplete {
             case Failure(e) => logger.error("Error saving vo with id: {}", m.voId.toString)

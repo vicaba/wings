@@ -14,9 +14,9 @@ import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.actor.mqtt.{MqttTopics => Topics}
 import wings.m2m.conf.model._
-import wings.model.virtual.virtualobject.VOIdentityManager
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
+import wings.virtualobject.infrastructure.repository.mongodb.VOIdentityManager
 
 import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.{Failure, Success, Try}

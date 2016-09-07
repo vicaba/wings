@@ -4,9 +4,9 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import wings.model.virtual.virtualobject.VO
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
 import wings.model.virtual.virtualobject.sense.SenseCapability
+import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 
 case class VOMessage(voId: UUID,
                      pVoId: Option[UUID] = None,
@@ -18,21 +18,21 @@ case class VOMessage(voId: UUID,
 
 object VOMessage {
   val sensedVoReads: Reads[VOMessage] = (
-      (__ \ VO.VOIDKey).read[UUID] and
-      (__ \ VO.PVOIDKey).readNullable[UUID] and
-      (__ \ VO.ChildrenKey).readNullable[Array[String]] and
-      (__ \ VO.PathKey).read[String] and
-      (__ \ VO.SenseCapabilityKey).readNullable[SenseCapability] and
-      (__ \ VO.ActuateCapabilityKey).readNullable[ActuateCapability]
+      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
+      (__ \ VirtualObjectKeys.PVOIDKey).readNullable[UUID] and
+      (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
+      (__ \ VirtualObjectKeys.PathKey).read[String] and
+      (__ \ VirtualObjectKeys.SenseCapabilityKey).readNullable[SenseCapability] and
+      (__ \ VirtualObjectKeys.ActuateCapabilityKey).readNullable[ActuateCapability]
     )(VOMessage.apply _)
 
   val sensedVoWrites: OWrites[VOMessage] = (
-      (__ \ VO.VOIDKey).write[UUID] and
-      (__ \ VO.PVOIDKey).writeNullable[UUID] and
-      (__ \ VO.ChildrenKey).writeNullable[Array[String]] and
-      (__ \ VO.PathKey).write[String] and
-      (__ \ VO.SenseCapabilityKey).writeNullable[SenseCapability] and
-      (__ \ VO.ActuateCapabilityKey).writeNullable[ActuateCapability]
+      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
+      (__ \ VirtualObjectKeys.PVOIDKey).writeNullable[UUID] and
+      (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
+      (__ \ VirtualObjectKeys.PathKey).write[String] and
+      (__ \ VirtualObjectKeys.SenseCapabilityKey).writeNullable[SenseCapability] and
+      (__ \ VirtualObjectKeys.ActuateCapabilityKey).writeNullable[ActuateCapability]
     )(unlift(VOMessage.unapply _))
 
   implicit val vOFormat = OFormat(sensedVoReads, sensedVoWrites)

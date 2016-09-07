@@ -4,7 +4,7 @@ import play.api.libs.json._
 import wings.toolkit.error.application.Types.AppError
 import wings.toolkit.error.infrastructure.keys.AppErrorKeys
 
-object AppError {
+object AppErrorJson {
 
   object AppErrorWrites extends Writes[AppError] {
 

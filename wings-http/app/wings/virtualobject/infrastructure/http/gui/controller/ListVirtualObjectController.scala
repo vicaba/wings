@@ -7,7 +7,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
-import wings.model.virtual.virtualobject.VO._
+import wings.virtualobject.domain.VirtualObject._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

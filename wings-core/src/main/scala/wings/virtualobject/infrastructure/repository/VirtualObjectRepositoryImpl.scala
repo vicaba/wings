@@ -4,7 +4,7 @@ import java.util.UUID
 
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.model.virtual.virtualobject.VO
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoService
 
 import scala.concurrent.Future
 

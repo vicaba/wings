@@ -1,17 +1,17 @@
-package wings.services.db
+package wings.toolkit.db.mongodb.service
 
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
-import play.modules.reactivemongo.json._
-import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.api.commands.WriteResult
+import reactivemongo.api.{QueryOpts, ReadPreference}
+import reactivemongo.play.json._
+import reactivemongo.play.json.collection.JSONCollection
 import wings.model.{HasIdentity, IdentityManager}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CRUDService[E <: HasIdentity[ID], ID](identityManager: IdentityManager[E, ID])
-                                                    (implicit
+abstract class MongoCrudService[E <: HasIdentity[ID], ID](identityManager: IdentityManager[E, ID])
+                                                         (implicit
                                                      tFormat: OFormat[E],
                                                      idFormat: Format[ID],
                                                      ec: ExecutionContext) {

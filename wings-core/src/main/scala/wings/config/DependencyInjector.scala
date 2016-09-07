@@ -11,7 +11,7 @@ import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualOb
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
 import wings.model.virtual.virtualobject.VOIdentityManager
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoService
 import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}
 
 import scala.concurrent.ExecutionContext.Implicits.global

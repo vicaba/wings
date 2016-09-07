@@ -6,11 +6,11 @@ import reactivemongo.api.DB
 import reactivemongo.play.json.collection.JSONCollection
 import wings.model.IdentityManager
 import wings.model.virtual.virtualobject.VO
-import wings.toolkit.db.mongodb.service.MongoCrudService
+import wings.toolkit.db.mongodb.service.MongoCrudRepository
 
 import scala.concurrent.ExecutionContext
 
-case class VirtualObjectMongoService
+case class VirtualObjectMongoRepository
 (
   db: DB
 )
@@ -20,7 +20,7 @@ case class VirtualObjectMongoService
 (
   implicit ec: ExecutionContext
 )
-  extends MongoCrudService[VO, UUID](identityManger) {
+  extends MongoCrudRepository[VO, UUID](identityManger) {
 
   override val collection: JSONCollection = db.collection("virtualObjects")
 

@@ -4,13 +4,13 @@ import java.util.UUID
 
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.model.virtual.virtualobject.VO
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
 import scala.concurrent.Future
 
 case class VirtualObjectRepositoryImpl
 (
-  virtualObjectMongoRepository: VirtualObjectMongoService
+  virtualObjectMongoRepository: VirtualObjectMongoRepository
 )
   extends VirtualObjectRepository {
 

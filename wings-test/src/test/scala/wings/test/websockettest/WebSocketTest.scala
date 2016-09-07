@@ -28,7 +28,7 @@ import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateState}
 import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 // import wings.test.helper.database.MongoEnvironment
 import wings.test.prebuilt.{Http, WebSocket}

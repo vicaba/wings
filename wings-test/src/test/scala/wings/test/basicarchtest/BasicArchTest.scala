@@ -30,7 +30,7 @@ import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateState}
 import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.test.prebuilt.{Http, WebSocket}
 import scaldi.Injectable._
@@ -204,7 +204,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> WebSocketGlobals.voId
@@ -256,7 +256,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> MqttGlobals.voId
@@ -281,7 +281,7 @@ class BasicArchTest
 
     Thread.sleep(1000)
 
-    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
 
     val virtualObjectQuery = virtualObjectService.findOneByCriteria(
       Json.obj(VO.VOIDKey -> MqttGlobals2.voId

@@ -17,7 +17,7 @@ import scaldi.Injectable._
 import websocket.WebSocketHandler
 import wings.actor.websocket.WebSocketActor
 import wings.config.DependencyInjector._
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.services.db.MongoEnvironment
 

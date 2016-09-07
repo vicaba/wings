@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.sense.SenseCapability
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager}
 import wings.services.db.MongoEnvironment
 
@@ -51,7 +51,7 @@ class VirtualObject extends Controller {
           BadRequest
         }
         case Some(finder) =>
-          val virtualObjectService = VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+          val virtualObjectService = VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
           val query = Json.obj(
             "$or" -> JsArray(Seq(
               Json.obj(s"${VO.SenseCapabilityKey}.${SenseCapability.NameKey}" -> finder.path),
@@ -74,7 +74,7 @@ class VirtualObject extends Controller {
   }
 
   def searchTestAPI = AuthenticatedAction.async {
-    val virtualObjectService = VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
     val query = Json.obj()
     virtualObjectService.findByCriteria(query).map {
       list =>

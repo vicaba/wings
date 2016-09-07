@@ -7,7 +7,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.VOIdentityManager
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.services.db.MongoEnvironment
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +20,7 @@ package object mongodb {
 
   def cleanMongoDatabase: Future[WriteResult] = {
     val selector = Json.obj()
-    val virtualObjectService = new VirtualObjectMongoService(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = new VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
     val userCollection: JSONCollection = mongoEnv.mainDb.collection("webusers")
     virtualObjectService.delete(Json.obj())
     userCollection.remove(Json.obj())

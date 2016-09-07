@@ -1,0 +1,41 @@
+@import wings.model.virtual.virtualobject.VO
+
+@(virtualObjectList: List[VO])
+
+@main("Things") {
+    <h1>Things</h1>
+
+    <table>
+        <tr>
+            <th>UUID</th>
+            <th>Path</th>
+            <th>Sense Capability (units)</th>
+            <th>Actuation Capability</th>
+
+        </tr>
+
+        @virtualObjectList.map { vo =>
+
+            <tr>
+                <td>@vo.id.getOrElse("").toString</td>
+                <td>@vo.path</td>
+
+                @vo.senseCapability.map { sc =>
+
+                    <td>@sc.name (@sc.unit)</td>
+
+                }.getOrElse("")
+
+                @vo.actuateCapability.map { ac =>
+
+                <td>@ac.name</td>
+
+                }.getOrElse("")
+
+            </tr>
+
+        }
+
+    </table>
+
+}

@@ -17,7 +17,7 @@ import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.model.virtual.virtualobject.{VO, VOIdentityManager, VOTree}
-import wings.model.virtual.virtualobject.services.db.mongo.VirtualObjectMongoService
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.services.db.MongoEnvironment
@@ -68,7 +68,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
   }
 
   def saveOrUpdateVo(vo: VOMessage): Future[Option[VO]] = {
-    val voService = new VirtualObjectMongoService(mongoEnvironment.mainDb)(VOIdentityManager)
+    val voService = new VirtualObjectMongoRepository(mongoEnvironment.mainDb)(VOIdentityManager)
     voService.findOneByCriteria(Json.obj(VO.VOIDKey -> vo.voId)).flatMap {
       // TODO: Handle the case where a virtualObject is found!
       case None =>

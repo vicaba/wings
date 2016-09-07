@@ -10,8 +10,8 @@ import wings.model.{HasIdentity, IdentityManager}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class MongoCrudService[E <: HasIdentity[ID], ID](identityManager: IdentityManager[E, ID])
-                                                         (implicit
+abstract class MongoCrudRepository[E <: HasIdentity[ID], ID](identityManager: IdentityManager[E, ID])
+                                                            (implicit
                                                      tFormat: OFormat[E],
                                                      idFormat: Format[ID],
                                                      ec: ExecutionContext) {

@@ -10,7 +10,7 @@ import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager,
 import wings.services.db.MongoEnvironment
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 
 package object mongodb {
@@ -19,7 +19,9 @@ package object mongodb {
 
   def cleanMongoDatabase: Future[WriteResult] = {
     val selector = Json.obj()
-    val virtualObjectService = new VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
+    val virtualObjectService = VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
+    Thread.sleep(2000)
+
     val userCollection: JSONCollection = mongoEnv.mainDb.collection("webusers")
     virtualObjectService.delete(Json.obj())
     userCollection.remove(Json.obj())

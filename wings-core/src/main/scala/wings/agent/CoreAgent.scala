@@ -70,24 +70,27 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
   }
 
   def saveOrUpdateVo(vo: VOMessage): Future[Option[VirtualObject]] = {
-    val voService = new VirtualObjectMongoRepository(mongoEnvironment.mainDb)(VOIdentityManager)
-    voService.findOneByCriteria(Json.obj(VirtualObjectKeys.VOIDKey -> vo.voId)).flatMap {
-      // TODO: Handle the case where a virtualObject is found!
+    val virtualObjectRepository = VirtualObjectMongoRepository(mongoEnvironment.mainDb)(VOIdentityManager)
+    virtualObjectRepository.findOneByCriteria(Json.obj(VirtualObjectKeys.VOIDKey -> vo.voId)).flatMap {
       case None =>
         logger.debug("Virtual Object with id {} not found", virtualObjectId)
         val newVirtualObject = VirtualObject(
           Some(UUID.randomUUID()), vo.voId, vo.pVoId, Some(remoteAddress), vo.children,
           vo.path, None, ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
         )
-        voService.create(newVirtualObject).map {
-
+        virtualObjectRepository.create(newVirtualObject).map {
           case Right(o) =>
             logger.debug("Inserted {}", newVirtualObject)
             Some(o)
-          case _ => None
+          case Left(wr) =>
+            logger.debug("Saving or updating a VirtualObject failed, message: {}", wr.message)
+            None
         }
 
-      case _ => Future(None)
+      case Some(o) =>
+        logger.debug("Virtual Object with id {} found", o)
+        // TODO: Handle the case where a virtualObject is found!
+        Future(None)
 
     }
   }
@@ -112,8 +115,9 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
             throw e
           //TODO: handle Failure
           case Success(optVo) =>
+            logger.debug("Success in saving VirtualObject data for the first time.")
             optVo match {
-              case None => //TODO: handle Failure
+              case None => logger.debug("VirtualObject data for the first time was empty.")
               case Some(vo) =>
                 val toArchitecture = actorOf(toArchitectureProps)
                 val createVo = CreateVo(virtualObjectId.toString)
@@ -166,7 +170,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           )
           Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
             //val voTree = parentVoTree.get
-          //saveOrUpdateVo(m).onComplete {
+            //saveOrUpdateVo(m).onComplete {
             case Failure(e) => logger.error("Error saving vo with id: {}", m.voId.toString)
             case Success(optVo) =>
               optVo match {

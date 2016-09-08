@@ -5,4 +5,6 @@ object Implicits {
 
   implicit val VirtualObjectJsonSerializer = VirtualObjectJson.VirtualObjectFormat
 
+  implicit val SenseCapabilityJsonSerializer = SenseCapabilityJson.SenseCapabilityFormat
+
 }

@@ -104,8 +104,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
           m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
-        //Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
-        saveOrUpdateVo(m).onComplete {
+        Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
+        //saveOrUpdateVo(m).onComplete {
           case Failure(e) => //TODO: handle Failure
           case Success(optVo) =>
             optVo match {

@@ -3,8 +3,8 @@ package wings.test
 import play.api.libs.json.Json
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
-import wings.model.virtual.virtualobject.actuate.{ActuateState, ActuateCapability}
-import wings.model.virtual.virtualobject.sense.SenseCapability
+import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateState}
+import wings.virtualobject.domain.SenseCapability
 
 /**
   * Created by vicaba on 18/02/16.

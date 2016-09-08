@@ -18,9 +18,9 @@ import wings.m2m.VOMessage
 import wings.m2m.conf.model.NameAcquisitionRequest
 import wings.model.virtual.operations.VoWatch
 import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateState}
-import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.test.prebuilt.{Http, WebSocket}
+import wings.virtualobject.domain.SenseCapability
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global

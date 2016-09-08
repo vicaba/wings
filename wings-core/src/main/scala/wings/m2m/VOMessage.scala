@@ -5,8 +5,9 @@ import java.util.UUID
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
-import wings.model.virtual.virtualobject.sense.SenseCapability
+import wings.virtualobject.domain.SenseCapability
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
+import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
 case class VOMessage(voId: UUID,
                      pVoId: Option[UUID] = None,

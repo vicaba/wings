@@ -5,7 +5,6 @@ import java.util.UUID
 
 import wings.model.{HasIdentity, HasVoId}
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
-import wings.model.virtual.virtualobject.sense.SenseCapability
 
 case class VirtualObject
 (

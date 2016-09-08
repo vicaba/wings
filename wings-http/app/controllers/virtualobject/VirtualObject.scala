@@ -5,9 +5,8 @@ import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
-import wings.model.virtual.virtualobject.sense.SenseCapability
 import wings.services.db.MongoEnvironment
-import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
+import wings.virtualobject.infrastructure.keys.{SenseCapabilityKeys, VirtualObjectKeys}
 import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
@@ -54,7 +53,7 @@ class VirtualObject extends Controller {
           val virtualObjectService = VirtualObjectMongoRepository(mongoEnv.mainDb)(VOIdentityManager)
           val query = Json.obj(
             "$or" -> JsArray(Seq(
-              Json.obj(s"${VirtualObjectKeys.SenseCapabilityKey}.${SenseCapability.NameKey}" -> finder.path),
+              Json.obj(s"${VirtualObjectKeys.SenseCapabilityKey}.${SenseCapabilityKeys.NameKey}" -> finder.path),
               Json.obj(s"${VirtualObjectKeys.PathKey}" -> Json.obj("$regex" -> finder.path))
             )))
           virtualObjectService.findByCriteria(query).map {

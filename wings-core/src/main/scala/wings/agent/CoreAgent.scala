@@ -104,9 +104,13 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
           m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
-        Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
-        //saveOrUpdateVo(m).onComplete {
-          case Failure(e) => //TODO: handle Failure
+        logger.debug("I'm about to save VirtualObject data for the first time")
+        //Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
+        saveOrUpdateVo(m).onComplete {
+          case Failure(e) =>
+            logger.debug("Failed to save VirtualObject data for the first time. Reason: {}", e.getStackTrace)
+            throw e
+          //TODO: handle Failure
           case Success(optVo) =>
             optVo match {
               case None => //TODO: handle Failure

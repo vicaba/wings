@@ -3,17 +3,14 @@ package wings.config
 import java.net.URI
 
 import reactivemongo.api.DB
-import scaldi.Injectable._
-
-import scala.collection.JavaConverters._
 import scaldi.Module
+import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
-import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
-import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}
+import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.JavaConverters._
 
 object DependencyInjector {
 
@@ -34,7 +31,7 @@ object DependencyInjector {
       * VirtualObject
       */
 
-    bind[VirtualObjectMongoRepository] identifiedBy 'VirtualObjectMongoService to VirtualObjectMongoRepository(inject[DB](identified by 'mainDb))(VOIdentityManager)
+    bind[VirtualObjectMongoRepository] identifiedBy 'VirtualObjectMongoService to VirtualObjectMongoRepository(inject[DB](identified by 'mainDb))
 
     bind[VirtualObjectRepository] identifiedBy 'VirtualObjectRepository to VirtualObjectRepositoryImpl(inject[VirtualObjectMongoRepository](identified by 'VirtualObjectMongoService))
 

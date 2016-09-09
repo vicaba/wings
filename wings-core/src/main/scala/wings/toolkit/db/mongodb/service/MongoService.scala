@@ -1,23 +1,37 @@
 package wings.toolkit.db.mongodb.service
 
+import org.scalactic.{Bad, Good, One, Or}
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.api.{QueryOpts, ReadPreference}
+import reactivemongo.api.{DB, QueryOpts, ReadPreference}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
+import wings.toolkit.error.application.Types.RepositoryError
+import wings.toolkit.error.application.Types.RepositoryError.{CustomRepositoryError, UnknownRepositoryError}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class MongoCrudRepository[E <: HasIdentity[ID], ID](identityManager: IdentityManager[E, ID])
-                                                            (implicit
-                                                     tFormat: OFormat[E],
-                                                     idFormat: Format[ID],
-                                                     ec: ExecutionContext) {
+abstract class MongoService[E, ID]
+(
+  db: DB
+)
+(implicit
+ ec: ExecutionContext
+) {
+
   val collection: JSONCollection
 
+  def identityKey: String
+
+  def identityOf(o: E): ID
+
+  implicit val entityFormat: OFormat[E]
+
+  implicit val identityFormat: Format[ID]
+
   def findById(id: ID): Future[Option[E]] = {
-    collection.find(Json.obj(identityManager.name -> id)).one[E]
+    collection.find(Json.obj(identityKey -> id)).one[E]
   }
 
   def findStreamByCriteria(criteria: JsObject, limit: Int): Enumerator[E] = {
@@ -54,24 +68,24 @@ abstract class MongoCrudRepository[E <: HasIdentity[ID], ID](identityManager: Id
 
   def findAll(): Future[List[E]] = findAll(None, None)
 
-  def create(o: E): Future[Either[WriteResult, E]] = {
+  def create(o: E): Future[E Or One[RepositoryError]] = {
     collection.insert(o).map {
-      case wr if wr.ok => Right(o)
-      case wr => Left(wr)
+      case wr if wr.ok => Good(o)
+      case wr => Bad(One(CustomRepositoryError(wr.message)))
     }.recover {
-      case wr: WriteResult => Left(wr)
+      case wr: WriteResult => Bad(One(CustomRepositoryError(wr.message)))
     }
   }
 
   def update(o: E): Future[Either[WriteResult, E]] = {
-    collection.update(Json.obj(identityManager.name -> o.id), o).map {
+    collection.update(Json.obj(identityKey -> identityOf(o)), o).map {
       case wr if wr.ok => Right(o)
       case wr => Left(wr)
     }
   }
 
   def delete(id: ID): Future[Either[WriteResult, ID]] = {
-    collection.remove(Json.obj(identityManager.name -> id)) map {
+    collection.remove(Json.obj(identityKey -> id)) map {
       case le if le.ok => Right(id)
       case le => Left(le)
     }
@@ -81,3 +95,4 @@ abstract class MongoCrudRepository[E <: HasIdentity[ID], ID](identityManager: Id
     collection.remove(selector)
   }
 }
+

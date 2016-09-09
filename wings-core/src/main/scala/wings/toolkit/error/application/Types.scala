@@ -18,4 +18,16 @@ object Types {
 
   }
 
+  sealed trait RepositoryError extends AppError
+
+  object RepositoryError {
+
+    case class CustomRepositoryError(override val message: String) extends RepositoryError
+
+    case object UnknownRepositoryError extends RepositoryError {
+      override val message: String = "Unknown repository error"
+    }
+
+  }
+
 }

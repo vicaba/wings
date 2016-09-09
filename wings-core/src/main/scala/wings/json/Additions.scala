@@ -1,8 +1,37 @@
 package wings.json
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
+import scala.util.Try
+
 object Additions {
+
+
+  object Formats {
+
+    object UUID {
+
+      object UUIDReads extends Reads[java.util.UUID] {
+        def parseUUID(s: String): Option[java.util.UUID] = Try(java.util.UUID.fromString(s)).toOption
+
+        def reads(json: JsValue) = json match {
+          case JsString(s) =>
+            parseUUID(s).map(JsSuccess(_)).getOrElse(JsError(Seq(JsPath() -> Seq(ValidationError("Expected UUID string")))))
+          case _ =>
+            JsError(Seq(JsPath() -> Seq(ValidationError("Expected UUID string"))))
+        }
+      }
+
+      object UUIDWrites extends Writes[java.util.UUID] {
+        def writes(uuid: java.util.UUID): JsValue = JsString(uuid.toString)
+      }
+
+      val uuidFormat: Format[java.util.UUID] = Format(UUIDReads, UUIDWrites)
+
+    }
+
+  }
 
   /**
    * Non functional nullable additions

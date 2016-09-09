@@ -3,15 +3,14 @@ package wings.virtualobject.domain
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import play.api.libs.json.{JsObject, JsValue, Json}
-import wings.model.{HasIdentity, HasVoId}
+import play.api.libs.json.{JsObject, Json}
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
+import wings.virtualobject.domain.VirtualObject.IdType
 
 case class VirtualObject
 (
-  override val id: Option[UUID],
-  override val voId: UUID,
-  pVoId: Option[UUID],
+  id: IdType,
+  parentId: Option[UUID],
   actorRef: Option[String],
   children: Option[Array[String]],
   path: String,
@@ -21,4 +20,9 @@ case class VirtualObject
   senseCapability: Option[SenseCapability],
   actuateCapability: Option[ActuateCapability]
 )
-  extends HasIdentity[UUID] with HasVoId
+
+object VirtualObject {
+
+  type IdType = UUID
+
+}

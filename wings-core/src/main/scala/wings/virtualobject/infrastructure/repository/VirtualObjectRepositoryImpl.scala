@@ -1,9 +1,9 @@
 package wings.virtualobject.infrastructure.repository
 
-import java.util.UUID
-
-import wings.virtualobject.domain.repository.VirtualObjectRepository
+import org.scalactic.{One, Or}
+import wings.toolkit.error.application.Types.AppError
 import wings.virtualobject.domain.VirtualObject
+import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
 import scala.concurrent.Future
@@ -14,7 +14,7 @@ case class VirtualObjectRepositoryImpl
 )
   extends VirtualObjectRepository {
 
-  override def findById(id: UUID): Future[Option[VirtualObject]] =
+  override def findById(id: VirtualObject.IdType): Future[Option[VirtualObject]] =
     virtualObjectMongoRepository.findById(id)
 
   override def findAll(): Future[List[VirtualObject]] =
@@ -23,4 +23,7 @@ case class VirtualObjectRepositoryImpl
 
   override def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VirtualObject]] =
     virtualObjectMongoRepository.findAll(skip, limit)
+
+  override def create(newVirtualObject: VirtualObject): Future[VirtualObject Or One[AppError]] =
+    virtualObjectMongoRepository.create(newVirtualObject)
 }

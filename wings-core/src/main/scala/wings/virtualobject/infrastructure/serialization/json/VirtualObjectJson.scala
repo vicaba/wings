@@ -11,7 +11,6 @@ import wings.model.ActorReferenced
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
 import wings.virtualobject.domain.{SenseCapability, VirtualObject}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
-import wings.virtualobject.infrastructure.repository.mongodb.VOIdentityManager
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 import wings.json.Additions._
 
@@ -19,7 +18,6 @@ import wings.json.Additions._
 object VirtualObjectJson {
 
   val VirtualObjectReads: Reads[VirtualObject] = (
-    (__ \ VOIdentityManager.name).readNullable[UUID] and
       (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
       (__ \ VirtualObjectKeys.PVOIDKey).readNullable[UUID] and
       (__ \ ActorReferenced.ReferenceKey).readNullable[String] and
@@ -33,7 +31,6 @@ object VirtualObjectJson {
     )(VirtualObject.apply _)
 
   val VirtualObjectWrites: OWrites[VirtualObject] = (
-    (__ \ VOIdentityManager.name).writeNullable[UUID] and
       (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
       (__ \ VirtualObjectKeys.PVOIDKey).writeNullable[UUID] and
       (__ \ ActorReferenced.ReferenceKey).writeNullable[String] and

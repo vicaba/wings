@@ -23,7 +23,7 @@ object VirtualObjectJson {
       (__ \ ActorReferenced.ReferenceKey).readNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
-      (__ \ VirtualObjectKeys.MetadataKey).readNullable[UUID] and
+      (__ \ VirtualObjectKeys.MetadataKey).read[JsObject] and
       (__ \ VirtualObjectKeys.CreationTimeKey).read[ZonedDateTime] and
       (__ \ VirtualObjectKeys.DeletionTimeKey).readNullable[ZonedDateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).readNullable[SenseCapability] and
@@ -37,7 +37,7 @@ object VirtualObjectJson {
       (__ \ ActorReferenced.ReferenceKey).writeNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
-      (__ \ VirtualObjectKeys.MetadataKey).writeNullable[UUID] and
+      (__ \ VirtualObjectKeys.MetadataKey).write[JsObject] and
       (__ \ VirtualObjectKeys.CreationTimeKey).write[ZonedDateTime] and
       (__ \ VirtualObjectKeys.DeletionTimeKey).writeNullable[ZonedDateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).writeNullable[SenseCapability] and

@@ -65,7 +65,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
         logger.debug("Virtual Object with id {} not found", virtualObjectId)
         val newVirtualObject = VirtualObject(
           Some(UUID.randomUUID()), vo.voId, vo.pVoId, Some(remoteAddress), vo.children,
-          vo.path, None, ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
+          vo.path, Json.obj(), ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
         )
         virtualObjectRepository.create(newVirtualObject).map {
           case Right(o) =>
@@ -94,7 +94,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case m: VOMessage =>
         val voTemp = VirtualObject(
           Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
-          m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
+          m.path, Json.obj(), ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
         logger.debug("I'm about to save VirtualObject data for the first time")
         //Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
@@ -155,7 +155,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
         if (parentVoTree.isDefined) {
           val voTemp = VirtualObject(
             Some(UUID.randomUUID()), m.voId, m.pVoId, Some(remoteAddress), m.children,
-            m.path, None, ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
+            m.path, Json.obj(), ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
           )
           Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
             //val voTree = parentVoTree.get

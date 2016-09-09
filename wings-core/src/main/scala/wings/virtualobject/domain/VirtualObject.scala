@@ -3,6 +3,7 @@ package wings.virtualobject.domain
 import java.time.ZonedDateTime
 import java.util.UUID
 
+import play.api.libs.json.{JsObject, JsValue, Json}
 import wings.model.{HasIdentity, HasVoId}
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
 
@@ -14,7 +15,7 @@ case class VirtualObject
   actorRef: Option[String],
   children: Option[Array[String]],
   path: String,
-  metadata: Option[UUID],
+  metadata: JsObject = Json.obj(),
   creationTime: ZonedDateTime,
   deletionTime: Option[ZonedDateTime],
   senseCapability: Option[SenseCapability],

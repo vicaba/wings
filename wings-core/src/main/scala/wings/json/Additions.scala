@@ -64,5 +64,11 @@ object Additions {
       * when reading undefined and empty jsarray becomes an empty collection */
     def formatNullableIterable[A <: Iterable[_]](implicit format: Format[A]): OFormat[A] =
       OFormat[A](r = readNullableIterable(format), w = writeNullableIterable(format))
+
+    def writeEmptyJsonAsNullable(implicit writes: Writes[JsObject]): OWrites[JsObject] =
+      OWrites[JsObject]{ jsObject =>
+        if(jsObject.keys.isEmpty) Json.obj()
+        else JsPath.createObj(path -> writes.writes(jsObject))
+      }
   }
 }

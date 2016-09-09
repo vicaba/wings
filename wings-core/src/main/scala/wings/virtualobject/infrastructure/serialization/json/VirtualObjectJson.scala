@@ -6,12 +6,14 @@ import java.util.UUID
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
+import play.api.libs.json.Writes._
 import wings.model.ActorReferenced
 import wings.model.virtual.virtualobject.actuate.ActuateCapability
 import wings.virtualobject.domain.{SenseCapability, VirtualObject}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.repository.mongodb.VOIdentityManager
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
+import wings.json.Additions._
 
 
 object VirtualObjectJson {
@@ -23,7 +25,7 @@ object VirtualObjectJson {
       (__ \ ActorReferenced.ReferenceKey).readNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
-      (__ \ VirtualObjectKeys.MetadataKey).read[JsObject] and
+      (__ \ VirtualObjectKeys.MetadataKey).readNullable[JsObject].map(_.getOrElse(Json.obj())) and
       (__ \ VirtualObjectKeys.CreationTimeKey).read[ZonedDateTime] and
       (__ \ VirtualObjectKeys.DeletionTimeKey).readNullable[ZonedDateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).readNullable[SenseCapability] and
@@ -37,7 +39,7 @@ object VirtualObjectJson {
       (__ \ ActorReferenced.ReferenceKey).writeNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
-      (__ \ VirtualObjectKeys.MetadataKey).write[JsObject] and
+      (__ \ VirtualObjectKeys.MetadataKey).writeEmptyJsonAsNullable and
       (__ \ VirtualObjectKeys.CreationTimeKey).write[ZonedDateTime] and
       (__ \ VirtualObjectKeys.DeletionTimeKey).writeNullable[ZonedDateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).writeNullable[SenseCapability] and
@@ -45,4 +47,5 @@ object VirtualObjectJson {
     )(unlift(VirtualObject.unapply _))
 
    val VirtualObjectFormat = OFormat(VirtualObjectReads, VirtualObjectWrites)
+
 }

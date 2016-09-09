@@ -11,13 +11,12 @@ import wings.actor.util.ActorUtilities
 import wings.collection.mutable.tree.Tree
 import wings.config.DependencyInjector._
 import wings.m2m.VOMessage
-import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.VOTree
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.services.db.MongoEnvironment
 import wings.virtualobject.agent.domain.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
-import wings.virtualobject.agent.domain.messages.command.CreateVirtualObject
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, WatchVirtualObject}
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
@@ -142,7 +141,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
     val toDeviceReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
-      case voActuate: VoActuate =>
+      case voActuate: ActuateOnVirtualObject =>
         logger.info("Sending an {} from {} to Device", voActuate.getClass, name)
         toDevice ! MsgEnv.ToDevice(voActuate)
       case sensedValue: SensedValue =>
@@ -179,10 +178,10 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
         //val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
         //sensedValueService.create(sensedValue)
         toArchitecture ! MsgEnv.ToArch(sensedValue)
-      case voWatch: VoWatch =>
+      case voWatch: WatchVirtualObject =>
         logger.info("Sending an {} from {} to Arch", voWatch.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voWatch)
-      case voActuate: VoActuate =>
+      case voActuate: ActuateOnVirtualObject =>
         logger.info("Sending an {} from {} to Arch", voActuate.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voActuate)
 

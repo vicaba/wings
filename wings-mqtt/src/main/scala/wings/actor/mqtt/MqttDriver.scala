@@ -10,9 +10,10 @@ import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.Config
-import wings.model.virtual.operations.{VoActuate, VoOp}
 import wings.model.virtual.virtualobject.sensed.SensedValue
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, WatchVirtualObject}
 import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
+import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 
@@ -56,7 +57,7 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
   override def connectionLost(throwable: Throwable): Unit = {}
 
   def validateJsonForConfig(json: JsValue): JsResult[Any] = {
-    json.validate[Config] orElse json.validate[VOMessage] orElse json.validate[VoOp]
+    json.validate[Config] orElse json.validate[VOMessage] orElse json.validate[ActuateOnVirtualObject] orElse json.validate[WatchVirtualObject]
   }
 
   def validateJsonForData(json: JsValue): JsResult[SensedValue] = {
@@ -64,7 +65,7 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
   }
 
   override def toDeviceReceive(dc: ActorRef): PartialFunction[Any, Unit] = {
-    case voActuate: VoActuate =>
+    case voActuate: ActuateOnVirtualObject =>
       val json = Json.toJson(voActuate).toString()
       val msg = MqttMessage(ConfigInTopic, json.getBytes, 2, false, false)
       conn ! MqttRouter.Publish(msg)

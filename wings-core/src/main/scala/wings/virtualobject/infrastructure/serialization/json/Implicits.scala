@@ -1,5 +1,7 @@
 package wings.virtualobject.infrastructure.serialization.json
 
+import wings.virtualobject.agent.infrastructure.serialization.json.OperateOnVirtualObjectJson
+
 
 object Implicits {
 

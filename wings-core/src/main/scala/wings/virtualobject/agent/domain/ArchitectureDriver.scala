@@ -9,10 +9,9 @@ import akka.remote.RemoteScope
 import wings.actor.cluster.pubsub.PSMediator
 import wings.actor.cluster.pubsub.PSMediator.{PublishMsg, PublishedMsg, Referrer}
 import wings.m2m.VOMessage
-import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.virtualobject.agent.domain.messages.command.{CreateVirtualObject, ManageVirtualObject, RemoveVirtualObject}
+import wings.virtualobject.agent.domain.messages.command._
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
@@ -44,8 +43,8 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
       case sv: SensedValue =>
         logger.debug("{}. Sensed Value received: {}", ArchitectureDriver.name, sv)
         continuation ! MsgEnv.ToDevice(sv)
-      case voActuate: VoActuate =>
-        logger.debug("{}. VoActuate received: {}", ArchitectureDriver.name, voActuate)
+      case voActuate: ActuateOnVirtualObject =>
+        logger.debug("{}. ActuateOnVirtualObject received: {}", ArchitectureDriver.name, voActuate)
         continuation ! MsgEnv.ToDevice(voActuate)
       case a: Any => println(s"Message not known $a")
     }
@@ -57,10 +56,10 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
       case sv: SensedValue =>
         mediator ! PublishMsg(sv.voId.toString, sv)
         logger.debug("{}. Sensed Value Published", ArchitectureDriver.name)
-      case voWatch: VoWatch =>
+      case voWatch: WatchVirtualObject =>
         mediator ! Subscribe(voWatch.path, self)
         logger.debug("{}. Subscribed to path {}", ArchitectureDriver.name, voWatch.path)
-      case voActuate: VoActuate =>
+      case voActuate: ActuateOnVirtualObject =>
         val actuatePath = voActuate.path + "/a"
         mediator ! PublishMsg(actuatePath, voActuate)
         logger.debug("{}. Published to path {}", ArchitectureDriver.name, actuatePath)

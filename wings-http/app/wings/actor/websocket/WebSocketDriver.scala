@@ -6,9 +6,10 @@ import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.json.{JsValue, Json}
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.Config
-import wings.model.virtual.operations.{VoActuate, VoWatch}
 import wings.model.virtual.virtualobject.sensed.SensedValue
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, WatchVirtualObject}
 import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
+import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 
 import scala.util.Try
 
@@ -32,13 +33,13 @@ case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: A
   }
 
   override def toDeviceReceive(dc: DeviceConnectionContext): PartialFunction[Any, Unit] = {
-    case voActuate: VoActuate =>
+    case voActuate: ActuateOnVirtualObject =>
       val json = Json.toJson(voActuate).toString()
       out ! json.toString
     case sv: SensedValue =>
       val json = Json.toJson(sv).toString()
       out ! json.toString
-    case voActuate: VoActuate =>
+    case voActuate: ActuateOnVirtualObject =>
       val json = Json.toJson(voActuate)
       out ! json.toString
   }
@@ -55,8 +56,8 @@ case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: A
 
   def validateJson(json: JsValue) = {
     json.validate[Config] orElse json.validate[VOMessage] orElse
-      json.validate[VoWatch] orElse json.validate[SensedValue] orElse
-      json.validate[VoActuate]
+      json.validate[WatchVirtualObject] orElse json.validate[SensedValue] orElse
+      json.validate[ActuateOnVirtualObject]
   }
 
 }

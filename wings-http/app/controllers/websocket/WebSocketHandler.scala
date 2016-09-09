@@ -5,13 +5,12 @@ import java.util.UUID
 import akka.actor._
 import akka.event.Logging
 import play.api.libs.json.{JsValue, Json}
-import wings.agent.CoreAgent
-import wings.agent.CoreAgentMessages.ToDeviceActor
-import wings.m2m.conf.model.{NameAcquisitionAck, NameAcquisitionRequest, Config}
-
-import scala.util.Try
+import wings.m2m.conf.model.{Config, NameAcquisitionAck, NameAcquisitionRequest}
+import wings.virtualobject.agent.domain.CoreAgent
+import wings.virtualobject.agent.domain.CoreAgentMessages.ToDeviceActor
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 object WebSocketHandler {
   def props(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef) = Props(WebSocketHandler(agentProps, webSocketOutputHandler))

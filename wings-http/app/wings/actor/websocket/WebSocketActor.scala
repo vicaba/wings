@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.actor._
 import models.user.WebUser
 import wings.actor.util.ActorUtilities
-import wings.agent.{ArchitectureDriver, CoreAgent}
+import wings.virtualobject.agent.domain.{ArchitectureDriver, CoreAgent}
 
 object WebSocketActor {
 

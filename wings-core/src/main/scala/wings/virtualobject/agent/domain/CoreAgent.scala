@@ -1,39 +1,29 @@
-package wings.agent
+package wings.virtualobject.agent.domain
 
-import java.net.URI
 import java.time.ZonedDateTime
 import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props, Stash}
 import akka.event.Logging
 import play.api.libs.json.Json
-import wings.actor.pipeline.MsgEnv
+import scaldi.Injectable._
 import wings.actor.util.ActorUtilities
-import wings.agent.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
-import wings.agent.commands.CreateVo
 import wings.collection.mutable.tree.Tree
+import wings.config.DependencyInjector._
 import wings.m2m.VOMessage
 import wings.model.virtual.operations.{VoActuate, VoWatch}
+import wings.model.virtual.virtualobject.VOTree
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
-import wings.model.virtual.virtualobject.VOTree
-import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
-import scaldi.Injectable._
-import wings.config.DependencyInjector._
 import wings.services.db.MongoEnvironment
+import wings.virtualobject.agent.domain.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
+import wings.virtualobject.agent.domain.messages.command.CreateVirtualObject
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
+import wings.virtualobject.infrastructure.repository.mongodb.{VOIdentityManager, VirtualObjectMongoRepository}
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-
-case class PipelineEndpoints(toDevice: ActorRef, toArchitecture: ActorRef) {
-  def !(message: Any)(implicit sender: ActorRef = Actor.noSender): Unit = {
-    toDevice ! MsgEnv.ToDevice(message)
-    toArchitecture ! MsgEnv.ToArch(message)
-  }
-}
 
 object CoreAgentMessages {
 
@@ -120,8 +110,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
               case None => logger.debug("VirtualObject data for the first time was empty.")
               case Some(vo) =>
                 val toArchitecture = actorOf(toArchitectureProps)
-                val createVo = CreateVo(virtualObjectId.toString)
-                val endpoints = PipelineEndpoints(toDevice, toArchitecture)
+                val createVo = CreateVirtualObject(virtualObjectId)
+                val endpoints = PipelineEndPoints(toDevice, toArchitecture)
                 endpoints ! createVo
                 val tree = VOTree(vo)
                 logger.info("Setup completed, becoming state2. I can handle messages now")
@@ -146,7 +136,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
     receive
   }
 
-  def state2(voTree: Tree[VirtualObject], endpoints: PipelineEndpoints): Receive = {
+  def state2(voTree: Tree[VirtualObject], endpoints: PipelineEndPoints): Receive = {
     val toDevice = endpoints.toDevice
     val toArchitecture = endpoints.toArchitecture
 
@@ -176,7 +166,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
               optVo match {
                 case None => //TODO: handle Failure
                 case Some(vo) =>
-                  val createVo = CreateVo(vo.id.get.toString) // TODO: Calling get is unsafe
+                  val createVo = CreateVirtualObject(vo.id.get) // TODO: Calling get is unsafe
                   endpoints ! createVo
                   voTree.add(vo)
                   become(state2(voTree, endpoints))

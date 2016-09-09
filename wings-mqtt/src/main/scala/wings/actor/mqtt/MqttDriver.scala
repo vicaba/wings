@@ -4,18 +4,15 @@ import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props}
 import org.eclipse.paho.client.mqttv3._
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import play.api.libs.json.{JsResult, JsValue, Json}
-import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
-import wings.actor.pipeline.MsgEnv
-import wings.agent.DeviceDriver
-import wings.enrichments.UUIDHelper.UUIDEnrichment
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
+import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.Config
 import wings.model.virtual.operations.{VoActuate, VoOp}
 import wings.model.virtual.virtualobject.sensed.SensedValue
+import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
 
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 

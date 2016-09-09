@@ -1,21 +1,18 @@
-package wings.agent
+package wings.virtualobject.agent.domain
 
 import java.util.UUID
 
 import akka.actor._
-import akka.cluster.pubsub.DistributedPubSubMediator.{Unsubscribe, Subscribe}
+import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, Unsubscribe}
 import akka.event.Logging
-
 import akka.remote.RemoteScope
 import wings.actor.cluster.pubsub.PSMediator
-import wings.actor.cluster.pubsub.PSMediator.{PublishedMsg, Referrer, PublishMsg}
-import wings.actor.pipeline.MsgEnv
-import wings.agent.commands.{RemoveVo, CreateVo, VoManagementCommand}
+import wings.actor.cluster.pubsub.PSMediator.{PublishMsg, PublishedMsg, Referrer}
 import wings.m2m.VOMessage
 import wings.model.virtual.operations.{VoActuate, VoWatch}
-import wings.model.virtual.virtualobject.actuated.ActuatedValue
 import wings.model.virtual.virtualobject.metadata.VOMetadata
 import wings.model.virtual.virtualobject.sensed.SensedValue
+import wings.virtualobject.agent.domain.messages.command.{CreateVirtualObject, ManageVirtualObject, RemoveVirtualObject}
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
@@ -54,7 +51,7 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
     }
 
     val toArchReceive: PartialFunction[Any, Unit] = {
-      case command: VoManagementCommand => onVoManagementCommand(command, mediator)
+      case command: ManageVirtualObject => onVoManagementCommand(command, mediator)
       case m: VOMessage =>
       case vom: VOMetadata =>
       case sv: SensedValue =>
@@ -80,11 +77,11 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
 
   }
 
-  def onVoManagementCommand(voManagementCommand: VoManagementCommand, pubSubMediator: ActorRef) = {
-    def actuatePath(voId: String) = voId + "/a"
-    voManagementCommand match {
-      case CreateVo(voId) => pubSubMediator ! Subscribe(actuatePath(voId), self)
-      case RemoveVo(voId) => pubSubMediator ! Unsubscribe(actuatePath(voId), self)
+  def onVoManagementCommand(manageVirtualObject: ManageVirtualObject, pubSubMediator: ActorRef) = {
+    def actuatePathOf(virtualObjectId: String) = virtualObjectId + "/a"
+    manageVirtualObject match {
+      case CreateVirtualObject(virtualObjectId) => pubSubMediator ! Subscribe(actuatePathOf(virtualObjectId.toString), self)
+      case RemoveVirtualObject(virtualObjectId) => pubSubMediator ! Unsubscribe(actuatePathOf(virtualObjectId.toString), self)
     }
   }
 

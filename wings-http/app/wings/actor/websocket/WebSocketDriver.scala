@@ -2,15 +2,13 @@ package wings.actor.websocket
 
 import java.util.UUID
 
-import akka.actor.{Actor, Props, ActorRef}
-import play.api.libs.json.{JsResult, JsValue, Json}
-import wings.actor.pipeline.MsgEnv
-import wings.agent.DeviceDriver
+import akka.actor.{Actor, ActorRef, Props}
+import play.api.libs.json.{JsValue, Json}
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.Config
 import wings.model.virtual.operations.{VoActuate, VoWatch}
-import wings.model.virtual.virtualobject.actuated.ActuatedValue
 import wings.model.virtual.virtualobject.sensed.SensedValue
+import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
 
 import scala.util.Try
 

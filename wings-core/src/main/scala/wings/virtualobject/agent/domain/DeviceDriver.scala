@@ -1,10 +1,9 @@
-package wings.agent
+package wings.virtualobject.agent.domain
 
-import akka.actor.{ActorRef, Actor}
-import akka.dispatch.sysmsg.Create
+import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import wings.actor.pipeline.MsgEnv
-import wings.agent.commands.{RemoveVo, CreateVo, VoManagementCommand}
+import wings.virtualobject.agent.domain.messages.command.{CreateVirtualObject, ManageVirtualObject, RemoveVirtualObject}
+
 import scala.reflect.ClassTag
 
 object DeviceDriver {
@@ -44,15 +43,15 @@ trait DeviceDriver extends Actor {
     case MsgEnv.ToDevice(msg) =>
       logger.debug("{}. Message: {} received from {}, forwarding to device", DeviceDriver.name, msg, sender.path)
       msg match {
-        case command: VoManagementCommand => onVoManageCommand(command)
+        case command: ManageVirtualObject => onManageVirtualObject(command)
         case _ => toDeviceReceive(dc)(msg)
       }
   }
 
-  def onVoManageCommand(command: VoManagementCommand) = {
+  def onManageVirtualObject(command: ManageVirtualObject) = {
     command match {
-      case CreateVo(voId) =>
-      case RemoveVo(voId) =>
+      case CreateVirtualObject(voId) =>
+      case RemoveVirtualObject(voId) =>
     }
   }
 

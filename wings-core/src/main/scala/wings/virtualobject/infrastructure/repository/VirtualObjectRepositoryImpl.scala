@@ -1,7 +1,7 @@
 package wings.virtualobject.infrastructure.repository
 
 import org.scalactic.{One, Or}
-import wings.toolkit.error.application.Types.AppError
+import wings.toolkit.error.application.Types.{AppError, RepositoryError}
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
@@ -24,6 +24,6 @@ case class VirtualObjectRepositoryImpl
   override def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VirtualObject]] =
     virtualObjectMongoRepository.findAll(skip, limit)
 
-  override def create(newVirtualObject: VirtualObject): Future[VirtualObject Or One[AppError]] =
+  override def create(newVirtualObject: VirtualObject): Future[VirtualObject Or One[RepositoryError]] =
     virtualObjectMongoRepository.create(newVirtualObject)
 }

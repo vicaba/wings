@@ -11,6 +11,7 @@ import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object DependencyInjector {
 

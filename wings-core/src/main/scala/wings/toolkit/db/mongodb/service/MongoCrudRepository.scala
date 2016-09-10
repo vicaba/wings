@@ -6,6 +6,7 @@ import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
+import wings.model.{HasIdentity, IdentityManager}
 
 import scala.concurrent.{ExecutionContext, Future}
 

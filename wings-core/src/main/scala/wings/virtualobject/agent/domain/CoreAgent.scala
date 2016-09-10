@@ -52,8 +52,6 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
   val virtualObjectRepository: VirtualObjectRepository = inject[VirtualObjectRepository](identified by 'VirtualObjectRepository)
 
-  val mongoEnvironment: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
-
   val logger = Logging(context.system, this)
 
   override def preStart(): Unit = {

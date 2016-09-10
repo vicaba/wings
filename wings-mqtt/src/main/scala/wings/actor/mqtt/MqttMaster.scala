@@ -16,7 +16,6 @@ import wings.actor.mqtt.{MqttTopics => Topics}
 import wings.m2m.conf.model._
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
-import wings.virtualobject.infrastructure.repository.mongodb.VOIdentityManager
 
 import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.{Failure, Success, Try}
@@ -34,7 +33,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   /**
    * This actor id
    */
-  val id = VOIdentityManager.next
+  val id = UUID.randomUUID()
 
   /**
    * Used virtual identities. For a key K in used identities, exists a Virtual Object V where V.id = K

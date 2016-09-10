@@ -17,7 +17,7 @@
         @virtualObjectList.map { vo =>
 
             <tr>
-                <td>@vo.id.getOrElse("").toString</td>
+                <td>@vo.id.toString</td>
                 <td>@vo.path</td>
 
                 @vo.senseCapability.map { sc =>

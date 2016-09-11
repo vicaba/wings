@@ -3,14 +3,13 @@ package models.user
 import java.util.UUID
 
 import play.api.libs.json._
-import wings.model.{ActorReferenced, HasIdentity}
 
 
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-trait User extends HasIdentity[UUID] {
-  val id: Option[UUID]
+trait User extends {
+  val id: UUID
   val username: String
   val email: String
   val password: String
@@ -33,8 +32,8 @@ object User {
  * @param password  the user password
  */
 case class WebUser(
-                    override val id: Option[UUID],
-                    virtualObjectId: Option[UUID],
+                    id: UUID,
+                    virtualObjectId: UUID,
                     override val username: String,
                     override val email: String,
                     override val password: String
@@ -56,17 +55,18 @@ object WebUser {
           email <- (json \ User.emailKey).asOpt[String]
           password <- (json \ User.passwordKey).asOpt[String]
         } yield {
-            val virtualObjectId = (json \ virtualObjectIdKey).asOpt[UUID]
-            val id = (json \ UserIdentityManager.name).asOpt[UUID]
+            val virtualObjectId = (json \ virtualObjectIdKey).as[UUID]
+            val id = (json \ "_id").as[UUID]
             JsSuccess(new WebUser(id, virtualObjectId, username, email, password))
           }) getOrElse JsError("Can't convert to WebUser")
       case _ => JsError("Can't convert to WebUser")
     }
   }
 
+  // TODO: Create id constant
   val webUserWrites: OWrites[WebUser] = (
-    (__ \ UserIdentityManager.name).writeNullable[UUID] and
-    (__ \ virtualObjectIdKey).writeNullable[UUID] and
+    (__ \ "_id").write[UUID] and
+    (__ \ virtualObjectIdKey).write[UUID] and
     (__ \ User.usernameKey).write[String] and
     (__ \ User.emailKey).write[String] and
     (__ \ User.passwordKey).write[String]

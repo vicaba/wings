@@ -13,15 +13,11 @@ import wings.collection.mutable.tree.Tree
 import wings.config.DependencyInjector._
 import wings.m2m.VOMessage
 import wings.model.virtual.virtualobject.VOTree
-import wings.model.virtual.virtualobject.metadata.VOMetadata
-import wings.services.db.MongoEnvironment
 import wings.virtualobject.agent.domain.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
 import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.repository.VirtualObjectRepository
-import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
-import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -65,7 +61,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case None =>
         logger.debug("Virtual Object with id {} not found", virtualObjectId)
         val newVirtualObject = VirtualObject(
-          vo.voId, vo.pVoId, Some(remoteAddress), vo.children,
+          vo.voId, vo.pVoId, vo.children,
           vo.path, Json.obj(), ZonedDateTime.now(), None, vo.senseCapability, vo.actuateCapability
         )
         virtualObjectRepository.create(newVirtualObject).map {
@@ -94,7 +90,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
     val toArchReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
         val voTemp = VirtualObject(
-          m.voId, m.pVoId, Some(remoteAddress), m.children,
+          m.voId, m.pVoId, m.children,
           m.path, Json.obj(), ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
         )
         logger.debug("I'm about to save VirtualObject data for the first time")
@@ -155,7 +151,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
         val parentVoTree = m.pVoId.flatMap(pVoId => voTree.getWhere(_.id == pVoId))
         if (parentVoTree.isDefined) {
           val voTemp = VirtualObject(
-            m.voId, m.pVoId, Some(remoteAddress), m.children,
+            m.voId, m.pVoId, m.children,
             m.path, Json.obj(), ZonedDateTime.now(), None, m.senseCapability, m.actuateCapability
           )
           Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
@@ -173,7 +169,6 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
               }
           }
         }
-      case vom: VOMetadata =>
       case sensedValue: VirtualObjectSensed =>
         logger.info("Sending an {} from {} to Arch", sensedValue.getClass, name)
         //val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)

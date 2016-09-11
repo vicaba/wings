@@ -2,8 +2,6 @@ package wings.virtualobject.agent.domain.messages.event
 
 import java.util.UUID
 
-import wings.model.HasIdentity
-
 sealed trait VirtualObjectOperated
 
 case class VirtualObjectSensed

@@ -7,7 +7,6 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
 import play.api.libs.json.Writes._
-import wings.model.ActorReferenced
 import wings.virtualobject.domain.{ActuateCapability, SenseCapability, VirtualObject}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
@@ -19,7 +18,6 @@ object VirtualObjectJson {
   val VirtualObjectReads: Reads[VirtualObject] = (
       (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
       (__ \ VirtualObjectKeys.PVOIDKey).readNullable[UUID] and
-      (__ \ ActorReferenced.ReferenceKey).readNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
       (__ \ VirtualObjectKeys.MetadataKey).readNullable[JsObject].map(_.getOrElse(Json.obj())) and
@@ -32,7 +30,6 @@ object VirtualObjectJson {
   val VirtualObjectWrites: OWrites[VirtualObject] = (
       (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
       (__ \ VirtualObjectKeys.PVOIDKey).writeNullable[UUID] and
-      (__ \ ActorReferenced.ReferenceKey).writeNullable[String] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
       (__ \ VirtualObjectKeys.MetadataKey).writeEmptyJsonAsNullable and

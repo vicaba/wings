@@ -10,7 +10,6 @@ case class VirtualObject
 (
   id: IdType,
   parentId: Option[UUID],
-  actorRef: Option[String],
   children: Option[Array[String]],
   path: String,
   metadata: JsObject = Json.obj(),

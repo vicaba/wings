@@ -4,8 +4,7 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import wings.model.virtual.virtualobject.actuate.ActuateCapability
-import wings.virtualobject.domain.SenseCapability
+import wings.virtualobject.domain.{ActuateCapability, SenseCapability}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 

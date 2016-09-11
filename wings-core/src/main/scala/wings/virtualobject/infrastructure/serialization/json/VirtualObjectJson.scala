@@ -8,8 +8,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
 import play.api.libs.json.Writes._
 import wings.model.ActorReferenced
-import wings.model.virtual.virtualobject.actuate.ActuateCapability
-import wings.virtualobject.domain.{SenseCapability, VirtualObject}
+import wings.virtualobject.domain.{ActuateCapability, SenseCapability, VirtualObject}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 import wings.json.Additions._

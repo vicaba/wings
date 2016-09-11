@@ -4,9 +4,9 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import wings.model.virtual.virtualobject.actuate.ActuateState
 import wings.model.{HasIdentity, IdentityManager}
-import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
+import wings.virtualobject.domain.ActuateState
+import wings.virtualobject.infrastructure.keys.{ActuateStateKeys, VirtualObjectKeys}
 
 object ActuatedValueIdentityManager extends IdentityManager[ActuatedValue, UUID] {
   override def name: String = "_id"
@@ -28,13 +28,13 @@ object ActuatedValue {
   val actuatedValueReads: Reads[ActuatedValue] = (
     (__ \ ActuatedValueIdentityManager.name).readNullable[UUID] and
     (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
-      (__ \ ActuateState.StateIdKey).read[String]
+      (__ \ ActuateStateKeys.StateIdKey).read[String]
     )(ActuatedValue.apply _)
 
   val actuatedValueWrites: OWrites[ActuatedValue] = (
     (__ \ ActuatedValueIdentityManager.name).writeNullable[UUID] and
       (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
-      (__ \ ActuateState.StateIdKey).write[String]
+      (__ \ ActuateStateKeys.StateIdKey).write[String]
     )(unlift(ActuatedValue.unapply _))
 
   implicit val stateLogicFormat = OFormat(actuatedValueReads, actuatedValueWrites)

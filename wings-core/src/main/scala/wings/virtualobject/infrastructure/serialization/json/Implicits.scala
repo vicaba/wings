@@ -1,9 +1,10 @@
 package wings.virtualobject.infrastructure.serialization.json
 
-import wings.virtualobject.agent.infrastructure.serialization.json.OperateOnVirtualObjectJson
-
-
 object Implicits {
+
+  lazy implicit val ActuateStateJsonSerializer = ActuateStateJson.ActuateStateFormat
+
+  lazy implicit val ActuateCapabilityJsonSerializer = ActuateCapabilityJson.ActuateCapabilityFormat
 
   lazy implicit val SenseCapabilityJsonSerializer = SenseCapabilityJson.SenseCapabilityFormat
 

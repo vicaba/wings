@@ -16,11 +16,11 @@ import wings.config.DependencyInjector._
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.NameAcquisitionRequest
-import wings.model.virtual.virtualobject.actuate.{ActuateCapability, ActuateState}
+import wings.model.virtual.virtualobject.actuate.ActuateState
 import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.test.prebuilt.{Http, WebSocket}
 import wings.virtualobject.agent.domain.messages.command.WatchVirtualObject
-import wings.virtualobject.domain.SenseCapability
+import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 
 import scala.concurrent.Await

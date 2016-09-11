@@ -4,7 +4,6 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 import play.api.libs.json.{JsObject, Json}
-import wings.model.virtual.virtualobject.actuate.ActuateCapability
 import wings.virtualobject.domain.VirtualObject.IdType
 
 case class VirtualObject

@@ -5,9 +5,9 @@ import java.util.UUID
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
-import wings.model.virtual.virtualobject.actuate.ActuateState
 import wings.model.{HasIdentity, IdentityManager}
-import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
+import wings.virtualobject.domain.ActuateState
+import wings.virtualobject.infrastructure.keys.{ActuateStateKeys, VirtualObjectKeys}
 
 
 object SensedValueIdentityManager extends IdentityManager[SensedValue, UUID] {
@@ -35,7 +35,7 @@ object SensedValue {
       (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
       (__ \ ValueKey).read[String] and
       (__ \ "unit").readNullable[String] and
-        (__ \ ActuateState.StateIdKey).readNullable[String]
+        (__ \ ActuateStateKeys.StateIdKey).readNullable[String]
     )(SensedValue.apply _)
 
   val sensedValueWrites: OWrites[SensedValue] = (
@@ -43,7 +43,7 @@ object SensedValue {
       (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
       (__ \ ValueKey).write[String] and
       (__ \ "unit").writeNullable[String] and
-        (__ \ ActuateState.StateIdKey).writeNullable[String]
+        (__ \ ActuateStateKeys.StateIdKey).writeNullable[String]
     )(unlift(SensedValue.unapply _))
 
   implicit val sensedvalueFormat = OFormat(sensedValueReads, sensedValueWrites)

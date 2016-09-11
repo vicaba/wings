@@ -10,8 +10,8 @@ import wings.actor.cluster.pubsub.PSMediator
 import wings.actor.cluster.pubsub.PSMediator.{PublishMsg, PublishedMsg, Referrer}
 import wings.m2m.VOMessage
 import wings.model.virtual.virtualobject.metadata.VOMetadata
-import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.virtualobject.agent.domain.messages.command._
+import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
@@ -40,7 +40,7 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
     val toDeviceReceive: PartialFunction[Any, Unit] = {
       case m: VOMessage =>
       case vom: VOMetadata =>
-      case sv: SensedValue =>
+      case sv: VirtualObjectSensed =>
         logger.debug("{}. Sensed Value received: {}", ArchitectureDriver.name, sv)
         continuation ! MsgEnv.ToDevice(sv)
       case voActuate: ActuateOnVirtualObject =>
@@ -53,7 +53,7 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
       case command: ManageVirtualObject => onVoManagementCommand(command, mediator)
       case m: VOMessage =>
       case vom: VOMetadata =>
-      case sv: SensedValue =>
+      case sv: VirtualObjectSensed =>
         mediator ! PublishMsg(sv.voId.toString, sv)
         logger.debug("{}. Sensed Value Published", ArchitectureDriver.name)
       case voWatch: WatchVirtualObject =>

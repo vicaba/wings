@@ -14,10 +14,10 @@ import wings.config.DependencyInjector._
 import wings.m2m.VOMessage
 import wings.model.virtual.virtualobject.VOTree
 import wings.model.virtual.virtualobject.metadata.VOMetadata
-import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.services.db.MongoEnvironment
 import wings.virtualobject.agent.domain.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
 import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, WatchVirtualObject}
+import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
@@ -145,7 +145,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case voActuate: ActuateOnVirtualObject =>
         logger.info("Sending an {} from {} to Device", voActuate.getClass, name)
         toDevice ! MsgEnv.ToDevice(voActuate)
-      case sensedValue: SensedValue =>
+      case sensedValue: VirtualObjectSensed =>
         logger.info("Sending an {} from {} to Device", sensedValue.getClass, name)
         toDevice ! MsgEnv.ToDevice(sensedValue)
     }
@@ -174,7 +174,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
           }
         }
       case vom: VOMetadata =>
-      case sensedValue: SensedValue =>
+      case sensedValue: VirtualObjectSensed =>
         logger.info("Sending an {} from {} to Arch", sensedValue.getClass, name)
         //val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
         //sensedValueService.create(sensedValue)

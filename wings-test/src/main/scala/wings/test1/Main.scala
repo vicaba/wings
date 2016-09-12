@@ -89,32 +89,6 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    // WebSocket Connection
-
-    val receiverProbe = TestProbe()(system)
-
-    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
-
-    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
-
-    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
-    )
-
-    // End WebSocket Connection
-
-    Thread.sleep(300)
-
-    System.exit(-1)
-
-    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(WebSocketGlobals.Messages.metadata).toString
-    )
-
-    Thread.sleep(300)
-
-    println("WebSocket has sent metadata")
-
     val numberOfSenders = 150
 
     val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
@@ -152,6 +126,26 @@ object Main {
     println("Metadata Sent")
 
     // Request a WebSocket connection and watch sensed messages
+
+    val receiverProbe = TestProbe()(system)
+
+    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
+
+    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
+    )
+
+    Thread.sleep(300)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(WebSocketGlobals.Messages.metadata).toString
+    )
+
+    Thread.sleep(300)
+
+    println("WebSocket has sent metadata")
 
     actorList.foreach { case (uuid, actorRef) =>
 

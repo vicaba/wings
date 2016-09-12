@@ -1,4 +1,18 @@
 package controllers.admin
+
+import java.util.UUID
+
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.Materializer
+import com.google.inject.Inject
+import play.api.libs.streams.ActorFlow
+import play.api.mvc.{Controller, WebSocket}
+import play.mvc.Security.AuthenticatedAction
+import websocket.WebSocketHandler
+import wings.actor.websocket.WebSocketActor
+
+import scala.concurrent.Future
+
 /*
 
 import java.util.UUID
@@ -49,3 +63,19 @@ class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materiali
 
 }
 */
+
+class WebSocket @Inject()
+(
+  implicit system: ActorSystem,
+  materializer: Materializer
+)
+extends Controller
+{
+
+  def apply = WebSocket.acceptOrResult[String, String] { req =>
+    // TODO: Add authentication
+    val coreAgentProps = (voId: UUID, out: ActorRef) => WebSocketActor.props(voId)(out)
+    Future.successful(Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out), Int.MaxValue)))
+  }
+
+}

@@ -30,4 +30,18 @@ object Types {
 
   }
 
+  sealed trait ValueObjectError extends AppError
+
+  object ValueObjectError {
+
+    case class ValueObjectConstructionError(valueObjectName: Option[String]) extends ValueObjectError {
+
+      override val message: String = valueObjectName.map {
+        _ + "constraints error"
+      }.getOrElse("ValueObject constraints error")
+
+    }
+
+  }
+
 }

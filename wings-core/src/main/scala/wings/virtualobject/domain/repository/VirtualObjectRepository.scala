@@ -14,7 +14,6 @@ trait VirtualObjectRepository {
 
   def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VirtualObject]]
 
-  // TODO: This should not return a generic AppError
   def create(newVirtualObject: VirtualObject): Future[VirtualObject Or One[RepositoryError]]
 
 }

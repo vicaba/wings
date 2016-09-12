@@ -3,13 +3,12 @@ package wings.actor.websocket
 import java.util.UUID
 
 import akka.actor._
-import models.user.WebUser
 import wings.actor.util.ActorUtilities
 import wings.virtualobject.agent.domain.{ArchitectureDriver, CoreAgent}
 
 object WebSocketActor {
 
-  def props(virtualObjectId: UUID, user: WebUser)(out: ActorRef) = Props(new WebSocketActor(virtualObjectId, user, out))
+  def props(virtualObjectId: UUID)(out: ActorRef) = Props(new WebSocketActor(virtualObjectId, out))
 
 }
 
@@ -18,7 +17,7 @@ object WebSocketActor {
   *
   * @param out an actor reference representing the other side of the connection, usually the browser client
   */
-class WebSocketActor(val virtualObjectId: UUID, user: WebUser, out: ActorRef)
+class WebSocketActor(val virtualObjectId: UUID, out: ActorRef)
   extends Actor
     with CoreAgent
   with ActorUtilities {

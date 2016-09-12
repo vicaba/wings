@@ -19,6 +19,7 @@ class ListVirtualObjectController
   extends Controller {
 
   val listVirtualObjectUseCase: ListVirtualObject.UseCase = inject[ListVirtualObject.UseCase](identified by 'ListVirtualObjectUseCase)
+
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 
   def apply() = Action.async {

@@ -5,18 +5,18 @@ GET           /                            controllers.Index.apply
 # User
 
 #API
-POST          /api/user/                   controllers.User.signUpAPI
+POST          /api/v1/user/                   wings.user.infrastructure.http.api.SignUpUserController.apply()
 
-POST          /api/user/session/           controllers.User.signInAPI
+POST          /api/v1/user/session/            wings.user.infrastructure.http.api.SignInUserController.apply()
 
-DELETE        /api/user/session/           controllers.User.logoutAPI
+DELETE        /api/v1/user/session/                wings.user.infrastructure.http.api.LogoutUserController.apply()
 
 
 # Admin
 
 # API
 
-GET           /api/admin/ws/socket/        controllers.admin.WebSocket.socketAPI
+# GET           /api/admin/ws/socket/        controllers.admin.WebSocket.socketAPI
 
 # Virtual Object
 

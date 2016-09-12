@@ -3,10 +3,10 @@ package common.request
 import java.util.UUID
 
 import common.JsonTemplates
-import models.user.UserIdentityManager
 import play.api.mvc.{ActionBuilder, Request, WrappedRequest, _}
 import wings.enrichments.UUIDHelper
 import play.api.libs.concurrent.{Execution => playEc}
+import wings.user.infrastructure.keys.UserKeys
 
 import scala.concurrent.Future
 
@@ -55,7 +55,7 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
     */
   def sessionAuthenticate(request: RequestHeader) = {
     request.session.get("username")
-      .flatMap(name => request.session.get(UserIdentityManager.name).map((name, _)))
+      .flatMap(name => request.session.get(UserKeys.IdKey).map((name, _)))
       .flatMap { case (name, uid) => UUIDHelper.tryFromString(uid).map(uuid => (name, uuid)).toOption }
   }
 }

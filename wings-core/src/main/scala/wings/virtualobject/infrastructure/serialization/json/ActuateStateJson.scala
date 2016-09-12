@@ -8,16 +8,16 @@ import wings.virtualobject.infrastructure.keys.ActuateStateKeys
 
 object ActuateStateJson {
 
-  implicit val actuateStateReads: Reads[ActuateState] = (
+  val actuateStateReads: Reads[ActuateState] = (
     (__ \ ActuateStateKeys.StateIdKey).read[String] and
       (__ \ ActuateStateKeys.DescriptionKey).readNullable[String]
     )(ActuateState.apply _)
 
-  implicit val actuateStateWrites: OWrites[ActuateState] = (
+  val actuateStateWrites: OWrites[ActuateState] = (
     (__ \ ActuateStateKeys.StateIdKey).write[String] and
       (__ \ ActuateStateKeys.DescriptionKey).writeNullable[String]
     )(unlift(ActuateState.unapply _))
 
-  implicit val ActuateStateFormat = OFormat(actuateStateReads, actuateStateWrites)
+  val ActuateStateFormat = OFormat(actuateStateReads, actuateStateWrites)
 
 }

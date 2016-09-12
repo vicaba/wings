@@ -72,7 +72,7 @@ class WebSocket @Inject()
 extends Controller
 {
 
-  def apply = WebSocket.acceptOrResult[String, String] { req =>
+  def apply() = WebSocket.acceptOrResult[String, String] { req =>
     // TODO: Add authentication
     val coreAgentProps = (voId: UUID, out: ActorRef) => WebSocketActor.props(voId)(out)
     Future.successful(Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out), Int.MaxValue)))

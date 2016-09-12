@@ -16,10 +16,9 @@ import wings.config.DependencyInjector._
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
 import wings.m2m.conf.model.NameAcquisitionRequest
-import wings.model.virtual.virtualobject.actuate.ActuateState
-import wings.model.virtual.virtualobject.sensed.SensedValue
 import wings.test.prebuilt.{Http, WebSocket}
 import wings.virtualobject.agent.domain.messages.command.WatchVirtualObject
+import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 
@@ -55,7 +54,7 @@ object Main {
         Some(ActuateCapability("light", Array(ActuateState("on"), ActuateState("off"))))
       )
 
-      def sensedValue(id: UUID) = SensedValue(voId = id, value = "5", unit = Some("C"))
+      def sensedValue(id: UUID) = VirtualObjectSensed(voId = id, value = "5", unit = Some("C"))
 
     }
 
@@ -89,6 +88,32 @@ object Main {
     cleanMongoDatabase
 
     implicit val system = ActorSystem("system-test1")
+
+    // WebSocket Connection
+
+    val receiverProbe = TestProbe()(system)
+
+    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
+
+    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
+    )
+
+    // End WebSocket Connection
+
+    Thread.sleep(300)
+
+    System.exit(-1)
+
+    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+      Json.toJson(WebSocketGlobals.Messages.metadata).toString
+    )
+
+    Thread.sleep(300)
+
+    println("WebSocket has sent metadata")
 
     val numberOfSenders = 150
 
@@ -127,26 +152,6 @@ object Main {
     println("Metadata Sent")
 
     // Request a WebSocket connection and watch sensed messages
-
-    val receiverProbe = TestProbe()(system)
-
-    val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
-
-    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
-
-    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
-    )
-
-    Thread.sleep(300)
-
-    webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(WebSocketGlobals.Messages.metadata).toString
-    )
-
-    Thread.sleep(300)
-
-    println("WebSocket has sent metadata")
 
     actorList.foreach { case (uuid, actorRef) =>
 

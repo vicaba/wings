@@ -21,7 +21,7 @@ case class VirtualObjectMongoRepository
 )
   extends MongoService[VirtualObject, VirtualObject.IdType](db) {
 
-  override val collection: JSONCollection = db.collection("virtualObjects")
+  override val collection: JSONCollection = db.collection("virtualObject")
 
   override def identityKey: String = VirtualObjectKeys.VOIDKey
 

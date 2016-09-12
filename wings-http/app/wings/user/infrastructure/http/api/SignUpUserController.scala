@@ -1,23 +1,23 @@
 package wings.user.infrastructure.http.api
 
-import com.google.inject.Singleton
+import com.google.inject.{Inject, Provider, Singleton}
 import httpplay.config.DependencyInjector._
 import httpplay.error.HttpErrorHandler
+import play.api.Application
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
 import wings.user.application.usecase.SignUpUser
 import wings.user.application.usecase.SignUpUser.Message
-import play.api.i18n.Messages.Implicits._
-
+import wings.user.infrastructure.keys.UserKeys
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 @Singleton
-class SignUpUserController
+class SignUpUserController @Inject() (appProvider: Provider[Application])
   extends Controller {
 
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
@@ -25,16 +25,18 @@ class SignUpUserController
   val signUpUserUseCase: SignUpUser.UseCase = inject[SignUpUser.UseCase](identified by 'SignUpUserUseCase)
 
   def apply() = Action.async(parse.json) { implicit request =>
-    println(request.body)
     userSignUpForm.bindFromRequest().fold(
       formWithErrors => {
+        implicit lazy val app = appProvider.get()
+        val lang = play.api.i18n.Lang.defaultLang
+        implicit val m = play.api.i18n.Messages.Implicits.applicationMessages(lang, app)
         Future {
-          BadRequest
+          BadRequest(formWithErrors.errorsAsJson)
         }
       },
       success => {
         signUpUserUseCase.execute(Message(success._1, success._2, success._3, success._4)).map {
-          httpErrorHandler.handle(_) { user => Created }
+          httpErrorHandler.handle(_) { user => Created.addingToSession(UserKeys.NameKey -> user.name.value, UserKeys.IdKey -> user.id.toString) }
         }
       }
     )

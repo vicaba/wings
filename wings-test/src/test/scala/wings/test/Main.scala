@@ -3,7 +3,6 @@ package wings.test
 import play.api.libs.json.Json
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
-import wings.model.virtual.virtualobject.actuate.ActuateState
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 
 /**

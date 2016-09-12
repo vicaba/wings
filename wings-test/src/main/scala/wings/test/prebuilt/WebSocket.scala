@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 object WebSocket {
 
-  val webSocketUrl = "ws://localhost:9000/api/admin/ws/socket/"
+  val webSocketUrl = "ws://localhost:9000/api/v1/admin/ws/socket"
 
   def getConnection(response: WSResponse, testActor: ActorRef = ActorRef.noSender)(actorSystem: ActorSystem = ActorSystem())
   = {

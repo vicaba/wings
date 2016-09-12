@@ -25,7 +25,8 @@ object SignUpUser {
       ) {
         (_, _, _, _)
       } match {
-        case Good((name, email, password, _)) => userRepository.create(User(User.nextIdentity, name, email, password))
+        case Good((name, email, password, _)) =>
+          userRepository.create(User(User.nextIdentity, name, email, password))
         case bad => Future.successful(Good[User].orBad(bad.swap.get))
       }
     }

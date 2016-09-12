@@ -54,7 +54,7 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
     * @return
     */
   def sessionAuthenticate(request: RequestHeader) = {
-    request.session.get("username")
+    request.session.get(UserKeys.NameKey)
       .flatMap(name => request.session.get(UserKeys.IdKey).map((name, _)))
       .flatMap { case (name, uid) => UUIDHelper.tryFromString(uid).map(uuid => (name, uuid)).toOption }
   }

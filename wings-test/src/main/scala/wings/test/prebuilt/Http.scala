@@ -30,7 +30,7 @@ object Http {
         "passwdConf" -> User.password
       )
       val request =
-        httpClient.url("http://localhost:9000/api/user/").
+        httpClient.url("").
           withHeaders("Content-Type" -> "application/json").
           withBody(jsonBody).
           withMethod("POST")

@@ -1,35 +1,35 @@
 # GUI
 
-GET           /                            controllers.Index.apply
+GET           /                              controllers.Index.apply
 
 # User
 
 #API
-POST          /api/v1/user/                   wings.user.infrastructure.http.api.SignUpUserController.apply()
+POST          /api/v1/users                  wings.user.infrastructure.http.api.SignUpUserController.apply()
 
-POST          /api/v1/user/session/            wings.user.infrastructure.http.api.SignInUserController.apply()
+POST          /api/v1/users/session          wings.user.infrastructure.http.api.SignInUserController.apply()
 
-DELETE        /api/v1/user/session/                wings.user.infrastructure.http.api.LogoutUserController.apply()
+DELETE        /api/v1/users/session          wings.user.infrastructure.http.api.LogoutUserController.apply()
 
 
 # Admin
 
 # API
 
-# GET           /api/admin/ws/socket/        controllers.admin.WebSocket.socketAPI
+GET           /api/v1/admin/ws/socket        controllers.admin.WebSocket.apply()
 
 # Virtual Object
 
 # API
 
-GET           /api/v1/vo                   wings.virtualobject.infrastructure.http.api.controller.ListVirtualObjectController.apply()
+GET           /api/v1/vos                    wings.virtualobject.infrastructure.http.api.controller.ListVirtualObjectController.apply()
 
-GET           /api/v1/vo/:id               wings.virtualobject.infrastructure.http.api.controller.ShowVirtualObjectController.apply(id: String)
+GET           /api/v1/vos/:id                wings.virtualobject.infrastructure.http.api.controller.ShowVirtualObjectController.apply(id: String)
 
 
 # GUI
 
-GET           /vo                          wings.virtualobject.infrastructure.http.gui.controller.ListVirtualObjectController.apply()
+GET           /vo                            wings.virtualobject.infrastructure.http.gui.controller.ListVirtualObjectController.apply()
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file                  controllers.Assets.versioned(path="/public", file: Asset)

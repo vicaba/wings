@@ -6,7 +6,7 @@ import reactivemongo.api.commands.WriteResult
 import reactivemongo.play.json.collection.JSONCollection
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
-import wings.services.db.MongoEnvironment
+import wings.toolkit.db.mongodb.service.MongoEnvironment
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -1,4 +1,4 @@
-package wings.services.db
+package wings.toolkit.db.mongodb.service
 
 import reactivemongo.api.{DB, MongoConnectionOptions, MongoDriver}
 import scaldi.Injectable._
@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 
 
-object MongoEnvironmentImpl extends wings.services.db.MongoEnvironment {
+object MongoEnvironmentImpl extends MongoEnvironment {
 
   override val driver1 = MongoDriver() // first pool
 

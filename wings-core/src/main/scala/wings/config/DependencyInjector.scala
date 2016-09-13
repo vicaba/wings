@@ -4,7 +4,7 @@ import java.net.URI
 
 import reactivemongo.api.DB
 import scaldi.Module
-import wings.services.db.{MongoEnvironment, MongoEnvironmentImpl}
+import wings.toolkit.db.mongodb.service.{MongoEnvironment, MongoEnvironmentImpl}
 import wings.user.application.usecase.{SignInUser, SignUpUser}
 import wings.user.domain.repository.UserRepository
 import wings.user.infrastructure.repository.UserRepositoryImpl

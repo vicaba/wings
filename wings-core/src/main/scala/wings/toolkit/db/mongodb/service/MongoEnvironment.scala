@@ -1,6 +1,5 @@
-package wings.services.db
+package wings.toolkit.db.mongodb.service
 
-import com.typesafe.config.Config
 import reactivemongo.api.{DB, MongoDriver}
 
 

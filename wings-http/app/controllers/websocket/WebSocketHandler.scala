@@ -5,9 +5,10 @@ import java.util.UUID
 import akka.actor._
 import akka.event.Logging
 import play.api.libs.json.{JsValue, Json}
-import wings.m2m.conf.model.{Config, NameAcquisitionAck, NameAcquisitionRequest}
 import wings.virtualobject.agent.domain.CoreAgent
+import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 import wings.virtualobject.agent.domain.CoreAgentMessages.ToDeviceActor
+import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
 
 import scala.concurrent.duration._
 import scala.util.Try
@@ -37,9 +38,9 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
       msgToJson(msg).map(validateJson(_).map {
         case cnf: NameAcquisitionRequest =>
           // TODO: Perform name resolution here
-          webSocketOutputHandler ! Json.toJson[Config](NameAcquisitionAck("")).toString() // Send an ACK temporarily
+          webSocketOutputHandler ! Json.toJson(NameAcquisitionAck(cnf.virtualObjectId)).toString() // Send an ACK temporarily
           // TODO: Save Actor UUID to user
-          val coreAgent = context.actorOf(agentProps(UUID.fromString(cnf.value), webSocketOutputHandler), CoreAgent.name)
+          val coreAgent = context.actorOf(agentProps(cnf.virtualObjectId, webSocketOutputHandler), CoreAgent.name)
           val tickToQueryForToDeviceActor = context.system.scheduler.schedule(0.millis, 500.millis, coreAgent, ToDeviceActor)
           become(waitForFirstToDeviceMessage(tickToQueryForToDeviceActor))
       })
@@ -65,7 +66,7 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))
 
   def validateJson(json: JsValue) = {
-    json.validate[Config]
+    json.validate[RegisterVirtualObjectId]
   }
 
   override def postStop = {

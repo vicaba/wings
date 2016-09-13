@@ -23,7 +23,7 @@ case class VirtualObjectMongoRepository
 
   override val collection: JSONCollection = db.collection("virtualObject")
 
-  override def identityKey: String = VirtualObjectKeys.VOIDKey
+  override def identityKey: String = VirtualObjectKeys.IdKey
 
   override def identityOf(o: VirtualObject): IdType = o.id
 

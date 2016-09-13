@@ -3,8 +3,8 @@ package wings.virtualobject.infrastructure.keys
 
 object VirtualObjectKeys {
 
-  val VOIDKey = "VOID"
-  val PVOIDKey = "pVOID"
+  val IdKey = "voId"
+  val ParentIdKey = "pVoId"
   val ChildrenKey = "children"
   val PathKey = "path"
   val MetadataKey = "metadata"

@@ -5,7 +5,7 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSResponse
 import scaldi.Injectable._
 import wings.actor.mqtt.router.MqttRouter
@@ -15,6 +15,8 @@ import wings.client.actor.websocket.ActorJettyWebSocketAdapter
 import wings.config.DependencyInjector._
 import wings.enrichments.UUIDHelper
 import wings.test.prebuilt.{Http, WebSocket}
+import wings.test.util.RandomPointGenerator
+import wings.test.util.RandomPointGenerator.Point
 import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionRequest, VirtualObjectBasicDefinition, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
@@ -48,7 +50,7 @@ object Main {
         None,
         None,
         Some(id.toString),
-        Json.obj(),
+        Json.obj() ++ RandomPointGenerator.generateRandomJsonPoint(),
         Some(SenseCapability("power", "W")),
         Some(ActuateCapability("light", Array(ActuateState("on"), ActuateState("off"))))
       )

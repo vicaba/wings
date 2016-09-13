@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  lazy val akkaVersion = "2.4.9"
+  lazy val akkaVersion = "2.4.10"
 
   lazy val playVersion = "2.5.6"
 
@@ -18,7 +18,7 @@ object Dependencies {
 
   lazy val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.11" % akkaVersion
 
-  lazy val akkaSlf4j = "com.typesafe.akka" % "akka-slf4j_2.11" % "2.4.4"
+  lazy val akkaSlf4j = "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
 
   lazy val playJson = "com.typesafe.play" %% "play-json" % playVersion
 
@@ -32,9 +32,9 @@ object Dependencies {
 
   lazy val slf4j = "org.slf4j" % "slf4j-api" % "1.7.21"
 
-  lazy val eclipsePaho = "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.2"
+  lazy val eclipsePaho = "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0"
 
-  lazy val jettyWebSocket = "org.eclipse.jetty.websocket" % "websocket-client" % "9.3.8.v20160314"
+  lazy val jettyWebSocket = "org.eclipse.jetty.websocket" % "websocket-client" % "9.3.11.v20160721"
 
   lazy val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 

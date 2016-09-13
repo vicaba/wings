@@ -10,12 +10,12 @@ object Implicits {
 
   lazy implicit val VirtualObjectSensedJsonSerializer = VirtualObjectOperatedJson.VirtualObjectSensedFormat
   
-  lazy implicit val NameAcquisitionRequestJsonSerializer = RegisterVirtualObjectJson.NameAcquisitionRequestFormat
+  lazy implicit val NameAcquisitionRequestJsonSerializer = RegisterVirtualObjectIdJson.NameAcquisitionRequestFormat
 
-  lazy implicit val NameAcquisitionAckJsonSerializer = RegisterVirtualObjectJson.NameAcquisitionAckFormat
+  lazy implicit val NameAcquisitionAckJsonSerializer = RegisterVirtualObjectIdJson.NameAcquisitionAckFormat
   
-  lazy implicit val NameAcquisitionRejectJsonSerializer = RegisterVirtualObjectJson.NameAcquisitionRejectFormat
+  lazy implicit val NameAcquisitionRejectJsonSerializer = RegisterVirtualObjectIdJson.NameAcquisitionRejectFormat
 
-  lazy implicit val RegisterVirtualObjectJsonSerializer = RegisterVirtualObjectJson.RegisterVirtualObjectReads
+  lazy implicit val RegisterVirtualObjectIdJsonSerializer = RegisterVirtualObjectIdJson.RegisterVirtualObjectIdReads
 
 }

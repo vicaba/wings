@@ -6,14 +6,14 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Writes._
 import play.api.libs.json.{JsObject, Json, OFormat, OWrites, Reads, _}
 import wings.virtualobject.agent.domain.messages.command._
-import wings.virtualobject.agent.infrastructure.keys.RegisterVirtualObjectKeys
+import wings.virtualobject.agent.infrastructure.keys.RegisterVirtualObjectIdKeys
 
 
-object RegisterVirtualObjectJson {
+object RegisterVirtualObjectIdJson {
 
   val NameAcquisitionRequestReads: Reads[NameAcquisitionRequest] = (
-    (__ \ RegisterVirtualObjectKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectKeys.NameAcquisitionRequestPath) ~>
-      (__ \ RegisterVirtualObjectKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath) ~>
+      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionRequest(id)
   }
 
@@ -21,8 +21,8 @@ object RegisterVirtualObjectJson {
 
     override def writes(o: NameAcquisitionRequest): JsObject =
       Json.obj(
-        RegisterVirtualObjectKeys.OperationKey -> RegisterVirtualObjectKeys.NameAcquisitionRequestPath,
-        RegisterVirtualObjectKeys.VirtualObjectIdKey -> o.virtualObjectId
+        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath,
+        RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
   }
@@ -30,8 +30,8 @@ object RegisterVirtualObjectJson {
   val NameAcquisitionRequestFormat = OFormat(NameAcquisitionRequestReads, NameAcquisitionRequestWrites)
 
   val NameAcquisitionAckReads: Reads[NameAcquisitionAck] = (
-    (__ \ RegisterVirtualObjectKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectKeys.NameAcquisitionAckPath) ~>
-      (__ \ RegisterVirtualObjectKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionAckPath) ~>
+      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionAck(id)
   }
 
@@ -39,8 +39,8 @@ object RegisterVirtualObjectJson {
 
     override def writes(o: NameAcquisitionAck): JsObject =
       Json.obj(
-        RegisterVirtualObjectKeys.OperationKey -> RegisterVirtualObjectKeys.NameAcquisitionAckPath,
-        RegisterVirtualObjectKeys.VirtualObjectIdKey -> o.virtualObjectId
+        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionAckPath,
+        RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
   }
@@ -48,8 +48,8 @@ object RegisterVirtualObjectJson {
   val NameAcquisitionAckFormat = OFormat(NameAcquisitionAckReads, NameAcquisitionAckWrites)
 
   val NameAcquisitionRejectReads: Reads[NameAcquisitionReject] = (
-    (__ \ RegisterVirtualObjectKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectKeys.NameAcquisitionRejectPath) ~>
-      (__ \ RegisterVirtualObjectKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath) ~>
+      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionReject(id)
   }
 
@@ -57,8 +57,8 @@ object RegisterVirtualObjectJson {
 
     override def writes(o: NameAcquisitionReject): JsObject =
       Json.obj(
-        RegisterVirtualObjectKeys.OperationKey -> RegisterVirtualObjectKeys.NameAcquisitionRejectPath,
-        RegisterVirtualObjectKeys.VirtualObjectIdKey -> o.virtualObjectId
+        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath,
+        RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
   }
@@ -66,9 +66,9 @@ object RegisterVirtualObjectJson {
   val NameAcquisitionRejectFormat = OFormat(NameAcquisitionRejectReads, NameAcquisitionRejectWrites)
 
 
-  object RegisterVirtualObjectReads extends Reads[RegisterVirtualObject] {
+  object RegisterVirtualObjectIdReads extends Reads[RegisterVirtualObjectId] {
 
-    override def reads(json: JsValue): JsResult[RegisterVirtualObject] =
+    override def reads(json: JsValue): JsResult[RegisterVirtualObjectId] =
       json.validate[NameAcquisitionRequest](NameAcquisitionRequestReads) or
         json.validate[NameAcquisitionAck](NameAcquisitionAckReads) or
         json.validate[NameAcquisitionReject](NameAcquisitionRejectReads)

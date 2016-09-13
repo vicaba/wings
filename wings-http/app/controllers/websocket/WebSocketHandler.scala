@@ -8,7 +8,7 @@ import play.api.libs.json.{JsValue, Json}
 import wings.virtualobject.agent.domain.CoreAgent
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
 import wings.virtualobject.agent.domain.CoreAgentMessages.ToDeviceActor
-import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObject}
+import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
 
 import scala.concurrent.duration._
 import scala.util.Try
@@ -66,7 +66,7 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))
 
   def validateJson(json: JsValue) = {
-    json.validate[RegisterVirtualObject]
+    json.validate[RegisterVirtualObjectId]
   }
 
   override def postStop = {

@@ -2,7 +2,7 @@ package wings.virtualobject.agent.infrastructure.keys
 
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 
-object RegisterVirtualObjectKeys {
+object RegisterVirtualObjectIdKeys {
 
   val OperationKey = "op"
 

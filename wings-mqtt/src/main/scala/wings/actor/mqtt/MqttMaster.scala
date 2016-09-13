@@ -7,18 +7,18 @@ import akka.actor._
 import akka.event.Logging
 import org.eclipse.paho.client.mqttv3._
 import play.api.libs.json._
-import wings.enrichments.UUIDHelper
-import wings.enrichments.UUIDHelper._
+import scaldi.Injectable._
 import wings.actor.adapter.mqtt.paho
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.actor.mqtt.{MqttTopics => Topics}
-import wings.m2m.conf.model._
-import scaldi.Injectable._
 import wings.config.DependencyInjector._
+import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionReject, NameAcquisitionRequest, RegisterVirtualObject}
+import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
+import wings.virtualobject.domain.VirtualObject
 
 import scala.collection.immutable.{HashMap, HashSet}
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 object MqttMaster {
   def props() = Props(MqttMaster())
@@ -38,7 +38,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   /**
    * Used virtual identities. For a key K in used identities, exists a Virtual Object V where V.id = K
    */
-  var usedIdentities = new HashSet[UUID]
+  var usedIdentities = new HashSet[VirtualObject.IdType]
 
   /**
    * This actor childs. @see usedIdentities
@@ -75,36 +75,31 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   def onConfigOutTopic(mqttMsg: paho.MqttMessage) = {
 
     Try(Json.parse(mqttMsg.payloadAsString())).map { msg =>
-      msg.validate[Config].map {
-        case NameAcquisitionRequest(v) =>
+      msg.validate[RegisterVirtualObject].map {
+        case NameAcquisitionRequest(virtualObjectId) =>
           logger.info("MqttMaster has received a NameAcquisitionRequest")
-          UUIDHelper.tryFromString(v) match {
-            case Success(identity) =>
-              usedIdentities contains identity match {
+              usedIdentities contains virtualObjectId match {
                 case true =>
-                  logger.debug("MqttMaster has detected that identity already exists: {}", identity)
-                  mqttConection ! MqttRouter.Publish(rejectMessage(v))
+                  logger.debug("MqttMaster has detected that identity already exists: {}", virtualObjectId)
+                  mqttConection ! MqttRouter.Publish(rejectMessage("", UUID.randomUUID()))
                 case false =>
-                  logger.debug("MqttMaster creates proxy actor with identity: {}", identity)
-                  val actor = context.actorOf(MqttActor.props(identity.copy, mqttConection), s"MqttActor-${identity.toString}")
-                  registerVirtualObject(identity, actor)
-                  mqttConection ! MqttRouter.Publish(ackMessage(v))
+                  logger.debug("MqttMaster creates proxy actor with identity: {}", virtualObjectId)
+                  val actor = context.actorOf(MqttActor.props(virtualObjectId, mqttConection), s"MqttActor-${virtualObjectId.toString}")
+                  registerVirtualObject(virtualObjectId, actor)
+                  mqttConection ! MqttRouter.Publish(ackMessage(virtualObjectId))
               }
-            case Failure(e) =>
-              logger.debug(s"MqttMaster has failed to convert identity to an UUID, error message: {}", e)
-              mqttConection ! MqttRouter.Publish(rejectMessage(v))
-          }
+
       }
     }
   }
 
-  def rejectMessage(v: String) = MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config]
-    (NameAcquisitionReject("")).toString().getBytes, 2, false, false)
+  def rejectMessage(topic: String, virtualObjectId: VirtualObject.IdType) =
+    MqttMessage(Topics.provisionalConfigInTopic(topic), Json.toJson(NameAcquisitionReject(virtualObjectId)).toString().getBytes, 2, false, false)
 
-  def ackMessage(v: String) = MqttMessage(Topics.provisionalConfigInTopic(v), Json.toJson[Config]
-    (NameAcquisitionAck("")).toString().getBytes, 2, false, false)
+  def ackMessage(virtualObjectId: VirtualObject.IdType) =
+    MqttMessage(Topics.provisionalConfigInTopic(virtualObjectId), Json.toJson(NameAcquisitionAck(virtualObjectId)).toString().getBytes, 2, false, false)
 
-  def registerVirtualObject(id: UUID, ref: ActorRef): Unit = {
+  def registerVirtualObject(id: VirtualObject.IdType, ref: ActorRef): Unit = {
     usedIdentities += id
     childs += (id -> ref)
   }

@@ -4,13 +4,13 @@ import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props}
 import org.eclipse.paho.client.mqttv3._
+import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsResult, JsValue, Json}
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.m2m.VOMessage
-import wings.m2m.conf.model.Config
-import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, WatchVirtualObject}
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObject, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
@@ -57,7 +57,10 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
   override def connectionLost(throwable: Throwable): Unit = {}
 
   def validateJsonForConfig(json: JsValue): JsResult[Any] = {
-    json.validate[Config] orElse json.validate[VOMessage] orElse json.validate[ActuateOnVirtualObject] orElse json.validate[WatchVirtualObject]
+    json.validate[RegisterVirtualObject] or
+      json.validate[VOMessage] or
+      json.validate[ActuateOnVirtualObject] or
+      json.validate[WatchVirtualObject]
   }
 
   def validateJsonForData(json: JsValue): JsResult[VirtualObjectSensed] = {

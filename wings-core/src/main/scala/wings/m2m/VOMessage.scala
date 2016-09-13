@@ -18,8 +18,8 @@ case class VOMessage(voId: UUID,
 
 object VOMessage {
   val sensedVoReads: Reads[VOMessage] = (
-      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
-      (__ \ VirtualObjectKeys.PVOIDKey).readNullable[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).read[UUID] and
+      (__ \ VirtualObjectKeys.PIdKey).readNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).readNullable[SenseCapability] and
@@ -27,8 +27,8 @@ object VOMessage {
     )(VOMessage.apply _)
 
   val sensedVoWrites: OWrites[VOMessage] = (
-      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
-      (__ \ VirtualObjectKeys.PVOIDKey).writeNullable[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).write[UUID] and
+      (__ \ VirtualObjectKeys.PIdKey).writeNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).writeNullable[SenseCapability] and

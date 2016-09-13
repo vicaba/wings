@@ -5,8 +5,8 @@ import java.util.UUID
 import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.json.{JsValue, Json}
 import wings.m2m.VOMessage
-import wings.m2m.conf.model.Config
-import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, WatchVirtualObject}
+import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObject, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
@@ -55,8 +55,10 @@ case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: A
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))
 
   def validateJson(json: JsValue) = {
-    json.validate[Config] orElse json.validate[VOMessage] orElse
-      json.validate[WatchVirtualObject] orElse json.validate[VirtualObjectSensed] orElse
+    json.validate[RegisterVirtualObject] orElse
+      json.validate[VOMessage] orElse
+      json.validate[WatchVirtualObject] orElse
+      json.validate[VirtualObjectSensed] orElse
       json.validate[ActuateOnVirtualObject]
   }
 

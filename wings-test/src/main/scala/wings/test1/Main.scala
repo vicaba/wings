@@ -15,9 +15,8 @@ import wings.client.actor.websocket.ActorJettyWebSocketAdapter
 import wings.config.DependencyInjector._
 import wings.enrichments.UUIDHelper
 import wings.m2m.VOMessage
-import wings.m2m.conf.model.NameAcquisitionRequest
 import wings.test.prebuilt.{Http, WebSocket}
-import wings.virtualobject.agent.domain.messages.command.WatchVirtualObject
+import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionRequest, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
@@ -107,7 +106,7 @@ object Main {
 
       actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
       actorRef ! MqttTestActor2.Messages.Publish(
-        MqttGlobals.generalConfigOutTopic(uuid), Json.toJson(NameAcquisitionRequest(uuid.toString)).toString()
+        MqttGlobals.generalConfigOutTopic(uuid), Json.toJson(NameAcquisitionRequest(uuid)).toString()
       )
 
     }
@@ -134,7 +133,7 @@ object Main {
     val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
 
     webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voId)).toString()
+      Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voIdUUID)).toString()
     )
 
     Thread.sleep(300)

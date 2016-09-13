@@ -16,8 +16,8 @@ import wings.json.Additions._
 object VirtualObjectJson {
 
   val VirtualObjectReads: Reads[VirtualObject] = (
-      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
-      (__ \ VirtualObjectKeys.PVOIDKey).readNullable[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).read[UUID] and
+      (__ \ VirtualObjectKeys.PIdKey).readNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
       (__ \ VirtualObjectKeys.MetadataKey).readNullable[JsObject].map(_.getOrElse(Json.obj())) and
@@ -28,8 +28,8 @@ object VirtualObjectJson {
     )(VirtualObject.apply _)
 
   val VirtualObjectWrites: OWrites[VirtualObject] = (
-      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
-      (__ \ VirtualObjectKeys.PVOIDKey).writeNullable[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).write[UUID] and
+      (__ \ VirtualObjectKeys.PIdKey).writeNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
       (__ \ VirtualObjectKeys.MetadataKey).writeEmptyJsonAsNullable and

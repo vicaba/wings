@@ -13,13 +13,13 @@ object VirtualObjectOperatedJson {
 
   val VirtualObjectActuatedReads: Reads[VirtualObjectActuated] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).read[UUID] and
-      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).read[UUID] and
       (__ \ ActuateStateKeys.StateIdKey).read[String]
     ) (VirtualObjectActuated.apply _)
 
   val VirtualObjectActuatedWrites: OWrites[VirtualObjectActuated] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).write[UUID] and
-      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).write[UUID] and
       (__ \ ActuateStateKeys.StateIdKey).write[String]
     ) (unlift(VirtualObjectActuated.unapply _))
 
@@ -27,7 +27,7 @@ object VirtualObjectOperatedJson {
 
   val VirtualObjectSensedReads: Reads[VirtualObjectSensed] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).read[UUID] and
-      (__ \ VirtualObjectKeys.VOIDKey).read[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).read[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).read[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).readNullable[String] and
       (__ \ ActuateStateKeys.StateIdKey).readNullable[String]
@@ -35,7 +35,7 @@ object VirtualObjectOperatedJson {
 
   val VirtualObjectSensedWrites: OWrites[VirtualObjectSensed] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).write[UUID] and
-      (__ \ VirtualObjectKeys.VOIDKey).write[UUID] and
+      (__ \ VirtualObjectKeys.IdKey).write[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).write[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).writeNullable[String] and
       (__ \ ActuateStateKeys.StateIdKey).writeNullable[String]

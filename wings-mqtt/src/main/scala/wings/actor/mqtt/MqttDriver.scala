@@ -9,8 +9,7 @@ import play.api.libs.json.{JsResult, JsValue, Json}
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
-import wings.m2m.VOMessage
-import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, WatchVirtualObject}
+import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
@@ -58,7 +57,7 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
 
   def validateJsonForConfig(json: JsValue): JsResult[Any] = {
     json.validate[RegisterVirtualObjectId] or
-      json.validate[VOMessage] or
+      json.validate[VirtualObjectBasicDefinition] or
       json.validate[ActuateOnVirtualObject] or
       json.validate[WatchVirtualObject]
   }

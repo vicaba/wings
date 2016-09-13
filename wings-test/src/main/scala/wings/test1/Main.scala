@@ -14,9 +14,8 @@ import wings.client.actor.mqtt.MqttTestActor2.Messages.Subscribe
 import wings.client.actor.websocket.ActorJettyWebSocketAdapter
 import wings.config.DependencyInjector._
 import wings.enrichments.UUIDHelper
-import wings.m2m.VOMessage
 import wings.test.prebuilt.{Http, WebSocket}
-import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionRequest, WatchVirtualObject}
+import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionRequest, VirtualObjectBasicDefinition, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
@@ -44,11 +43,12 @@ object Main {
 
     object Messages {
 
-      def metadata(id: UUID) = VOMessage(
+      def metadata(id: UUID) = VirtualObjectBasicDefinition(
         id,
         None,
         None,
-        id.toString,
+        Some(id.toString),
+        Json.obj(),
         Some(SenseCapability("power", "W")),
         Some(ActuateCapability("light", Array(ActuateState("on"), ActuateState("off"))))
       )
@@ -65,11 +65,12 @@ object Main {
     val voIdUUID = UUIDHelper.tryFromString("73f86a2e-1004-4011-8a8f-3f78cdd6113c").get
 
     object Messages {
-      val metadata = VOMessage(
+      val metadata = VirtualObjectBasicDefinition(
         voIdUUID,
         None,
         None,
-        voId,
+        Some(voId),
+        Json.obj(),
         Some(SenseCapability("status", "state")),
         Some(ActuateCapability("running/stopped", Array(ActuateState("on"))))
       )

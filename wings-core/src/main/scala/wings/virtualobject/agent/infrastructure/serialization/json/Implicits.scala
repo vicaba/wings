@@ -18,4 +18,6 @@ object Implicits {
 
   lazy implicit val RegisterVirtualObjectIdJsonSerializer = RegisterVirtualObjectIdJson.RegisterVirtualObjectIdReads
 
+  lazy implicit val VirtualObjectBasicDefinitionJsonSerializer = VirtualObjectBasicDefinitionJson.VirtualObjectBasicDefinitionFormat
+
 }

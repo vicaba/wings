@@ -9,7 +9,7 @@ import wings.virtualobject.domain.VirtualObject.IdType
 case class VirtualObject
 (
   id: IdType,
-  parentId: Option[UUID],
+  parentId: Option[IdType],
   children: Option[Array[String]],
   path: String,
   metadata: JsObject = Json.obj(),

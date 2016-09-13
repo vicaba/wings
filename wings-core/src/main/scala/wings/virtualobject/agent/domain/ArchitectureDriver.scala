@@ -8,7 +8,6 @@ import akka.event.Logging
 import akka.remote.RemoteScope
 import wings.actor.cluster.pubsub.PSMediator
 import wings.actor.cluster.pubsub.PSMediator.{PublishMsg, PublishedMsg, Referrer}
-import wings.m2m.VOMessage
 import wings.virtualobject.agent.domain.messages.command._
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 
@@ -37,7 +36,6 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
   def continuationState(mediator: ActorRef): Receive = {
 
     val toDeviceReceive: PartialFunction[Any, Unit] = {
-      case m: VOMessage =>
       case sv: VirtualObjectSensed =>
         logger.debug("{}. Sensed Value received: {}", ArchitectureDriver.name, sv)
         continuation ! MsgEnv.ToDevice(sv)
@@ -49,7 +47,6 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
 
     val toArchReceive: PartialFunction[Any, Unit] = {
       case command: ManageVirtualObject => onVoManagementCommand(command, mediator)
-      case m: VOMessage =>
       case sv: VirtualObjectSensed =>
         mediator ! PublishMsg(sv.voId.toString, sv)
         logger.debug("{}. Sensed Value Published", ArchitectureDriver.name)

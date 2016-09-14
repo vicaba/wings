@@ -7,3 +7,8 @@ html, body {
     height: 420px;
     width: 420px;
 }
+
+#virtualobject-map {
+    height: 100%;
+    width: 100%;
+}

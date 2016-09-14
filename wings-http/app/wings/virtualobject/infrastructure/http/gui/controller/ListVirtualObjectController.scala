@@ -3,14 +3,11 @@ package wings.virtualobject.infrastructure.http.gui.controller
 import com.google.inject.Singleton
 import httpplay.config.DependencyInjector._
 import httpplay.error.HttpErrorHandler
-import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import scaldi.Injectable._
-import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
-import wings.virtualobject.domain.VirtualObject._
+import wings.virtualobject.application.usecase.ListVirtualObject
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 /**
   * ListVirtualObjectController

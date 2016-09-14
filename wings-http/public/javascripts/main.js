@@ -8,6 +8,7 @@ function setObjectsInMap(object, map) {
 
 function initializeVirtualObjectMap() {
     $.get("http://" + configuration.domain + "/api/v1/vos", function (data) {
+        initWebSocket(data);
         reloadVirtualObjectMap(data);
     })
         .done(function () {
@@ -55,7 +56,7 @@ function reloadVirtualObjectMap(data) {
 
     heatmap.setMap(map);
 
-    _(mapData).each(function(coords) {
+    _(mapData).each(function (coords) {
         var infowindow = new google.maps.InfoWindow({
             content: ("[" + coords[0] + "," + coords[1] + "]")
         });
@@ -67,9 +68,64 @@ function reloadVirtualObjectMap(data) {
             icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
         });
 
-        marker.addListener('click', function() {
+        marker.addListener('click', function () {
             infowindow.open(map, marker);
         });
 
     });
+}
+
+function initWebSocket(data) {
+    var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
+
+    webSocket.onopen = function () {
+
+        console.log("WebSocket opened");
+
+        webSocket.send(JSON.stringify({
+            "op" : "vo/register/name/request",
+            "voId" : "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
+        }));
+
+        webSocket.send(JSON.stringify({
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "path": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "scap": {
+                "name": "status",
+                "unit": "state"
+            },
+            "acap": {
+                "name": "running/stopped",
+                "states": [{
+                    "stateId": "on"
+                }]
+            }
+        }));
+
+
+
+        _(data).each(function (virtualObject) {
+            console.log(virtualObject);
+            webSocket.send(JSON.stringify({
+                "op": "vo/watch",
+                "path": virtualObject.voId
+            }));
+        });
+
+
+    };
+
+    webSocket.onerror = function (error) {
+        console.log("WebSocket error", error);
+    };
+
+    webSocket.onclose = function () {
+        console.log("WebSocket closed");
+
+    };
+
+    webSocket.onmessage = function (event) {
+        console.log(event.data);
+    };
+
 }

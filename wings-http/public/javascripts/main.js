@@ -2,14 +2,17 @@ var configuration = {
     domain: "127.0.0.1:9000"
 };
 
+var heatPoints = [];
+var heatmap = null;
+
 function setObjectsInMap(object, map) {
 
 }
 
 function initializeVirtualObjectMap() {
     $.get("http://" + configuration.domain + "/api/v1/vos", function (data) {
-        initWebSocket(data);
         reloadVirtualObjectMap(data);
+        initWebSocket(data);
     })
         .done(function () {
             alert("second success");
@@ -35,12 +38,12 @@ function reloadVirtualObjectMap(data) {
     for (dataCount = 0; dataCount < data.length; dataCount++) {
         var coordinates = _.get(data[dataCount], "metadata.geometry.coordinates", "undefined");
         if (coordinates !== "undefined") {
-            mapData[mapDataCount] = new google.maps.LatLng(coordinates[0], coordinates[1]);
+            var location = new google.maps.LatLng(parseFloat(coordinates[0]), parseFloat(coordinates[1]));
+            mapData[mapDataCount] = { location: location, weight: Math.random() };
             mapDataCount = mapDataCount + 1;
+            heatPoints[data[dataCount].voId] = { location: location, weight: 0 };
         }
     }
-
-    console.log(mapData);
 
     var barcelona = new google.maps.LatLng(41.412574, 2.1367906);
 
@@ -50,19 +53,17 @@ function reloadVirtualObjectMap(data) {
         mapTypeId: 'satellite'
     });
 
-    var heatmap = new google.maps.visualization.HeatmapLayer({
-        data: mapData
-    });
+    heatmap = new google.maps.visualization.HeatmapLayer({});
 
     heatmap.setMap(map);
 
     _(mapData).each(function (coords) {
         var infowindow = new google.maps.InfoWindow({
-            content: ("[" + coords[0] + "," + coords[1] + "]")
+            content: ("[" + coords.location.lat() + "," + coords.location.lng() + "]")
         });
 
         var marker = new google.maps.Marker({
-            position: coords,
+            position: coords.location,
             map: map,
             title: 'Hello World!',
             icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
@@ -73,9 +74,11 @@ function reloadVirtualObjectMap(data) {
         });
 
     });
+
 }
 
 function initWebSocket(data) {
+
     var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
 
     webSocket.onopen = function () {
@@ -125,7 +128,17 @@ function initWebSocket(data) {
     };
 
     webSocket.onmessage = function (event) {
-        console.log(event.data);
+
+        var virtualObject = JSON.parse(event.data);
+        console.log(virtualObject.voId + " = " + virtualObject.value);
+
+        heatPoints[virtualObject.voId] = {location: heatPoints[virtualObject.voId].location, weight: virtualObject.value};
+        heat();
     };
 
+}
+
+function heat() {
+    var array = Object.keys(heatPoints).map(function(x) { return heatPoints[x]; });
+    heatmap.setData(array);
 }

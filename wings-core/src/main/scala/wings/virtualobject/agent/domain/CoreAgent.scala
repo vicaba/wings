@@ -67,10 +67,10 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
             None
         }
 
-      case Some(o) =>
-        logger.debug("Virtual Object with id {} found", o)
+      case someVirtualObject: Some[VirtualObject] =>
+        logger.debug("Virtual Object with id {} found", someVirtualObject.get)
         // TODO: Handle the case where a virtualObject is found!
-        Future(None)
+        Future.successful(someVirtualObject)
 
     }
   }

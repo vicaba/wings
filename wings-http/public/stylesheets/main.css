@@ -12,3 +12,12 @@ html, body {
     height: 100%;
     width: 100%;
 }
+
+#singlevirtualobject-map {
+    height: 420px;
+    width: 420px;
+}
+
+#canvas-wrapper {
+    width: 75%;
+}

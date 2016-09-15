@@ -1,0 +1,25 @@
+@(virtualObjecId: String)
+
+@main("Welcome to Play") {
+
+    <h1>VirtualObject</h1>
+
+    <div id="canvas-wrapper">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <button id="randomizeData">Randomize Data</button>
+    <button id="addData">Add Data</button>
+    <button id="removeData">Remove Data</button>
+
+    <div id="singlevirtualobject-map"></div>
+
+    <script type="text/javascript">
+            window.onload = function () {
+                var ctx = document.getElementById("canvas").getContext("2d");
+                window.myLine = new Chart(ctx, config);
+                initwebSocket2("@virtualObjecId", config);
+            };
+    </script>
+
+}

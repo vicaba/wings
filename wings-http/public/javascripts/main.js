@@ -13,16 +13,7 @@ function initializeVirtualObjectMap() {
     $.get("http://" + configuration.domain + "/api/v1/vos", function (data) {
         reloadVirtualObjectMap(data);
         initWebSocket(data);
-    })
-        .done(function () {
-            alert("second success");
-        })
-        .fail(function () {
-            alert("error");
-        })
-        .always(function () {
-            alert("finished");
-        });
+    });
 }
 
 function reloadVirtualObjectMap(data) {
@@ -38,10 +29,12 @@ function reloadVirtualObjectMap(data) {
     for (dataCount = 0; dataCount < data.length; dataCount++) {
         var coordinates = _.get(data[dataCount], "metadata.geometry.coordinates", "undefined");
         if (coordinates !== "undefined") {
+            var voId = data[dataCount].voId;
             var location = new google.maps.LatLng(parseFloat(coordinates[0]), parseFloat(coordinates[1]));
-            mapData[mapDataCount] = { location: location, weight: Math.random() };
-            mapDataCount = mapDataCount + 1;
-            heatPoints[data[dataCount].voId] = { location: location, weight: 0 };
+            heatPoints[voId] = {
+                voId: voId,
+                loc: {location: location, weight: 0}
+            };
         }
     }
 
@@ -57,23 +50,26 @@ function reloadVirtualObjectMap(data) {
 
     heatmap.setMap(map);
 
-    _(mapData).each(function (coords) {
-        var infowindow = new google.maps.InfoWindow({
-            content: ("[" + coords.location.lat() + "," + coords.location.lng() + "]")
-        });
+    for (var key in heatPoints) {
+        if (heatPoints.hasOwnProperty(key)) {
+            var current = heatPoints[key];
+            var loc = heatPoints[key].loc;
+            var infowindow = new google.maps.InfoWindow({
+                content: ("[" + loc.location.lat() + "," + loc.location.lng() + "]" + "<a href='http://" + configuration.domain + "/vos/" + current.voId + "'>See</a>")
+            });
 
-        var marker = new google.maps.Marker({
-            position: coords.location,
-            map: map,
-            title: 'Hello World!',
-            icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
-        });
+            var marker = new google.maps.Marker({
+                position: loc.location,
+                map: map,
+                title: 'Hello World!',
+                icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
+            });
 
-        marker.addListener('click', function () {
-            infowindow.open(map, marker);
-        });
-
-    });
+            marker.addListener('click', function () {
+                infowindow.open(map, marker);
+            });
+        }
+    }
 
 }
 
@@ -86,8 +82,8 @@ function initWebSocket(data) {
         console.log("WebSocket opened");
 
         webSocket.send(JSON.stringify({
-            "op" : "vo/register/name/request",
-            "voId" : "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
+            "op": "vo/register/name/request",
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
         }));
 
         webSocket.send(JSON.stringify({
@@ -106,9 +102,7 @@ function initWebSocket(data) {
         }));
 
 
-
         _(data).each(function (virtualObject) {
-            console.log(virtualObject);
             webSocket.send(JSON.stringify({
                 "op": "vo/watch",
                 "path": virtualObject.voId
@@ -132,13 +126,190 @@ function initWebSocket(data) {
         var virtualObject = JSON.parse(event.data);
         console.log(virtualObject.voId + " = " + virtualObject.value);
 
-        heatPoints[virtualObject.voId] = {location: heatPoints[virtualObject.voId].location, weight: virtualObject.value};
+        $.extend(true, heatPoints[virtualObject.voId], {
+            loc: {
+                weight: virtualObject.value
+            }
+        });
+
         heat();
     };
 
 }
 
 function heat() {
-    var array = Object.keys(heatPoints).map(function(x) { return heatPoints[x]; });
+    var array = Object.keys(heatPoints).map(function (x) {
+        return heatPoints[x].loc;
+    });
     heatmap.setData(array);
+}
+
+// ShowVirtualObject
+
+
+
+function initSingleVirtualObject() {
+    var ctx = $("#canvas");
+    var chartData = {
+        labels: [],
+        datasets: [
+            {
+                label: this.props.params.action,
+                data: [1, 2],
+                backgroundColor: "rgba(75,192,192,0.1)",
+                borderColor: "rgba(75,192,192,1)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                lineTension: 0
+            }
+        ]
+    };
+    var options = {
+        scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    unit: "second"
+                }
+            }]
+        }
+    };
+    var chart = Chart.Line(ctx, {data: chartData, options: options});
+}
+
+function initwebSocket2(virtualObjectId, config) {
+
+    var currentUrl = document.URL;
+
+    var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
+
+    webSocket.onopen = function () {
+
+        console.log("WebSocket opened");
+
+        webSocket.send(JSON.stringify({
+            "op": "vo/register/name/request",
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
+        }));
+
+        webSocket.send(JSON.stringify({
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "path": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "scap": {
+                "name": "status",
+                "unit": "state"
+            },
+            "acap": {
+                "name": "running/stopped",
+                "states": [{
+                    "stateId": "on"
+                }]
+            }
+        }));
+
+
+        webSocket.send(JSON.stringify({
+            "op": "vo/watch",
+            "path": virtualObjectId
+        }));
+
+
+    };
+
+    webSocket.onerror = function (error) {
+        console.log("WebSocket error", error);
+    };
+
+    webSocket.onclose = function () {
+        console.log("WebSocket closed");
+
+    };
+
+    webSocket.onmessage = function (event) {
+        console.log(event.data);
+        var virtualObjectSensed = JSON.parse(event.data);
+        addData(parseFloat(virtualObjectSensed.value));
+    };
+
+}
+
+function randomScalingFactor() {
+    return Math.round(Math.random() * 100 * (Math.random() > 0.5 ? -1 : 1));
+}
+function randomColorFactor() {
+    return Math.round(Math.random() * 255);
+}
+function randomColor(opacity) {
+    return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+}
+
+function newDateString(days) {
+    return moment().add(2, 'd').format();
+}
+var config = {
+    type: 'line',
+    data: {
+        datasets: [{
+            label: "Dataset with string point data",
+            data: [],
+            fill: false,
+            borderColor: "rgba(131,101,129,0.4)",
+            backGroundColor: "rgba(247,23,90,0.5)",
+            pointBorderColor: "rgba(69,112,87,0.7)",
+            pointBackgroundColor: "rgba(16,63,185,0.5)",
+            pointBorderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: "Chart.js Time Point Data"
+        },
+        scales: {
+            xAxes: [{
+                type: "time",
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'value'
+                }
+            }]
+        }
+    }
+};
+
+function addData(value) {
+    if (config.data.datasets.length > 0) {
+        var lastTime = myLine.scales['x-axis-0'].labelMoments[0].length ? myLine.scales['x-axis-0'].labelMoments[0][myLine.scales['x-axis-0'].labelMoments[0].length - 1] : moment();
+        var newTime = lastTime
+            .clone()
+            .add(1, 'day')
+            .format('MM/DD/YYYY HH:mm');
+        for (var index = 0; index < config.data.datasets.length; ++index) {
+            config.data.datasets[index].data.push({
+                x: newTime,
+                y: value
+            });
+        }
+        window.myLine.update();
+    }
 }

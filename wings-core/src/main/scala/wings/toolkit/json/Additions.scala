@@ -1,4 +1,4 @@
-package wings.json
+package wings.toolkit.json
 
 import play.api.data.validation.ValidationError
 import play.api.libs.json._

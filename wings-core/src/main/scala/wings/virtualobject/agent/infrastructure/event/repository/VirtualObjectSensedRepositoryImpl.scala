@@ -17,4 +17,7 @@ case class VirtualObjectSensedRepositoryImpl
 {
   override def create(newVirtualObjectSensed: VirtualObjectSensed): Future[Or[VirtualObjectSensed, One[RepositoryError]]] =
     virtualObjectSensedMongoRepository.create(newVirtualObjectSensed)
+
+  override def findAll(): Future[List[VirtualObjectSensed]] =
+    virtualObjectSensedMongoRepository.findAll()
 }

@@ -3,7 +3,7 @@ package wings.virtualobject.agent.infrastructure.event.serialization.json
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, Instant}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
@@ -33,7 +33,9 @@ object VirtualObjectOperatedJson {
       (__ \ VirtualObjectKeys.IdKey).read[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).read[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).readNullable[String] and
-      (__ \ VirtualObjectOperatedKeys.CreationTimeKey).readNullable[DateTime].map(_.getOrElse(DateTime.now()))
+      (__ \ VirtualObjectOperatedKeys.CreationTimeKey).readNullable[Long].map(_.map { date =>
+        new DateTime(new Instant(date))
+      } getOrElse DateTime.now())
     ) (VirtualObjectSensed.apply _)
 
   val VirtualObjectSensedWrites: OWrites[VirtualObjectSensed] = (

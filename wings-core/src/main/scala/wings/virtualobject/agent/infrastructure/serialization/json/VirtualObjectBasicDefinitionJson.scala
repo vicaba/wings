@@ -4,7 +4,7 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsObject, Json, OFormat, OWrites, Reads, _}
-import wings.json.Additions._
+import wings.toolkit.json.Additions._
 import wings.virtualobject.agent.domain.messages.command.VirtualObjectBasicDefinition
 import wings.virtualobject.agent.infrastructure.keys.VirtualObjectBasicDefinitionKeys
 import wings.virtualobject.domain.{ActuateCapability, SenseCapability}

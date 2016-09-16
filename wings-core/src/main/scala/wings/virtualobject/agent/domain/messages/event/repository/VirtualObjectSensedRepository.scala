@@ -11,4 +11,6 @@ trait VirtualObjectSensedRepository {
 
   def create(newVirtualObjectSensed: VirtualObjectSensed): Future[VirtualObjectSensed Or One[RepositoryError]]
 
+  def findAll(): Future[List[VirtualObjectSensed]]
+
 }

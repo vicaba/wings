@@ -1,15 +1,15 @@
 package wings.virtualobject.agent.infrastructure.event.repository.mongodb
 
-import java.time.ZoneId
 import java.util.UUID
 
 import org.scalactic.{Bad, Good, One, Or}
-import play.api.libs.json.{Format, OFormat}
-import reactivemongo.api.DB
+import play.api.libs.json.{Format, JsObject, Json, OFormat}
+import reactivemongo.api.{DB, QueryOpts, ReadPreference}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.BSONDateTime
 import reactivemongo.bson._
+import reactivemongo.play.json.BSONFormats.BSONDocumentFormat
 import reactivemongo.play.json.collection.JSONCollection
 import wings.toolkit.db.mongodb.service.MongoService
 import wings.toolkit.error.application.Types.RepositoryError
@@ -18,7 +18,7 @@ import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.agent.infrastructure.event.keys.VirtualObjectOperatedKeys
 import wings.virtualobject.agent.infrastructure.event.serialization.json.VirtualObjectOperatedJson
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 
 case class VirtualObjectSensedMongoRepository
@@ -55,6 +55,33 @@ case class VirtualObjectSensedMongoRepository
     }
   }
 
+  override def findAll(): Future[List[VirtualObjectSensed]] = {
+    val v = bsonCollection.
+      find(BSONDocument()).
+      cursor[BSONDocument](readPreference = ReadPreference.primary).
+      collect[List]()
+
+    v.map(_.map(transform))
+
+  }
+
+  private def transform(doc: BSONDocument): VirtualObjectSensed = {
+
+    val convertedBsonDocument = {
+
+      doc.get(VirtualObjectOperatedKeys.CreationTimeKey).map { bsonCreationTime =>
+        val convertedBsonDocument =
+          BSONDocument(
+            VirtualObjectOperatedKeys.CreationTimeKey -> BSONLong(bsonCreationTime.asInstanceOf[BSONDateTime].value))
+
+        doc -- VirtualObjectOperatedKeys.CreationTimeKey ++ convertedBsonDocument
+      }
+
+    }.get
+
+    BSONDocumentFormat.writes(convertedBsonDocument).as[VirtualObjectSensed]
+  }
+
   private def transform(o: VirtualObjectSensed): BSONDocument = {
     val doc = reactivemongo.play.json.ImplicitBSONHandlers.JsObjectWriter.write(entityFormat.writes(o))
 
@@ -66,11 +93,5 @@ case class VirtualObjectSensedMongoRepository
         VirtualObjectOperatedKeys.CreationTimeKey -> bsonCreationDate)
 
     doc -- VirtualObjectOperatedKeys.CreationTimeKey ++ convertedBsonDocument
-  }
-}
-
-object Main {
-  def main(args: Array[String]): Unit = {
-    println(ZoneId.getAvailableZoneIds)
   }
 }

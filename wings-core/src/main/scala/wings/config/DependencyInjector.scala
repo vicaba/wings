@@ -9,6 +9,9 @@ import wings.user.application.usecase.{SignInUser, SignUpUser}
 import wings.user.domain.repository.UserRepository
 import wings.user.infrastructure.repository.UserRepositoryImpl
 import wings.user.infrastructure.repository.mongodb.UserMongoRepository
+import wings.virtualobject.agent.domain.messages.event.repository.VirtualObjectSensedRepository
+import wings.virtualobject.agent.infrastructure.event.repository.VirtualObjectSensedRepositoryImpl
+import wings.virtualobject.agent.infrastructure.event.repository.mongodb.VirtualObjectSensedMongoRepository
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
@@ -56,6 +59,13 @@ object DependencyInjector {
 
     bind[SignUpUser.UseCase] identifiedBy 'SignUpUserUseCase to SignUpUser.UseCase(inject[UserRepository](identified by 'UserRepository))
 
+    /**
+      * VirtualObjectSensed
+      */
+
+    bind[VirtualObjectSensedMongoRepository] identifiedBy 'VirtualObjectSensedMongoRepository to VirtualObjectSensedMongoRepository(inject[DB](identified by 'mainDb))
+
+    bind[VirtualObjectSensedRepository] identifiedBy 'VirtualObjectSensedRepository to VirtualObjectSensedRepositoryImpl(inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository))
 
   }
 

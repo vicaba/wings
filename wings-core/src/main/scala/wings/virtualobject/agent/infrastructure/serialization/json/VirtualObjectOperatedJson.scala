@@ -1,10 +1,12 @@
 package wings.virtualobject.agent.infrastructure.serialization.json
 
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
-import wings.virtualobject.agent.domain.messages.event.{VirtualObjectActuated, VirtualObjectOperated, VirtualObjectSensed}
+import wings.virtualobject.agent.domain.messages.event.{VirtualObjectActuated, VirtualObjectSensed}
 import wings.virtualobject.agent.infrastructure.keys.VirtualObjectOperatedKeys
 import wings.virtualobject.infrastructure.keys.{ActuateStateKeys, VirtualObjectKeys}
 
@@ -30,7 +32,7 @@ object VirtualObjectOperatedJson {
       (__ \ VirtualObjectKeys.IdKey).read[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).read[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).readNullable[String] and
-      (__ \ ActuateStateKeys.StateIdKey).readNullable[String]
+      (__ \ VirtualObjectOperatedKeys.CreationTimeKey).readNullable[ZonedDateTime].map(_.getOrElse(ZonedDateTime.now()))
     ) (VirtualObjectSensed.apply _)
 
   val VirtualObjectSensedWrites: OWrites[VirtualObjectSensed] = (
@@ -38,7 +40,7 @@ object VirtualObjectOperatedJson {
       (__ \ VirtualObjectKeys.IdKey).write[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).write[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).writeNullable[String] and
-      (__ \ ActuateStateKeys.StateIdKey).writeNullable[String]
+      (__ \ VirtualObjectOperatedKeys.CreationTimeKey).write[ZonedDateTime]
     ) (unlift(VirtualObjectSensed.unapply _))
 
   val VirtualObjectSensedFormat = OFormat(VirtualObjectSensedReads, VirtualObjectSensedWrites)

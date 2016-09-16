@@ -26,7 +26,8 @@ package object mongodb {
     virtualObjectService.delete(Json.obj())
     userCollection.remove(Json.obj())
 
-    val sensedCollection: JSONCollection = mongoEnv.mainDb.collection("sensed")
+    val sensedCollection: JSONCollection = mongoEnv.mainDb.collection("virtualObjectSensed")
     sensedCollection.remove(Json.obj())
+
   }
 }

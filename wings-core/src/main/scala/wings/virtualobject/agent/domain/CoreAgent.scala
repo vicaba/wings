@@ -13,6 +13,7 @@ import wings.model.virtual.virtualobject.VOTree
 import wings.virtualobject.agent.domain.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
 import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, VirtualObjectBasicDefinition, WatchVirtualObject}
 import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
+import wings.virtualobject.agent.domain.messages.event.repository.VirtualObjectSensedRepository
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 
@@ -44,6 +45,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
   val toArchitectureProps: Props
 
   val virtualObjectRepository: VirtualObjectRepository = inject[VirtualObjectRepository](identified by 'VirtualObjectRepository)
+
+  val virtualObjectSensedRepository: VirtualObjectSensedRepository = inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
 
   val logger = Logging(context.system, this)
 
@@ -156,11 +159,10 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
               }
           }
         }
-      case sensedValue: VirtualObjectSensed =>
-        logger.info("Sending an {} from {} to Arch", sensedValue.getClass, name)
-        //val sensedValueService = SensedValueMongoService(mongoEnvironment.db1)(SensedValueIdentityManager)
-        //sensedValueService.create(sensedValue)
-        toArchitecture ! MsgEnv.ToArch(sensedValue)
+      case virtualObjectSensed: VirtualObjectSensed =>
+        logger.info("Sending an {} from {} to Arch", virtualObjectSensed.getClass, name)
+        virtualObjectSensedRepository.create(virtualObjectSensed)
+        toArchitecture ! MsgEnv.ToArch(virtualObjectSensed)
       case voWatch: WatchVirtualObject =>
         logger.info("Sending an {} from {} to Arch", voWatch.getClass, name)
         toArchitecture ! MsgEnv.ToArch(voWatch)

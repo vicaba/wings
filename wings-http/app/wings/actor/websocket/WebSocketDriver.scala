@@ -4,12 +4,11 @@ import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.json.{JsValue, Json}
-import wings.virtualobject.agent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
-import wings.virtualobject.agent.domain.messages.event.VirtualObjectSensed
-import wings.virtualobject.agent.domain.{DeviceDriver, MsgEnv}
-import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
+import wings.virtualobject.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobject.domain.messages.event.VirtualObjectSensed
+import wings.virtualobject.infrastructure.messages.serialization.json.Implicits._
 import play.api.libs.functional.syntax._
-
+import wings.virtualobject.domain.agent.{DeviceDriver, MsgEnv}
 
 import scala.util.Try
 

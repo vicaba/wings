@@ -9,9 +9,9 @@ import wings.user.application.usecase.{SignInUser, SignUpUser}
 import wings.user.domain.repository.UserRepository
 import wings.user.infrastructure.repository.UserRepositoryImpl
 import wings.user.infrastructure.repository.mongodb.UserMongoRepository
-import wings.virtualobject.agent.domain.messages.event.repository.VirtualObjectSensedRepository
-import wings.virtualobject.agent.infrastructure.event.repository.VirtualObjectSensedRepositoryImpl
-import wings.virtualobject.agent.infrastructure.event.repository.mongodb.VirtualObjectSensedMongoRepository
+import wings.virtualobject.domain.messages.event.repository.VirtualObjectSensedRepository
+import wings.virtualobject.infrastructure.messages.event.repository.VirtualObjectSensedRepositoryImpl
+import wings.virtualobject.infrastructure.messages.event.repository.mongodb.VirtualObjectSensedMongoRepository
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl

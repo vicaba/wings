@@ -9,7 +9,7 @@ import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 import wings.toolkit.error.application.Types.RepositoryError
 import wings.toolkit.error.application.Types.RepositoryError.{CustomRepositoryError, UnknownRepositoryError}
-import wings.virtualobject.agent.infrastructure.event.keys.VirtualObjectOperatedKeys
+import wings.virtualobject.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -4,7 +4,7 @@ import java.util.UUID
 
 import akka.actor._
 import wings.actor.util.ActorUtilities
-import wings.virtualobject.agent.domain.{ArchitectureDriver, CoreAgent}
+import wings.virtualobject.domain.agent.{ArchitectureDriver, CoreAgent}
 
 
 object MqttActor {

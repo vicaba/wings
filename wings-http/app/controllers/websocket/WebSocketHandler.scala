@@ -5,10 +5,10 @@ import java.util.UUID
 import akka.actor._
 import akka.event.Logging
 import play.api.libs.json.{JsValue, Json}
-import wings.virtualobject.agent.domain.CoreAgent
-import wings.virtualobject.agent.infrastructure.serialization.json.Implicits._
-import wings.virtualobject.agent.domain.CoreAgentMessages.ToDeviceActor
-import wings.virtualobject.agent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
+import wings.virtualobject.infrastructure.messages.serialization.json.Implicits._
+import wings.virtualobject.domain.agent.CoreAgent
+import wings.virtualobject.domain.agent.CoreAgentMessages.ToDeviceActor
+import wings.virtualobject.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
 
 import scala.concurrent.duration._
 import scala.util.Try

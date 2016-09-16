@@ -1,4 +1,4 @@
-package wings.virtualobject.agent.infrastructure.serialization.json
+package wings.virtualobject.agent.infrastructure.event.serialization.json
 
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -7,7 +7,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
 import wings.virtualobject.agent.domain.messages.event.{VirtualObjectActuated, VirtualObjectSensed}
-import wings.virtualobject.agent.infrastructure.keys.VirtualObjectOperatedKeys
+import wings.virtualobject.agent.infrastructure.event.keys.VirtualObjectOperatedKeys
 import wings.virtualobject.infrastructure.keys.{ActuateStateKeys, VirtualObjectKeys}
 
 object VirtualObjectOperatedJson {

@@ -1,4 +1,4 @@
-package wings.virtualobject.agent.infrastructure.keys
+package wings.virtualobject.agent.infrastructure.event.keys
 
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 

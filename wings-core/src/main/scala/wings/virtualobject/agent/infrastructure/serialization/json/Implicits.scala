@@ -1,5 +1,7 @@
 package wings.virtualobject.agent.infrastructure.serialization.json
 
+import wings.virtualobject.agent.infrastructure.event.serialization.json.VirtualObjectOperatedJson
+
 object Implicits {
 
   lazy implicit val ActuateOnVirtualObjectJsonSerializer = OperateOnVirtualObjectJson.ActuateOnVirtualObjectFormat

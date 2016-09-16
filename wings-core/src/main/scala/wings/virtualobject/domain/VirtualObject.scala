@@ -1,8 +1,8 @@
 package wings.virtualobject.domain
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
+import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, Json}
 import wings.virtualobject.domain.VirtualObject.IdType
 
@@ -13,8 +13,8 @@ case class VirtualObject
   children: Option[Array[String]],
   path: String,
   metadata: JsObject = Json.obj(),
-  creationTime: ZonedDateTime,
-  deletionTime: Option[ZonedDateTime],
+  creationTime: DateTime,
+  deletionTime: Option[DateTime],
   senseCapability: Option[SenseCapability],
   actuateCapability: Option[ActuateCapability]
 )

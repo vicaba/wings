@@ -59,12 +59,18 @@ case class VirtualObjectSensedMongoRepository
     val doc = reactivemongo.play.json.ImplicitBSONHandlers.JsObjectWriter.write(entityFormat.writes(o))
 
     val bsonCreationDate =
-      BSONDateTime(o.creationDate.toLocalDateTime.atZone(ZoneId.systemDefault()).toEpochSecond * 1000)
+      BSONDateTime(o.creationDate.getMillis)
 
     val convertedBsonDocument =
       BSONDocument(
         VirtualObjectOperatedKeys.CreationTimeKey -> bsonCreationDate)
 
     doc -- VirtualObjectOperatedKeys.CreationTimeKey ++ convertedBsonDocument
+  }
+}
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    println(ZoneId.getAvailableZoneIds)
   }
 }

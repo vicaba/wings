@@ -1,7 +1,8 @@
 package wings.virtualobject.agent.domain.messages.event
 
-import java.time.ZonedDateTime
 import java.util.UUID
+
+import org.joda.time.DateTime
 
 sealed trait VirtualObjectOperated
 
@@ -11,7 +12,7 @@ case class VirtualObjectSensed
   voId: UUID,
   value: String,
   unit: Option[String] = None,
-  creationDate: ZonedDateTime = ZonedDateTime.now()
+  creationDate: DateTime = DateTime.now()
 )
   extends VirtualObjectOperated
 

@@ -2,6 +2,7 @@ package wings.virtualobject.agent.domain.messages.command
 
 import java.time.ZonedDateTime
 
+import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, Json}
 import wings.virtualobject.domain.{ActuateCapability, SenseCapability, VirtualObject}
 
@@ -27,7 +28,7 @@ extends ModifyVirtualObjectDefinition
       children,
       path.getOrElse(id.toString),
       metadata,
-      ZonedDateTime.now(),
+      DateTime.now(),
       None,
       senseCapability,
       actuateCapability)

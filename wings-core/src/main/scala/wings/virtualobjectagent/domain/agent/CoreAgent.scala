@@ -10,6 +10,7 @@ import wings.actor.util.ActorUtilities
 import wings.collection.mutable.tree.Tree
 import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.VOTree
+import wings.util.actor.Stash
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobjectagent.domain.agent.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
 import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, VirtualObjectBasicDefinition, WatchVirtualObject}
@@ -105,8 +106,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
                 endpoints ! createVo
                 val tree = VOTree(vo)
                 logger.info("Setup completed, becoming state2. I can handle messages now")
-                unstashAll()
                 become(state2(tree, endpoints))
+                self ! Stash.UnStash
             }
         }
 
@@ -120,6 +121,9 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case MsgEnv.ToDevice(msg) => toDeviceReceive(msg)
       case MsgEnv.ToArch(msg) => toArchReceive(msg)
       case ToDeviceActor => sender ! toDevice
+      case Stash.UnStash =>
+        println("Unstashing")
+        unstashAll()
       case a: Any => println("All. Received Any")
     }
 
@@ -156,6 +160,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
                   endpoints ! createVo
                   voTree.add(vo)
                   become(state2(voTree, endpoints))
+                  self ! Stash.UnStash
               }
           }
         }
@@ -177,6 +182,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case MsgEnv.ToArch(msg) => toArchReceive(msg)
       case ToDeviceActor => sender ! toDevice
       case ToArchitectureActor => sender ! toArchitecture
+      case Stash.UnStash => unstashAll()
     }
 
     receive

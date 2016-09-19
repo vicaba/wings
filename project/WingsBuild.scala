@@ -63,6 +63,7 @@ object WingsBuild extends Build {
     jdbc,
     cache,
     ws,
+    filters,
     playReactiveMongo,
     akkaRemote
   ))

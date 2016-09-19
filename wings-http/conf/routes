@@ -26,6 +26,8 @@ GET           /api/v1/vos                    wings.virtualobject.infrastructure.
 
 GET           /api/v1/vos/:id                wings.virtualobject.infrastructure.http.api.controller.ShowVirtualObjectController.apply(id: String)
 
+GET           /api/v1/vos/:id/sensed         wings.virtualobjectagent.infrastructure.http.api.controller.ListVirtualObjectSensedController.apply(id: String)
+
 
 # GUI
 

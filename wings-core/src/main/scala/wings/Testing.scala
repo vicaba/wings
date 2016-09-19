@@ -2,7 +2,7 @@ package wings
 
 import scaldi.Injectable._
 import wings.config.DependencyInjector._
-import wings.virtualobject.domain.messages.event.repository.VirtualObjectSensedRepository
+import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

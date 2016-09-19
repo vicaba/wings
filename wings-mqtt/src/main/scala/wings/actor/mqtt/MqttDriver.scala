@@ -9,10 +9,10 @@ import play.api.libs.json.{JsResult, JsValue, Json}
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
 import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
-import wings.virtualobject.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
-import wings.virtualobject.domain.messages.event.VirtualObjectSensed
-import wings.virtualobject.infrastructure.messages.serialization.json.Implicits._
-import wings.virtualobject.domain.agent.{DeviceDriver, MsgEnv}
+import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
+import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
+import wings.virtualobjectagent.domain.agent.{DeviceDriver, MsgEnv}
 
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 

@@ -146,49 +146,30 @@ function heat() {
 
 // ShowVirtualObject
 
+function showVirtualObjectInitializer(virtualObjectId) {
+    var ctx = document.getElementById("canvas").getContext("2d");
+    window.myLine = new Chart(ctx, config);
+    initWebSocket2(virtualObjectId);
+    var request = requestVirtualObjectSensedHistory(virtualObjectId);
+/*    request
+        .done(function (data) {
+            console.log(data);
+            addDataBulk(data)
+        })
+        .fail(function (e) {
+            console.log(e);
+        }).always(function () {
+    });*/
 
-
-function initSingleVirtualObject() {
-    var ctx = $("#canvas");
-    var chartData = {
-        labels: [],
-        datasets: [
-            {
-                label: this.props.params.action,
-                data: [1, 2],
-                backgroundColor: "rgba(75,192,192,0.1)",
-                borderColor: "rgba(75,192,192,1)",
-                borderCapStyle: 'butt',
-                borderDash: [],
-                borderDashOffset: 0.0,
-                borderJoinStyle: 'miter',
-                pointBorderColor: "rgba(75,192,192,1)",
-                pointBackgroundColor: "#fff",
-                pointBorderWidth: 1,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                pointHoverBorderColor: "rgba(220,220,220,1)",
-                pointHoverBorderWidth: 2,
-                pointRadius: 1,
-                pointHitRadius: 10,
-                lineTension: 0
-            }
-        ]
-    };
-    var options = {
-        scales: {
-            xAxes: [{
-                type: 'time',
-                time: {
-                    unit: "second"
-                }
-            }]
-        }
-    };
-    var chart = Chart.Line(ctx, {data: chartData, options: options});
 }
 
-function initwebSocket2(virtualObjectId, config) {
+function requestVirtualObjectSensedHistory(virtualObjectId) {
+    var uri = "http://" + configuration.domain + "/api/v1/vos/" + virtualObjectId + "/sensed";
+    return $.get("http://localhost:9000/api/v1/vos/" + virtualObjectId + "/sensed");
+}
+
+
+function initWebSocket2(virtualObjectId) {
 
     var currentUrl = document.URL;
 
@@ -239,24 +220,11 @@ function initwebSocket2(virtualObjectId, config) {
     webSocket.onmessage = function (event) {
         console.log(event.data);
         var virtualObjectSensed = JSON.parse(event.data);
-        addData(parseFloat(virtualObjectSensed.value));
+        addData(virtualObjectSensed);
     };
 
 }
 
-function randomScalingFactor() {
-    return Math.round(Math.random() * 100 * (Math.random() > 0.5 ? -1 : 1));
-}
-function randomColorFactor() {
-    return Math.round(Math.random() * 255);
-}
-function randomColor(opacity) {
-    return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
-}
-
-function newDateString(days) {
-    return moment().add(2, 'd').format();
-}
 var config = {
     type: 'line',
     data: {
@@ -297,17 +265,33 @@ var config = {
     }
 };
 
+function addDataBulk(values) {
+
+    for (var key in values) {
+        var value = values[key];
+        if (config.data.datasets.length > 0) {
+            var newTime = moment(parseFloat(value.c))
+                .format('MM/DD/YYYY HH:mm:ss');
+            for (var index = 0; index < config.data.datasets.length; ++index) {
+                config.data.datasets[index].data.push({
+                    x: newTime,
+                    y: parseFloat(value.value)
+                });
+            }
+        }
+    }
+    window.myLine.update();
+}
+
 function addData(value) {
     if (config.data.datasets.length > 0) {
         var lastTime = myLine.scales['x-axis-0'].labelMoments[0].length ? myLine.scales['x-axis-0'].labelMoments[0][myLine.scales['x-axis-0'].labelMoments[0].length - 1] : moment();
-        var newTime = lastTime
-            .clone()
-            .add(1, 'day')
-            .format('MM/DD/YYYY HH:mm');
+        var newTime = moment(parseFloat(value.c))
+            .format('MM/DD/YYYY HH:mm:ss');
         for (var index = 0; index < config.data.datasets.length; ++index) {
             config.data.datasets[index].data.push({
                 x: newTime,
-                y: value
+                y: parseFloat(value)
             });
         }
         window.myLine.update();

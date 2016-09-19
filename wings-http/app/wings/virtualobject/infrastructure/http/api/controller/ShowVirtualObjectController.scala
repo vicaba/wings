@@ -20,6 +20,7 @@ class ShowVirtualObjectController
   extends Controller {
 
   val showVirtualObjectUseCase: ShowVirtualObject.UseCase = inject[ShowVirtualObject.UseCase](identified by 'ShowVirtualObjectUseCase)
+
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 
   def apply(id: String) = Action.async {

@@ -13,8 +13,8 @@ import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
 import wings.actor.mqtt.{MqttTopics => Topics}
 import wings.config.DependencyInjector._
-import wings.virtualobject.domain.messages.command.{NameAcquisitionAck, NameAcquisitionReject, NameAcquisitionRequest, RegisterVirtualObjectId}
-import wings.virtualobject.infrastructure.messages.serialization.json.Implicits._
+import wings.virtualobjectagent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionReject, NameAcquisitionRequest, RegisterVirtualObjectId}
+import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
 import wings.virtualobject.domain.VirtualObject
 
 import scala.collection.immutable.{HashMap, HashSet}

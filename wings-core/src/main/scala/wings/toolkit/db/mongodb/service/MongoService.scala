@@ -5,11 +5,13 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{DB, QueryOpts, ReadPreference}
+import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
+import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, Descendant, SortOrder, SortOrderWithKey}
 import wings.toolkit.error.application.Types.RepositoryError
 import wings.toolkit.error.application.Types.RepositoryError.{CustomRepositoryError, UnknownRepositoryError}
-import wings.virtualobject.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
+import wings.virtualobjectagent.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,17 +59,20 @@ abstract class MongoService[E, ID]
       one[E]
   }
 
-  def findAll(skip: Option[Int], limit: Option[Int]): Future[List[E]] = {
+  def findAll(sortOrder: Option[SortOrderWithKey], skip: Option[Int], limit: Option[Int]): Future[List[E]] = {
     val skipN = skip.getOrElse(0)
     val limitN = limit.getOrElse(0)
-    collection.
-      find(Json.obj()).
+
+    (sortOrder.map { sort =>
+      collection.find(Json.obj()).sort(sortOrderCriteriaJson(sort))
+    } getOrElse
+      collection.find(Json.obj())).
       options(QueryOpts(skipN, limitN)).
       cursor[E](readPreference = ReadPreference.primary).
       collect[List]()
   }
 
-  def findAll(): Future[List[E]] = findAll(None, None)
+  def findAll(): Future[List[E]] = findAll(None, None, None)
 
   def create(o: E): Future[E Or One[RepositoryError]] = {
     collection.insert(o).map {
@@ -94,6 +99,11 @@ abstract class MongoService[E, ID]
 
   def delete(selector: JsObject): Future[WriteResult] = {
     collection.remove(selector)
+  }
+
+  protected def sortOrderCriteriaJson(sortOrder: SortOrderWithKey): JsObject = sortOrder.sortOrder match {
+    case Ascendant => Json.obj(sortOrder.key -> 1)
+    case Descendant => Json.obj(sortOrder.key -> -1)
   }
 }
 

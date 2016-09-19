@@ -18,10 +18,10 @@ import wings.enrichments.UUIDHelper
 import wings.test.prebuilt.{Http, WebSocket}
 import wings.test.util.RandomPointGenerator
 import wings.test.util.RandomPointGenerator.Point
-import wings.virtualobject.domain.messages.command.{NameAcquisitionRequest, VirtualObjectBasicDefinition, WatchVirtualObject}
-import wings.virtualobject.domain.messages.event.VirtualObjectSensed
+import wings.virtualobjectagent.domain.messages.command.{NameAcquisitionRequest, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
-import wings.virtualobject.infrastructure.messages.serialization.json.Implicits._
+import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global

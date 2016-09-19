@@ -151,7 +151,7 @@ function showVirtualObjectInitializer(virtualObjectId) {
     window.myLine = new Chart(ctx, config);
     initWebSocket2(virtualObjectId);
     var request = requestVirtualObjectSensedHistory(virtualObjectId);
-/*    request
+    request
         .done(function (data) {
             console.log(data);
             addDataBulk(data)
@@ -159,7 +159,7 @@ function showVirtualObjectInitializer(virtualObjectId) {
         .fail(function (e) {
             console.log(e);
         }).always(function () {
-    });*/
+    });
 
 }
 
@@ -170,8 +170,6 @@ function requestVirtualObjectSensedHistory(virtualObjectId) {
 
 
 function initWebSocket2(virtualObjectId) {
-
-    var currentUrl = document.URL;
 
     var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
 
@@ -220,6 +218,9 @@ function initWebSocket2(virtualObjectId) {
     webSocket.onmessage = function (event) {
         console.log(event.data);
         var virtualObjectSensed = JSON.parse(event.data);
+        if(Object.hasOwnProperty("op")) {
+            return;
+        }
         addData(virtualObjectSensed);
     };
 
@@ -270,7 +271,7 @@ function addDataBulk(values) {
     for (var key in values) {
         var value = values[key];
         if (config.data.datasets.length > 0) {
-            var newTime = moment(parseFloat(value.c))
+            var newTime = moment(value.c)
                 .format('MM/DD/YYYY HH:mm:ss');
             for (var index = 0; index < config.data.datasets.length; ++index) {
                 config.data.datasets[index].data.push({
@@ -283,17 +284,20 @@ function addDataBulk(values) {
     window.myLine.update();
 }
 
+
 function addData(value) {
+    console.log(value);
+
     if (config.data.datasets.length > 0) {
-        var lastTime = myLine.scales['x-axis-0'].labelMoments[0].length ? myLine.scales['x-axis-0'].labelMoments[0][myLine.scales['x-axis-0'].labelMoments[0].length - 1] : moment();
-        var newTime = moment(parseFloat(value.c))
+        var newTime = moment(value.c)
             .format('MM/DD/YYYY HH:mm:ss');
         for (var index = 0; index < config.data.datasets.length; ++index) {
             config.data.datasets[index].data.push({
                 x: newTime,
-                y: parseFloat(value)
+                y: parseFloat(value.value)
             });
         }
         window.myLine.update();
     }
 }
+

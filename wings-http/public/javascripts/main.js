@@ -52,22 +52,28 @@ function reloadVirtualObjectMap(data) {
 
     for (var key in heatPoints) {
         if (heatPoints.hasOwnProperty(key)) {
-            var current = heatPoints[key];
-            var loc = heatPoints[key].loc;
-            var infowindow = new google.maps.InfoWindow({
-                content: ("[" + loc.location.lat() + "," + loc.location.lng() + "]" + "<a href='http://" + configuration.domain + "/vos/" + current.voId + "'>See</a>")
-            });
 
-            var marker = new google.maps.Marker({
-                position: loc.location,
-                map: map,
-                title: 'Hello World!',
-                icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
-            });
+            var addMarker = function () {
+                var current = heatPoints[key];
+                var loc = heatPoints[key].loc;
+                var infowindow = new google.maps.InfoWindow({
+                    content: ("[" + loc.location.lat() + "," + loc.location.lng() + "]" + "<a href='http://" + configuration.domain + "/vos/" + current.voId + "'>See</a>")
+                });
 
-            marker.addListener('click', function () {
-                infowindow.open(map, marker);
-            });
+                var marker = new google.maps.Marker({
+                    position: loc.location,
+                    map: map,
+                    title: 'Hello World!',
+                    icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
+                });
+
+                marker.addListener('click', function () {
+                    infowindow.open(map, marker);
+                });
+            };
+
+            addMarker();
+
         }
     }
 
@@ -151,7 +157,7 @@ function showVirtualObjectInitializer(virtualObjectId) {
     window.myLine = new Chart(ctx, config);
     initWebSocket2(virtualObjectId);
     var request = requestVirtualObjectSensedHistory(virtualObjectId);
-/*    request
+    request
         .done(function (data) {
             console.log(data);
             addDataBulk(data)
@@ -159,7 +165,7 @@ function showVirtualObjectInitializer(virtualObjectId) {
         .fail(function (e) {
             console.log(e);
         }).always(function () {
-    });*/
+    });
 
 }
 

@@ -72,13 +72,13 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    val numberOfSenders = 10
+    val numberOfSenders = 100
 
     val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
     val router = system.actorOf(MqttRouter.props(inject[URI](identified by 'MqttBroker).toString))
     val actorList = uuidList.map { uuid =>
 
-      Thread.sleep(20)
+      Thread.sleep(50)
 
       (uuid, system.actorOf(MqttTestActor2.props(router, TestProbe().ref)))
 
@@ -86,7 +86,7 @@ object Main {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      Thread.sleep(100)
+      Thread.sleep(80)
 
       actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
       actorRef ! MqttTestActor2.Messages.Publish(
@@ -116,7 +116,7 @@ object Main {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      system.scheduler.schedule(1 second, 5 seconds) {
+      system.scheduler.schedule(1 second, 2 seconds) {
         actorRef ! MqttTestActor2.Messages.Publish.apply(
           MqttGlobals.dataOutTopic(uuid),
           Json.toJson(MqttGlobals.Messages.sensedValue(uuid)))

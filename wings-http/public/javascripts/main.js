@@ -1,13 +1,38 @@
 var configuration = {
-    domain: "127.0.0.1:9000"
+    domain: "127.0.0.1:9000",
+    url: {
+        voSensed: function(virtualObjectId) {
+            return "http://localhost:9000/api/v1/vos/" + virtualObjectId + "/sensed";
+        },
+        vos: function () {
+            return "http://" + configuration.domain + "/api/v1/vos"
+        },
+        webSocket: function() {
+            return "ws://localhost:9000/api/v1/admin/ws/socket";
+        }
+    }
 };
 
 var heatPoints = [];
 var heatmap = null;
 
-function setObjectsInMap(object, map) {
 
+var request = requestVirtualObjectSensedHistory(virtualObjectId);
+request
+    .done(function (data) {
+        console.log(data);
+        addDataBulk(singleVirtualObjectChart, 0, data)
+    })
+    .fail(function (e) {
+        console.log(e);
+    }).always(function () {
+});
+
+function requestAllVirtualObjects() {
+    return $.get("http://" + configuration.domain + "/api/v1/vos");
 }
+
+
 
 function initializeVirtualObjectMap() {
     $.get("http://" + configuration.domain + "/api/v1/vos", function (data) {
@@ -81,7 +106,7 @@ function reloadVirtualObjectMap(data) {
 
 function initWebSocket(data) {
 
-    var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
+    var webSocket = new WebSocket(configuration.url.webSocket());
 
     webSocket.onopen = function () {
 
@@ -153,14 +178,14 @@ function heat() {
 // ShowVirtualObject
 
 function showVirtualObjectInitializer(virtualObjectId) {
-    var ctx = document.getElementById("canvas").getContext("2d");
-    window.myLine = new Chart(ctx, config);
-    initWebSocket2(virtualObjectId);
+    var ctx = document.getElementById("single-virtualobject-canvas").getContext("2d");
+    var singleVirtualObjectChart = new Chart(ctx, singleVirtualObjectConfig);
+    initWebSocket2(virtualObjectId, singleVirtualObjectChart);
     var request = requestVirtualObjectSensedHistory(virtualObjectId);
     request
         .done(function (data) {
             console.log(data);
-            addDataBulk(data)
+            addDataBulk(singleVirtualObjectChart, 0, data)
         })
         .fail(function (e) {
             console.log(e);
@@ -170,12 +195,12 @@ function showVirtualObjectInitializer(virtualObjectId) {
 }
 
 function requestVirtualObjectSensedHistory(virtualObjectId) {
-    var uri = "http://" + configuration.domain + "/api/v1/vos/" + virtualObjectId + "/sensed";
-    return $.get("http://localhost:9000/api/v1/vos/" + virtualObjectId + "/sensed");
+    var uri = configuration.url.voSensed(virtualObjectId);
+    return $.get(uri);
 }
 
 
-function initWebSocket2(virtualObjectId) {
+function initWebSocket2(virtualObjectId, singleVirtualObjectChart) {
 
     var webSocket = new WebSocket("ws://localhost:9000/api/v1/admin/ws/socket");
 
@@ -224,15 +249,15 @@ function initWebSocket2(virtualObjectId) {
     webSocket.onmessage = function (event) {
         console.log(event.data);
         var virtualObjectSensed = JSON.parse(event.data);
-        if(Object.hasOwnProperty("op")) {
+        if (Object.hasOwnProperty("op")) {
             return;
         }
-        addData(virtualObjectSensed);
+        addData(singleVirtualObjectChart, 0, virtualObjectSensed);
     };
 
 }
 
-var config = {
+var singleVirtualObjectConfig = {
     type: 'line',
     data: {
         datasets: [{
@@ -250,7 +275,7 @@ var config = {
         responsive: true,
         title: {
             display: true,
-            text: "Chart.js Time Point Data"
+            text: "Sensor Data"
         },
         scales: {
             xAxes: [{
@@ -259,6 +284,10 @@ var config = {
                 scaleLabel: {
                     display: true,
                     labelString: 'Date'
+                },
+                ticks: {
+                    suggestedMin: 0,
+                    beginAtZero: true
                 }
             }],
             yAxes: [{
@@ -272,38 +301,110 @@ var config = {
     }
 };
 
-function addDataBulk(values) {
+function addDataBulk(chart, dataset, values) {
 
     for (var key in values) {
         var value = values[key];
-        if (config.data.datasets.length > 0) {
+        if (chart.config.data.datasets.length > 0) {
             var newTime = moment(value.c)
                 .format('MM/DD/YYYY HH:mm:ss');
-            for (var index = 0; index < config.data.datasets.length; ++index) {
-                config.data.datasets[index].data.push({
+                chart.config.data.datasets[dataset].data.push({
                     x: newTime,
                     y: parseFloat(value.value)
                 });
-            }
         }
     }
-    window.myLine.update();
+    chart.update();
 }
 
 
-function addData(value) {
-    console.log(value);
+function addData(chart, dataset, value) {
 
-    if (config.data.datasets.length > 0) {
+    if (chart.config.data.datasets.length > 0) {
         var newTime = moment(value.c)
             .format('MM/DD/YYYY HH:mm:ss');
-        for (var index = 0; index < config.data.datasets.length; ++index) {
-            config.data.datasets[index].data.push({
+            chart.config.data.datasets[dataset].data.push({
                 x: newTime,
                 y: parseFloat(value.value)
             });
-        }
-        window.myLine.update();
+        chart.update();
     }
 }
+
+// ShowVirtualObjectList
+
+function showVirtualObjectListInitializer() {
+
+
+
+    var request = requestVirtualObjectSensedHistory(virtualObjectId);
+    request
+        .done(function (data) {
+            console.log(data);
+            addDataBulk(singleVirtualObjectChart, 0, data)
+        })
+        .fail(function (e) {
+            console.log(e);
+        }).always(function () {
+    });
+}
+
+function initWebSocket3(virtualObjectId) {
+
+    var webSocket = new WebSocket(configuration.url.webSocket());
+
+    webSocket.onopen = function () {
+
+        console.log("WebSocket opened");
+
+        webSocket.send(JSON.stringify({
+            "op": "vo/register/name/request",
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
+        }));
+
+        webSocket.send(JSON.stringify({
+            "voId": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "path": "73f86a2e-1004-4011-8a8f-3f78cdd6113c",
+            "scap": {
+                "name": "status",
+                "unit": "state"
+            },
+            "acap": {
+                "name": "running/stopped",
+                "states": [{
+                    "stateId": "on"
+                }]
+            }
+        }));
+
+
+        webSocket.send(JSON.stringify({
+            "op": "vo/watch",
+            "path": virtualObjectId
+        }));
+
+
+    };
+
+    webSocket.onerror = function (error) {
+        console.log("WebSocket error", error);
+    };
+
+    webSocket.onclose = function () {
+        console.log("WebSocket closed");
+
+    };
+
+    webSocket.onmessage = function (event) {
+        console.log(event.data);
+        var virtualObjectSensed = JSON.parse(event.data);
+        if (Object.hasOwnProperty("op")) {
+            return;
+        }
+        addData(singleVirtualObjectChart, 0, virtualObjectSensed);
+    };
+
+}
+
+
 

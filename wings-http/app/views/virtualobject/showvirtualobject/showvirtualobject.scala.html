@@ -1,22 +1,18 @@
-@(virtualObjecId: String)
+@(virtualObjectId: String)
 
 @main("Welcome to Play", "Chart") {
 
     <h1 class="page-header">Chart</h1>
 
     <div id="canvas-wrapper">
-        <canvas id="canvas"></canvas>
+        <canvas id="single-virtualobject-canvas"></canvas>
     </div>
-
-    <button id="randomizeData">Randomize Data</button>
-    <button id="addData">Add Data</button>
-    <button id="removeData">Remove Data</button>
 
     <div id="singlevirtualobject-map"></div>
 
     <script type="text/javascript">
             window.onload = function () {
-                showVirtualObjectInitializer("@virtualObjecId");
+                showVirtualObjectInitializer("@virtualObjectId");
             };
     </script>
 

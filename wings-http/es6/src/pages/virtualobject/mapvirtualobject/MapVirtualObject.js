@@ -49,15 +49,23 @@ class MapVirtualObject {
 
     VirtualObjectService.getAllVirtualObjects()
       .then((response) => {
-        this.mapData = response.data;
-        let transformedMapData = this.mapData.map(this._transformVirtualObjectToCoordinates).filter((value) => value != 'undefined');
-        transformedMapData.forEach(this._addMarker);
+        let data = response.data
+          .map(this._transformVirtualObjectToCoordinates)
+          .filter((value) => value != 'undefined');
+        this.mapData = this._generateMapData(data);
+        _.each(this.mapData, this._addMarker);
         this._startVirtualObject();
       })
       .catch((error) => {
         console.log(error);
         alert('An error occurred while trying to retrieve VirtualObjects');
       });
+  }
+
+  _generateMapData(data) {
+    var resultMapData = {};
+    data.forEach((value) => resultMapData[value.voId] = value);
+    return resultMapData;
   }
 
   _transformVirtualObjectToCoordinates(virtualObject) {
@@ -103,7 +111,7 @@ class MapVirtualObject {
 
     let socket = VirtualObjectSingleton.connect(
       (_socket) => {
-        this.mapData.forEach(
+        _.each(this.mapData,
           (value) => {
             this._watchVirtualObjects(_socket.getSocketWrapper(), value);
           }
@@ -115,7 +123,10 @@ class MapVirtualObject {
 
     socketObservable.subscribe(
       (message) => {
-        console.log(message);
+        let sensedData = JSON.parse(message.data);
+        if (_.get(sensedData, "value", "undefined") == "undefined") return;
+        this.mapData[sensedData.voId].loc.weight = sensedData.value;
+        this.heatMap.setData(_.map(this.mapData, v => v.loc));
       }
       ,
       (error) => {
@@ -124,19 +135,6 @@ class MapVirtualObject {
       () => {
 
       });
-
-    socketObservable.subscribe(
-      function (x) {
-        console.log('Value published to observer #2: ' + x);
-      },
-      function (e) {
-        console.log('onErråor: ' + e.message);
-      },
-      function () {
-        console.log('onCompleted');
-      });
-
-
   }
 
   _watchVirtualObjects(socketWrapper, value) {

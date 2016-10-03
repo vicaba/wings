@@ -39,13 +39,8 @@ class VirtualObjectSingleton {
 
     if (this.isOpen()) return this.subject;
 
-    console.log(JSON.stringify(
-      this._nameRegisterMessage()
-    ));
-
     var openObserver = Rx.Observer.create(
       (e) => {
-        console.log("hi");
         this._isOpen = true;
         this.subject.onNext(
           JSON.stringify(

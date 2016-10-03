@@ -4,6 +4,7 @@ import SensedChartJs from './SensedChartJs';
 import ChartJsSensedDefaultConfig from "./ChartJsSensedDefaultConfig";
 import VirtualObjectSensedService from "./../../../service/virtualobject/VirtualObjectSensedService";
 import VirtualObjectSingleton from "./../../../service/virtualobject/VirtualObjectSingleton";
+import * as VirtualObjectMessages from "./../../../service/virtualobject/VirtualObjectMessages";
 
 
 window.showVirtualObjectInitializer = (virtualObjectId) => {
@@ -22,7 +23,7 @@ let momentTime = (time) => {
 };
 
 class ShowVirtualObject {
-  constructor(chartElement, virtualObjectId) {
+  constructor() {
     this.chartElement = null;
     this.virtualObjectId = null;
     this.sensedChart = null;
@@ -41,6 +42,8 @@ class ShowVirtualObject {
         let sensedData = response.data;
         this.addDataToSensedChart(DefaultDataSet, sensedData);
       });
+
+    this._startVirtualObject(this.virtualObjectId);
 
   }
 
@@ -62,7 +65,7 @@ class ShowVirtualObject {
     }
   }
 
-  _startVirtualObject() {
+  _startVirtualObject(virtualObjectId) {
 
     let socket = VirtualObjectSingleton.connect(
       (_socket) => {
@@ -74,7 +77,9 @@ class ShowVirtualObject {
 
     socketObservable.subscribe(
       (message) => {
-        console.log(message);
+        let sensedData = JSON.parse(message.data);
+        if (_.get(sensedData, "value", "undefined") == "undefined") return;
+        this.addDataToSensedChart(DefaultDataSet, sensedData);
       }
       ,
       (error) => {
@@ -83,19 +88,6 @@ class ShowVirtualObject {
       () => {
 
       });
-
-    socketObservable.subscribe(
-      function (x) {
-        console.log('Value published to observer #2: ' + x);
-      },
-      function (e) {
-        console.log('onError: ' + e.message);
-      },
-      function () {
-        console.log('onCompleted');
-      });
-
-
   }
 
   _watchVirtualObject(socketWrapper, virtualObjectid) {

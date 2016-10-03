@@ -72,7 +72,7 @@ object Main {
 
     implicit val system = ActorSystem("system-test1")
 
-    val numberOfSenders = 100
+    val numberOfSenders = 50
 
     val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
     val router = system.actorOf(MqttRouter.props(inject[URI](identified by 'MqttBroker).toString))
@@ -86,7 +86,7 @@ object Main {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      Thread.sleep(80)
+      Thread.sleep(100)
 
       actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
       actorRef ! MqttTestActor2.Messages.Publish(

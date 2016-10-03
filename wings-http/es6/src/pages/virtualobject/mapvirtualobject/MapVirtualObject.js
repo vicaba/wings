@@ -1,6 +1,8 @@
 import * as underscore from "underscore";
 
 import VirtualObjectService from "./../../../service/virtualobject/VirtualObjectService";
+import VirtualObjectSingleton from "./../../../service/virtualobject/VirtualObjectSingleton";
+import * as VirtualObjectMessages from "./../../../service/virtualobject/VirtualObjectMessages";
 import DomainConfig from "./../../../service/DomainConfig";
 
 window.mapVirtualObjectInitializer = () => {
@@ -50,9 +52,11 @@ class MapVirtualObject {
         this.mapData = response.data;
         let transformedMapData = this.mapData.map(this._transformVirtualObjectToCoordinates).filter((value) => value != 'undefined');
         transformedMapData.forEach(this._addMarker);
+        this._startVirtualObject();
       })
       .catch((error) => {
-        alert('An error ocurred while trying to retrieve VirtualObjects');
+        console.log(error);
+        alert('An error occurred while trying to retrieve VirtualObjects');
       });
   }
 
@@ -66,7 +70,7 @@ class MapVirtualObject {
 
       return {
         voId: voId,
-        loc: { location: location, weight: 0 }
+        loc: {location: location, weight: 0}
       };
 
     } else {
@@ -77,8 +81,9 @@ class MapVirtualObject {
   _addMarker(heatPoint) {
 
     let location = heatPoint.loc;
+    let showVirtualObjectRef = `${DomainConfig.urlFront.vo(heatPoint.voId)}`;
     let heatPointInfoWindow = new google.maps.InfoWindow({
-      content: ("[" + location.location.lat() + "," + location.location.lng() + "]" + "<a href='${DomainConfig.vo(heatPoint.voId)}'>See</a>")
+      content: ("[" + location.location.lat() + "," + location.location.lng() + "]" + "<a href='" + showVirtualObjectRef + "'>See</a>")
     });
 
     let marker = new google.maps.Marker({
@@ -89,9 +94,55 @@ class MapVirtualObject {
     });
 
     marker.addListener('click', () => {
-      heatPointInfoWindow.open(map, marker);
+      heatPointInfoWindow.open(this.map, marker);
     });
 
+  }
+
+  _startVirtualObject() {
+
+    let socket = VirtualObjectSingleton.connect(
+      (_socket) => {
+        this.mapData.forEach(
+          (value) => {
+            this._watchVirtualObjects(_socket.getSocketWrapper(), value);
+          }
+        );
+      }
+    );
+
+    let socketObservable = socket.messageEmitter;
+
+    socketObservable.subscribe(
+      (message) => {
+        console.log(message);
+      }
+      ,
+      (error) => {
+
+      },
+      () => {
+
+      });
+
+    socketObservable.subscribe(
+      function (x) {
+        console.log('Value published to observer #2: ' + x);
+      },
+      function (e) {
+        console.log('onErråor: ' + e.message);
+      },
+      function () {
+        console.log('onCompleted');
+      });
+
+
+  }
+
+  _watchVirtualObjects(socketWrapper, value) {
+    socketWrapper.socket.onNext(
+      JSON.stringify(VirtualObjectMessages.WatchVirtualObject(value.voId))
+    );
   }
 
 }

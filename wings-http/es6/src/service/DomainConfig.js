@@ -1,4 +1,4 @@
-var config =  {
+var config = {
   domain: "127.0.0.1:9000",
   url: {
     voSensed: (virtualObjectId) => {
@@ -12,6 +12,11 @@ var config =  {
     },
     webSocket: () => {
       return `ws://${config.domain}/api/v1/admin/ws/socket`;
+    }
+  },
+  urlFront: {
+    vo: (voId) => {
+      return `http://${config.domain}/vos/${voId}`;
     }
   }
 };

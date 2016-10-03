@@ -16,18 +16,6 @@ var configuration = {
 var heatPoints = [];
 var heatmap = null;
 
-
-var request = requestVirtualObjectSensedHistory(virtualObjectId);
-request
-    .done(function (data) {
-        console.log(data);
-        addDataBulk(singleVirtualObjectChart, 0, data)
-    })
-    .fail(function (e) {
-        console.log(e);
-    }).always(function () {
-});
-
 function requestAllVirtualObjects() {
     return $.get("http://" + configuration.domain + "/api/v1/vos");
 }
@@ -405,6 +393,5 @@ function initWebSocket3(virtualObjectId) {
     };
 
 }
-
 
 

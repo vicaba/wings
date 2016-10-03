@@ -1,0 +1,21 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "semi": ["error", "always"],
+    "no-tabs": ["error"],
+    "no-mixed-spaces-and-tabs": ["error"],
+    "one-var-declaration-per-line": ["error"],
+    "indent": ["error", 2],
+    "max-lines": ["warn", { "max": 300, "skipBlankLines": true, "skipComments": true }],
+    "eol-last": ["warn"],
+    "no-useless-constructor": ["warn"],
+    "no-this-before-super": ["warn"],
+    "prefer-arrow-callback": ["warn"]
+  }
+}

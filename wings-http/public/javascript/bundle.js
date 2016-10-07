@@ -58399,8 +58399,6 @@
 	    value: function _addMarker(heatPoint) {
 	      var _this2 = this;
 
-	      console.log(_InfoWindowTemplateTpl2.default);
-
 	      var location = heatPoint.loc;
 	      var showVirtualObjectRef = "" + _DomainConfig2.default.urlFront.vo(heatPoint.voId);
 

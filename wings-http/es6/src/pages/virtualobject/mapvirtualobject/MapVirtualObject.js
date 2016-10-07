@@ -89,9 +89,6 @@ class MapVirtualObject {
 
   _addMarker(heatPoint) {
 
-    console.log(InfoWindowTemplate);
-
-
     let location = heatPoint.loc;
     let showVirtualObjectRef = `${DomainConfig.urlFront.vo(heatPoint.voId)}`;
 

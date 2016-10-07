@@ -20,6 +20,11 @@ module.exports = {
                 test: /\.js$/,
                 loader: "eslint-loader",
                 exclude: /node_modules/
+            },
+            {
+                test: /\.tpl.html$/,
+                loader: "raw-loader",
+                exclude: /node_modules/
             }
         ]
     },

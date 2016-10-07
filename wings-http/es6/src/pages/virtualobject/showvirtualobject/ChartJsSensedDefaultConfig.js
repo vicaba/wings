@@ -2,7 +2,7 @@ export default {
   type: 'line',
   data: {
     datasets: [{
-      label: "Dataset with string point data",
+      label: "",
       data: [],
       fill: false,
       borderColor: "rgba(131,101,129,0.4)",
@@ -24,7 +24,7 @@ export default {
         display: true,
         scaleLabel: {
           display: true,
-          labelString: 'Date'
+          labelString: 'Time'
         },
         ticks: {
           suggestedMin: 0,

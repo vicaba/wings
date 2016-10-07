@@ -1,9 +1,10 @@
-import * as underscore from "underscore";
+import * as _ from 'lodash';
 
 import VirtualObjectService from "./../../../service/virtualobject/VirtualObjectService";
 import VirtualObjectSingleton from "./../../../service/virtualobject/VirtualObjectSingleton";
 import * as VirtualObjectMessages from "./../../../service/virtualobject/VirtualObjectMessages";
 import DomainConfig from "./../../../service/DomainConfig";
+import InfoWindowTemplate from './InfoWindowTemplate.tpl.html';
 
 window.mapVirtualObjectInitializer = () => {
   let mapElement = document.getElementById('virtualobject-map');
@@ -88,10 +89,23 @@ class MapVirtualObject {
 
   _addMarker(heatPoint) {
 
+    console.log(InfoWindowTemplate);
+
+
     let location = heatPoint.loc;
     let showVirtualObjectRef = `${DomainConfig.urlFront.vo(heatPoint.voId)}`;
+
+    let compiledInfoWindowContent = _.template(InfoWindowTemplate);
+    let infoWindowContent = compiledInfoWindowContent({
+      showVirtualObjectRef: showVirtualObjectRef,
+      loc: {
+        lat: location.location.lat(),
+        lng: location.location.lng()
+      }
+    });
+
     let heatPointInfoWindow = new google.maps.InfoWindow({
-      content: ("[" + location.location.lat() + "," + location.location.lng() + "]" + "<a href='" + showVirtualObjectRef + "'>See</a>")
+      content: infoWindowContent
     });
 
     let marker = new google.maps.Marker({

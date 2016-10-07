@@ -14,11 +14,13 @@
     "babel-preset-es2015": "^6.16.0",
     "eslint": "^3.7.0",
     "eslint-loader": "^1.5.0",
+    "raw-loader": "^0.5.1",
     "webpack": "^1.13.2"
   },
   "dependencies": {
     "axios": "^0.14.0",
     "chart.js": "^2.3.0",
+    "lodash": "^4.16.4",
     "momentjs": "^1.1.17",
     "rx": "^4.1.0",
     "rx-dom": "^7.0.3",

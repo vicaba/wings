@@ -97,7 +97,7 @@ object Main {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      Thread.sleep(20)
+      Thread.sleep(80)
 
       actorRef ! MqttTestActor2.Messages.Publish(
         MqttGlobals.configOutTopic(uuid),

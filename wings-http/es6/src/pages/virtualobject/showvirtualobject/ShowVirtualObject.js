@@ -1,4 +1,5 @@
 import moment from 'moment';
+import * as _ from 'lodash';
 
 import SensedChartJs from './SensedChartJs';
 import ChartJsSensedDefaultConfig from "./ChartJsSensedDefaultConfig";
@@ -33,12 +34,13 @@ class ShowVirtualObject {
     this.chartElement = chartElement;
     this.virtualObjectId = virtualObjectId;
 
+    let config = _.cloneDeep(ChartJsSensedDefaultConfig);
+    config.data.datasets[DefaultDataSet].label = this.virtualObjectId;
 
-    this.sensedChart = new SensedChartJs(this.chartElement, ChartJsSensedDefaultConfig);
+    this.sensedChart = new SensedChartJs(this.chartElement, config);
 
     VirtualObjectSensedService.getSensedDataFromVirtualObject(this.virtualObjectId)
       .then((response) => {
-        console.log(response);
         let sensedData = response.data;
         this.addDataToSensedChart(DefaultDataSet, sensedData);
       });

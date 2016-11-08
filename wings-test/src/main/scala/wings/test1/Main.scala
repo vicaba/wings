@@ -133,7 +133,7 @@ object Main {
 
     val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
 
-    val webSocketActor = WebSocket.getConnection(userRegisteredResponse, receiverProbe.ref)(system)
+    val webSocketActor = WebSocket.getConnection(inject[URI](identified by 'WebSocketServerWithPath), userRegisteredResponse, receiverProbe.ref)(system)
 
     webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
       Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voIdUUID)).toString()

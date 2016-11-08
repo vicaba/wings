@@ -26,6 +26,10 @@ object DependencyInjector {
 
   def coreInjector = new Module {
 
+    bind[URI] identifiedBy 'WebSocketServerWithPath to Config.config.getStringList("websocket.servers-with-path").asScala.map(new URI(_)).head
+
+    bind[URI] identifiedBy 'HttpServer to Config.config.getStringList("http.servers").asScala.map(new URI(_)).head
+
     bind[URI] identifiedBy 'MqttBroker to Config.config.getStringList("mqtt.servers").asScala.map(new URI(_)).head
 
     bind[List[String]] identifiedBy 'MongoDBServers to Config.config.getStringList("mongodb.servers").asScala.toList

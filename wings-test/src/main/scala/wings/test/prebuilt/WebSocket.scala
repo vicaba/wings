@@ -12,11 +12,10 @@ import scala.collection.JavaConverters._
 
 object WebSocket {
 
-  val webSocketUrl = "ws://localhost:9000/api/v1/admin/ws/socket"
+  val webSocketUrl = s"ws://localhost:9000/api/v1/admin/ws/socket"
 
-  def getConnection(response: WSResponse, testActor: ActorRef = ActorRef.noSender)(actorSystem: ActorSystem = ActorSystem())
+  def getConnection(webSocketServerUri: URI, response: WSResponse, testActor: ActorRef = ActorRef.noSender)(actorSystem: ActorSystem = ActorSystem())
   = {
-    val webSocketServerUri = new URI(webSocketUrl)
     val webSocketClient = new WebSocketClient()
     val sessionCookie = response.cookie(Http.playSessionKey).get.value.get
 

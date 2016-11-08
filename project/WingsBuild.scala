@@ -1,11 +1,10 @@
 import play.sbt._
 import play.sbt.PlayImport._
 import play.sbt.routes.RoutesKeys._
-
 import sbt.Keys._
 import sbt._
-
 import Dependencies._
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
 
 object WingsBuild extends Build {
 
@@ -75,6 +74,7 @@ object WingsBuild extends Build {
     dependencies = Seq(core)
   )
     .settings(mqttDependencies:_*)
+    .enablePlugins(JavaAppPackaging)
 
   lazy val mqttDependencies = Seq(libraryDependencies ++= Seq(
     akkaActor,
@@ -95,6 +95,8 @@ object WingsBuild extends Build {
     dependencies = Seq(core)
   )
     .settings(clusterSeedDependencies:_*)
+    .enablePlugins(JavaAppPackaging)
+
 
   lazy val clusterSeedDependencies = Seq(libraryDependencies ++= Seq(
     akkaCluster,
@@ -109,6 +111,7 @@ object WingsBuild extends Build {
     dependencies = Seq(core, mqtt)
   )
     .settings(testDependencies)
+    .enablePlugins(JavaAppPackaging)
 
   lazy val testDependencies = Seq(libraryDependencies ++= Seq(
     playWs,

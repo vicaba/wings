@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 
-object Main {
+object Demo1 {
 
   object MqttGlobals {
 
@@ -107,8 +107,6 @@ object Main {
     }
 
     println("Metadata Sent")
-
-
 
     // Schedule MQTT clients to send sensed messages every period of time
     println("Starting to schedule")

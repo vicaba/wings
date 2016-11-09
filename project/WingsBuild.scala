@@ -112,6 +112,7 @@ object WingsBuild extends Build {
   )
     .settings(testDependencies)
     .enablePlugins(JavaAppPackaging)
+    .settings(mainClass in (Compile) := Some("wings.demo1.Demo1"))
 
   lazy val testDependencies = Seq(libraryDependencies ++= Seq(
     playWs,

@@ -83,7 +83,7 @@ object Main {
 
   }
 
-  def main(args: Array[String]) {
+  def _main(args: Array[String]) {
 
     import wings.test.database.mongodb._
 

@@ -44,27 +44,40 @@ builtMessage $wings_http $wings_http_zip
 
 echo "Uploading files"
 
-scp -i ~/.ssh/id_rsa $wings_mqtt$path_to_compressed/$wings_mqtt_zip vagrant@172.16.2.211:/home/vagrant/
 ssh -i ~/.ssh/id_rsa vagrant@172.16.2.198 << EOF
-unzip /home/vagrant/$wings_mqtt_zip;
-$wings_mqtt_v/bin/$wings_mqtt;
+  rm -r wings-*
+EOF
+
+ssh -i ~/.ssh/id_rsa vagrant@172.16.2.211 << EOF
+  rm -r wings-*
+EOF
+
+scp -i ~/.ssh/id_rsa $wings_mqtt$path_to_compressed/$wings_mqtt_zip vagrant@172.16.2.211:/home/vagrant/
+ssh -i ~/.ssh/id_rsa vagrant@172.16.2.211 << EOF
+  unzip /home/vagrant/$wings_mqtt_zip;
+# $wings_mqtt_v/bin/$wings_mqtt;
 EOF
 
 scp -i ~/.ssh/id_rsa $wings_test$path_to_compressed/$wings_test_zip vagrant@172.16.2.198:/home/vagrant/
+ssh -i ~/.ssh/id_rsa vagrant@172.16.2.198 << EOF
+ unzip /home/vagrant/$wings_test_zip;
+#   $wings_clusterseed_v/bin/$wings_clusterseed &
+#   $! > $wings_clusterseed_v/bin/RUNNING_PID
+EOF
 
 scp -i ~/.ssh/id_rsa $wings_clusterseed$path_to_compressed/$wings_clusterseed_zip vagrant@172.16.2.198:/home/vagrant/
 ssh -i ~/.ssh/id_rsa vagrant@172.16.2.198 << EOF
-unzip /home/vagrant/$wings_clusterseed_zip;
-$wings_clusterseed_v/bin/$wings_clusterseed &;
-$! > $wings_clusterseed_v/bin/RUNNING_PID
-
+ unzip /home/vagrant/$wings_clusterseed_zip;
+#   $wings_clusterseed_v/bin/$wings_clusterseed &
+#   $! > $wings_clusterseed_v/bin/RUNNING_PID
 EOF
 
 scp -i ~/.ssh/id_rsa $wings_http$path_to_compressed/$wings_http_zip vagrant@172.16.2.198:/home/vagrant/
 ssh -i ~/.ssh/id_rsa vagrant@172.16.2.198 << EOF
-unzip /home/vagrant/$wings_http_zip;
-$wings_http_v/bin/$wings_http -Dhttp.port=9000 -Dhttp.address=0.0.0.0 &;
-EOF
+#   echo "unzip /home/vagrant/$wings_http_zip"
+  unzip /home/vagrant/$wings_http_zip;
+#   $wings_http_v/bin/$wings_http -Dhttp.port=9000 -Dhttp.address=0.0.0.0 &
+# EOF
 
 ## declare an array variable
 # declare -a projects=("wings-mqtt" "wings-clusterseed" "wings-test")

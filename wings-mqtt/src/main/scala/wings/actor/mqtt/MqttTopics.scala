@@ -2,6 +2,8 @@ package wings.actor.mqtt
 
 import java.util.UUID
 
+import scala.util.matching.Regex
+
 object MqttTopics {
 
   def dataOutTopic(voId: String): String = voId + "/data/out"
@@ -23,7 +25,7 @@ object MqttTopics {
 
   val generalConfigOutTopic: String = "+/i/config/out"
 
-  val ConfigOutTopicPattern = "(.+)/i/config/out".r
+  val ConfigOutTopicPattern: Regex = "(.+)/i/config/out".r
 
   def provisionalConfigOutTopic(voId: String): String = s"$voId/i/config/out"
 

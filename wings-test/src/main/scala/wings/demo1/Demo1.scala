@@ -58,7 +58,7 @@ object Demo1 {
         Some(ActuateCapability("light", Array(ActuateState("on"), ActuateState("off"))))
       )
 
-      def sensedValue(id: UUID) = VirtualObjectSensed(voId = id, value = r.nextInt(50).toString, unit = Some("C"))
+      def sensedValue(id: UUID) = VirtualObjectSensed(voId = id, value = (40 + r.nextInt((42 - 40) + 1 )).toString, unit = Some("C"))
 
     }
 

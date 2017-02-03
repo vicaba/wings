@@ -114,7 +114,7 @@ object Demo1 {
 
     actorList.foreach { case (uuid, actorRef) =>
 
-      system.scheduler.schedule(1 second, 2 seconds) {
+      system.scheduler.schedule(1 second, 10 seconds) {
         actorRef ! MqttTestActor2.Messages.Publish.apply(
           MqttGlobals.dataOutTopic(uuid),
           Json.toJson(MqttGlobals.Messages.sensedValue(uuid)))

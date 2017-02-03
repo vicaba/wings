@@ -35,7 +35,11 @@ export default {
         display: true,
         scaleLabel: {
           display: true,
-          labelString: 'value'
+          labelString: 'value (V)'
+        },
+        ticks: {
+          suggestedMin: 0,
+          beginAtZero: true
         }
       }]
     }

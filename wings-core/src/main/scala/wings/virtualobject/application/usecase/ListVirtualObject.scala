@@ -1,12 +1,13 @@
 package wings.virtualobject.application.usecase
 
-import org.scalactic.{Every, Good, Or}
-import wings.virtualobject.domain.VirtualObject
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 import wings.toolkit.error.application.Types.AppError
 import wings.virtualobject.domain.repository.VirtualObjectRepository
+import wings.virtualobject.domain.VirtualObject
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalactic.{Every, Good, Or}
 
 object ListVirtualObject {
 

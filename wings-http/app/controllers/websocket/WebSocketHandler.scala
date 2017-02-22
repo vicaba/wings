@@ -1,24 +1,23 @@
-package websocket
+package controllers.websocket
 
 import java.util.UUID
-
-import akka.actor._
-import akka.event.Logging
-import play.api.libs.json.{JsValue, Json}
-import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
-import wings.virtualobjectagent.domain.agent.CoreAgent
-import wings.virtualobjectagent.domain.agent.CoreAgentMessages.ToDeviceActor
-import wings.virtualobjectagent.domain.messages.command.{
-  NameAcquisitionAck,
-  NameAcquisitionRequest,
-  RegisterVirtualObjectId
-}
 
 import scala.concurrent.duration._
 import scala.util.Try
 
+import akka.actor._
+import akka.event.Logging
+
+import play.api.libs.json.{Json, JsResult, JsValue}
+
+import wings.virtualobjectagent.domain.agent.CoreAgent
+import wings.virtualobjectagent.domain.agent.CoreAgentMessages.ToDeviceActor
+import wings.virtualobjectagent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
+import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
+
+
 object WebSocketHandler {
-  def props(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef) =
+  def props(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef): Props =
     Props(WebSocketHandler(agentProps, webSocketOutputHandler))
 }
 
@@ -30,7 +29,7 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
 
   val logger = Logging(context.system, this)
 
-  override def preStart() = {
+  override def preStart(): Unit = {
     logger.debug("WebSocketHandler Deployed")
     become(onStartReceive)
   }
@@ -55,7 +54,7 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
     case _ => stash()
   }
 
-  def becomeBridge(toDevice: ActorRef) = become(bridgeReceive(toDevice))
+  def becomeBridge(toDevice: ActorRef): Unit = become(bridgeReceive(toDevice))
 
   def waitForFirstToDeviceMessage(tickToQueryForToDeviceActor: Cancellable): Receive = {
     case toDeviceActor: ActorRef =>
@@ -73,11 +72,11 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
 
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))
 
-  def validateJson(json: JsValue) = {
+  def validateJson(json: JsValue): JsResult[RegisterVirtualObjectId] = {
     json.validate[RegisterVirtualObjectId]
   }
 
-  override def postStop = {
+  override def postStop: Unit = {
     println("Actor Stopped")
   }
 

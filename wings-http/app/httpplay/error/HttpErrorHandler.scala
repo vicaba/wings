@@ -1,10 +1,13 @@
 package httpplay.error
 
-import org.scalactic._
+import scala.concurrent.Future
+
 import play.api.mvc.{Controller, Result}
+
 import wings.toolkit.error.application.Types.AppError
 
-import scala.concurrent.Future
+import org.scalactic._
+
 
 trait HttpErrorHandler {
 

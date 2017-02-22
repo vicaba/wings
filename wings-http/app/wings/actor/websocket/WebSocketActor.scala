@@ -3,12 +3,13 @@ package wings.actor.websocket
 import java.util.UUID
 
 import akka.actor._
+
 import wings.actor.util.ActorUtilities
 import wings.virtualobjectagent.domain.agent.{ArchitectureDriver, CoreAgent}
 
 object WebSocketActor {
 
-  def props(virtualObjectId: UUID)(out: ActorRef) = Props(new WebSocketActor(virtualObjectId, out))
+  def props(virtualObjectId: UUID)(out: ActorRef): Props = Props(new WebSocketActor(virtualObjectId, out))
 
 }
 

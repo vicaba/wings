@@ -1,10 +1,11 @@
 package wings.toolkit.db.mongodb.service
 
-import reactivemongo.api.{DB, MongoConnectionOptions, MongoDriver}
-import scaldi.Injectable._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import wings.config.DependencyInjector._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import reactivemongo.api.{DB, MongoConnectionOptions, MongoDriver}
+import scaldi.Injectable._
 
 object MongoEnvironmentImpl extends MongoEnvironment {
 

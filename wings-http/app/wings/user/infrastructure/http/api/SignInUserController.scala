@@ -1,18 +1,22 @@
 package wings.user.infrastructure.http.api
 
-import com.google.inject.Singleton
-import httpplay.config.DependencyInjector._
-import httpplay.error.HttpErrorHandler
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.libs.json.JsValue
 import play.api.mvc.{Action, Controller}
-import scaldi.Injectable._
+
 import wings.user.application.usecase.SignInUser
 import wings.user.application.usecase.SignInUser.Message
 import wings.user.infrastructure.keys.UserKeys
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import com.google.inject.Singleton
+import httpplay.config.DependencyInjector._
+import httpplay.error.HttpErrorHandler
+import scaldi.Injectable._
+
 
 @Singleton
 class SignInUserController extends Controller {
@@ -21,7 +25,7 @@ class SignInUserController extends Controller {
 
   val signInUserUseCase: SignInUser.UseCase = inject[SignInUser.UseCase](identified by 'SignInUserUseCase)
 
-  def apply() = Action.async(parse.json) { implicit request =>
+  def apply(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     userSignInForm
       .bindFromRequest()
       .fold(
@@ -42,7 +46,7 @@ class SignInUserController extends Controller {
       )
   }
 
-  def userSignInForm = Form(
+  def userSignInForm: Form[(String, String, String)] = Form(
     tuple(
       "username" -> text,
       "email"    -> email,

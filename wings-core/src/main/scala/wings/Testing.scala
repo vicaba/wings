@@ -8,7 +8,6 @@ import scaldi.Injectable._
 import wings.config.DependencyInjector._
 import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
 
-
 object Testing {
 
   def main(args: Array[String]): Unit = {

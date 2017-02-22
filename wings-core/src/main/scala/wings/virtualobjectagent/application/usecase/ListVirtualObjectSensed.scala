@@ -2,16 +2,15 @@ package wings.virtualobjectagent.application.usecase
 
 import java.util.UUID
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
+
 import org.scalactic._
 import wings.toolkit.db.ClauseValues.SortOrder.SortOrder
 import wings.toolkit.error.application.Types.{AppError, FormatError}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 object ListVirtualObjectSensed {
 

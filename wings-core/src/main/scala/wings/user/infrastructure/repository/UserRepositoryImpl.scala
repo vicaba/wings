@@ -1,13 +1,14 @@
 package wings.user.infrastructure.repository
 
-import org.scalactic.{One, Or}
+import scala.concurrent.Future
+
 import wings.toolkit.error.application.Types.RepositoryError
 import wings.user.domain.User
 import wings.user.domain.User.{Email, Name, Password}
 import wings.user.domain.repository.UserRepository
 import wings.user.infrastructure.repository.mongodb.UserMongoRepository
 
-import scala.concurrent.Future
+import org.scalactic.{One, Or}
 
 case class UserRepositoryImpl(
     webUserMongoRepository: UserMongoRepository

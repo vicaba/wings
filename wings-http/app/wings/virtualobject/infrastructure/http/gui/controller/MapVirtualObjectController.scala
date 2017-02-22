@@ -1,12 +1,14 @@
 package wings.virtualobject.infrastructure.http.gui.controller
 
+import play.api.mvc.{Action, AnyContent, Controller}
+
 import com.google.inject.Singleton
-import play.api.mvc.{Action, Controller}
+
 
 @Singleton
 class MapVirtualObjectController extends Controller {
 
-  def apply() = Action {
+  def apply(): Action[AnyContent] = Action {
     Ok(views.html.virtualobject.mapvirtualobject.mapvirtualobject())
   }
 

@@ -1,15 +1,17 @@
 package wings.virtualobject.infrastructure.repository.mongodb
 
+import scala.concurrent.ExecutionContext
+
 import play.api.libs.json.{Format, OFormat}
-import reactivemongo.api.DB
-import reactivemongo.play.json.collection.JSONCollection
+
 import wings.toolkit.db.mongodb.service.MongoService
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.VirtualObject.IdType
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.VirtualObjectJson
 
-import scala.concurrent.ExecutionContext
+import reactivemongo.api.DB
+import reactivemongo.play.json.collection.JSONCollection
 
 case class VirtualObjectMongoRepository(
     db: DB

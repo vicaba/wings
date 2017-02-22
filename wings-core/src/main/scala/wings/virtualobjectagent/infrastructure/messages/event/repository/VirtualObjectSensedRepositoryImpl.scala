@@ -1,7 +1,8 @@
 package wings.virtualobjectagent.infrastructure.messages.event.repository
 
-import org.scalactic.{One, Or}
-import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, SortOrder, SortOrderWithKey}
+import scala.concurrent.Future
+
+import wings.toolkit.db.ClauseValues.SortOrder.{SortOrder, SortOrderWithKey}
 import wings.toolkit.error.application.Types.RepositoryError
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
@@ -9,7 +10,7 @@ import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSe
 import wings.virtualobjectagent.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
 import wings.virtualobjectagent.infrastructure.messages.event.repository.mongodb.VirtualObjectSensedMongoRepository
 
-import scala.concurrent.Future
+import org.scalactic.{One, Or}
 
 case class VirtualObjectSensedRepositoryImpl(
     virtualObjectSensedMongoRepository: VirtualObjectSensedMongoRepository

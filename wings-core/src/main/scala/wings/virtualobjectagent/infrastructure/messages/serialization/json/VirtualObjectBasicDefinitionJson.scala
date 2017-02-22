@@ -4,12 +4,13 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsObject, Json, OFormat, OWrites, Reads, _}
+
 import wings.toolkit.json.Additions._
-import wings.virtualobjectagent.domain.messages.command.VirtualObjectBasicDefinition
-import wings.virtualobjectagent.infrastructure.messages.keys.VirtualObjectBasicDefinitionKeys
 import wings.virtualobject.domain.{ActuateCapability, SenseCapability}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
+import wings.virtualobjectagent.domain.messages.command.VirtualObjectBasicDefinition
+import wings.virtualobjectagent.infrastructure.messages.keys.VirtualObjectBasicDefinitionKeys
 
 object VirtualObjectBasicDefinitionJson {
 

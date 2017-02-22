@@ -1,10 +1,11 @@
 package wings.virtualobjectagent.domain.agent
 
+import scala.reflect.ClassTag
+
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import wings.virtualobjectagent.domain.messages.command.{CreateVirtualObject, ManageVirtualObject, RemoveVirtualObject}
 
-import scala.reflect.ClassTag
+import wings.virtualobjectagent.domain.messages.command.{CreateVirtualObject, ManageVirtualObject, RemoveVirtualObject}
 
 object DeviceDriver {
   val name = "DeviceDriver"
@@ -23,7 +24,8 @@ trait DeviceDriver extends Actor {
   type DeviceConnectionContext
 
   /**
-    * This type abstracts over the type used by the third party implementation to communicate that a message has been received.
+    * This type abstracts over the type used by the third party implementation to communicate that a message has been
+    * received.
     */
   type DeviceMessageType
 
@@ -52,7 +54,7 @@ trait DeviceDriver extends Actor {
       }
   }
 
-  def onManageVirtualObject(command: ManageVirtualObject) = {
+  def onManageVirtualObject(command: ManageVirtualObject): Unit = {
     command match {
       case CreateVirtualObject(voId) =>
       case RemoveVirtualObject(voId) =>

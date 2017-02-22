@@ -2,16 +2,19 @@ package wings.virtualobjectagent.domain.agent
 
 import java.util.UUID
 
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
 import akka.actor.{Actor, ActorRef, Props, Stash}
 import akka.event.Logging
-import org.scalactic.{Bad, Good}
-import scaldi.Injectable._
+
 import wings.actor.util.ActorUtilities
 import wings.collection.mutable.tree.Tree
 import wings.config.DependencyInjector._
 import wings.model.virtual.virtualobject.VOTree
 import wings.util.actor.Stash
 import wings.virtualobject.domain.VirtualObject
+import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobjectagent.domain.agent.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
 import wings.virtualobjectagent.domain.messages.command.{
   ActuateOnVirtualObject,
@@ -21,10 +24,9 @@ import wings.virtualobjectagent.domain.messages.command.{
 }
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
-import wings.virtualobject.domain.repository.VirtualObjectRepository
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import org.scalactic.{Bad, Good}
+import scaldi.Injectable._
 
 object CoreAgentMessages {
 
@@ -42,7 +44,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
   import context._
 
-  val name = CoreAgent.name
+  val name: String = CoreAgent.name
 
   val virtualObjectId: UUID
 
@@ -96,12 +98,12 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case vobd: VirtualObjectBasicDefinition =>
         val voTemp = vobd.toVirtualObject
         logger.debug("I'm about to save VirtualObject data for the first time")
-        //Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
+        // Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
         saveOrUpdateVo(vobd).onComplete {
           case Failure(e) =>
             logger.debug("Failed to save VirtualObject data for the first time. Reason: {}", e.getStackTrace)
             throw e
-          //TODO: handle Failure
+          // TODO: handle Failure
           case Success(optVo) =>
             logger.debug("Success in saving VirtualObject data for the first time.")
             optVo match {
@@ -156,12 +158,12 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
         if (parentVoTree.isDefined) {
           val voTemp = vobd.toVirtualObject
           Future.successful[Option[VirtualObject]](Some(voTemp)).onComplete {
-            //val voTree = parentVoTree.get
-            //saveOrUpdateVo(m).onComplete {
+            // val voTree = parentVoTree.get
+            // saveOrUpdateVo(m).onComplete {
             case Failure(e) => logger.error("Error saving vo with id: {}", vobd.id.toString)
             case Success(optVo) =>
               optVo match {
-                case None => //TODO: handle Failure
+                case None => // TODO: handle Failure
                 case Some(vo) =>
                   val createVo = CreateVirtualObject(vo.id) // TODO: Calling get is unsafe
                   endpoints ! createVo
@@ -200,8 +202,6 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
     case _ =>
   }
 
-  def receive = {
-    unconnected
-  }
+  def receive: Receive = unconnected
 
 }

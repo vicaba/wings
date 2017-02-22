@@ -3,8 +3,9 @@ package wings.virtualobjectagent.infrastructure.messages.serialization.json
 import java.util.UUID
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Writes._
 import play.api.libs.json.{JsObject, Json, OFormat, OWrites, Reads, _}
+import play.api.libs.json.Writes._
+
 import wings.virtualobjectagent.domain.messages.command._
 import wings.virtualobjectagent.infrastructure.messages.keys.RegisterVirtualObjectIdKeys
 

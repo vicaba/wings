@@ -1,15 +1,18 @@
 package wings.virtualobject.infrastructure.http.api.controller
 
-import com.google.inject.Singleton
-import httpplay.config.DependencyInjector._
-import httpplay.error.HttpErrorHandler
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
-import scaldi.Injectable._
+import play.api.mvc.{Action, AnyContent, Controller}
+
 import wings.virtualobject.application.usecase.ListVirtualObject
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import com.google.inject.Singleton
+import httpplay.config.DependencyInjector._
+import httpplay.error.HttpErrorHandler
+import scaldi.Injectable._
+
 
 /**
   * ListVirtualObjectController
@@ -22,7 +25,7 @@ class ListVirtualObjectController extends Controller {
 
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 
-  def apply() = Action.async {
+  def apply(): Action[AnyContent] = Action.async {
     listVirtualObjectUseCase.execute(ListVirtualObject.Message(None, None)).map {
       httpErrorHandler.handle(_)(l => Ok(Json.toJson(l)))
     }

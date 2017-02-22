@@ -2,14 +2,15 @@ package wings.virtualobject.application.usecase
 
 import java.util.UUID
 
-import org.scalactic._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
+
 import wings.toolkit.error.application.Types.{AppError, FormatError}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.domain.VirtualObject
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalactic._
 
 /**
   * ShowVirtualObject UseCase

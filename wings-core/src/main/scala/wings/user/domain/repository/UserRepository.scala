@@ -1,10 +1,11 @@
 package wings.user.domain.repository
 
-import org.scalactic.{One, Or}
+import scala.concurrent.Future
+
 import wings.toolkit.error.application.Types.RepositoryError
 import wings.user.domain.User
 
-import scala.concurrent.Future
+import org.scalactic.{One, Or}
 
 trait UserRepository {
 

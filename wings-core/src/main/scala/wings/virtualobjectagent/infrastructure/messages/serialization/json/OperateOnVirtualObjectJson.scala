@@ -1,8 +1,9 @@
 package wings.virtualobjectagent.infrastructure.messages.serialization.json
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
 import play.api.libs.json.{OWrites, Reads, _}
+import play.api.libs.json.Reads._
+
 import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, WatchVirtualObject}
 import wings.virtualobjectagent.infrastructure.messages.keys.OperateOnVirtualObjectKeys
 

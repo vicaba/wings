@@ -2,13 +2,13 @@ package common.request
 
 import java.util.UUID
 
-import common.JsonTemplates
-import play.api.mvc.{ActionBuilder, Request, WrappedRequest, _}
-import wings.enrichments.UUIDHelper
-import play.api.libs.concurrent.{Execution => playEc}
-import wings.user.infrastructure.keys.UserKeys
-
 import scala.concurrent.Future
+
+import play.api.libs.concurrent.{Execution => playEc}
+import play.api.mvc.{ActionBuilder, Request, WrappedRequest, _}
+
+import wings.enrichments.UUIDHelper
+import wings.user.infrastructure.keys.UserKeys
 
 /**
   * Request that can be authenticated
@@ -53,7 +53,7 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
     * @param request the request
     * @return
     */
-  def sessionAuthenticate(request: RequestHeader) = {
+  def sessionAuthenticate(request: RequestHeader): Option[(String, UUID)] = {
     request.session
       .get(UserKeys.NameKey)
       .flatMap(name => request.session.get(UserKeys.IdKey).map((name, _)))
@@ -66,7 +66,7 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
   */
 object CanBeAuthenticatedAction extends ActionBuilder[CanBeAuthenticatedRequest] {
 
-  def invokeBlock[A](request: Request[A], block: (CanBeAuthenticatedRequest[A]) => Future[Result]) = {
+  def invokeBlock[A](request: Request[A], block: (CanBeAuthenticatedRequest[A]) => Future[Result]): Future[Result] = {
     AuthenticatedAction
       .sessionAuthenticate(request)
       .fold {

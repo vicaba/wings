@@ -2,6 +2,7 @@ package wings.virtualobject.infrastructure.serialization.json
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
+
 import wings.virtualobject.domain.ActuateState
 import wings.virtualobject.infrastructure.keys.ActuateStateKeys
 

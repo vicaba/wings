@@ -2,15 +2,10 @@ package wings.virtualobjectagent.infrastructure.messages.event.repository.mongod
 
 import java.util.UUID
 
-import org.scalactic.{Bad, Good, One, Or}
-import play.api.libs.json.{Format, JsObject, Json, OFormat}
-import reactivemongo.api.{DB, QueryOpts, ReadPreference}
-import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.BSONDateTime
-import reactivemongo.bson._
-import reactivemongo.play.json.BSONFormats.BSONDocumentFormat
-import reactivemongo.play.json.collection.JSONCollection
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.json.{Format, OFormat}
+
 import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, Descendant, SortOrder, SortOrderWithKey}
 import wings.toolkit.db.mongodb.service.MongoService
 import wings.toolkit.error.application.Types.RepositoryError
@@ -20,7 +15,14 @@ import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
 import wings.virtualobjectagent.infrastructure.messages.event.serialization.json.VirtualObjectOperatedJson
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import org.scalactic.{Bad, Good, One, Or}
+import reactivemongo.api.{DB, QueryOpts, ReadPreference}
+import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.commands.WriteResult
+import reactivemongo.bson._
+import reactivemongo.bson.BSONDateTime
+import reactivemongo.play.json.BSONFormats.BSONDocumentFormat
+import reactivemongo.play.json.collection.JSONCollection
 
 case class VirtualObjectSensedMongoRepository(
     db: DB

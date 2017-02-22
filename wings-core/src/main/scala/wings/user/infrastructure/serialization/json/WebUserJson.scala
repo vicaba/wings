@@ -4,6 +4,7 @@ import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
+
 import wings.user.domain.User
 import wings.user.infrastructure.keys.UserKeys
 

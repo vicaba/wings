@@ -1,6 +1,7 @@
 package wings.toolkit.error.infrastructure.serialization.json
 
 import play.api.libs.json._
+
 import wings.toolkit.error.application.Types.AppError
 import wings.toolkit.error.infrastructure.keys.AppErrorKeys
 

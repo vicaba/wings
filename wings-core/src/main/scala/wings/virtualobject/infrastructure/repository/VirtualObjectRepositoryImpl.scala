@@ -1,13 +1,13 @@
 package wings.virtualobject.infrastructure.repository
 
-import org.scalactic.{One, Or}
-import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, SortOrder}
-import wings.toolkit.error.application.Types.{AppError, RepositoryError}
+import scala.concurrent.Future
+
+import wings.toolkit.error.application.Types.RepositoryError
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 
-import scala.concurrent.Future
+import org.scalactic.{One, Or}
 
 case class VirtualObjectRepositoryImpl(
     virtualObjectMongoRepository: VirtualObjectMongoRepository

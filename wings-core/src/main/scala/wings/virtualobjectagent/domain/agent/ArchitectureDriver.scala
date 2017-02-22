@@ -6,14 +6,16 @@ import akka.actor._
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, Unsubscribe}
 import akka.event.Logging
 import akka.remote.RemoteScope
+
 import wings.actor.cluster.pubsub.PSMediator
-import wings.actor.cluster.pubsub.PSMediator.{PublishMsg, PublishedMsg, Referrer}
+import wings.actor.cluster.pubsub.PSMediator.{PublishedMsg, PublishMsg, Referrer}
 import wings.virtualobjectagent.domain.messages.command._
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 
 object ArchitectureDriver {
-  def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
-  val name                                                 = "ArchitectureDriver"
+  def props(virtualObjectId: UUID, continuation: ActorRef): Props =
+    Props(ArchitectureDriver(virtualObjectId, continuation))
+  val name = "ArchitectureDriver"
 }
 
 case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) extends Actor {
@@ -74,7 +76,7 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
 
   }
 
-  def onVoManagementCommand(manageVirtualObject: ManageVirtualObject, pubSubMediator: ActorRef) = {
+  def onVoManagementCommand(manageVirtualObject: ManageVirtualObject, pubSubMediator: ActorRef): Unit = {
     def actuatePathOf(virtualObjectId: String) = virtualObjectId + "/a"
     manageVirtualObject match {
       case CreateVirtualObject(virtualObjectId) =>

@@ -1,14 +1,15 @@
 package wings.user.application.usecase
 
-import org.scalactic.Accumulation._
-import org.scalactic._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 import wings.toolkit.error.application.Types.AppError
 import wings.user.domain.User
 import wings.user.domain.User.{Email, Name, Password}
 import wings.user.domain.repository.UserRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import org.scalactic._
+import org.scalactic.Accumulation._
 
 object SignInUser {
 

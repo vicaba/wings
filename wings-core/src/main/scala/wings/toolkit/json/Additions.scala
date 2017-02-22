@@ -1,9 +1,11 @@
 package wings.toolkit.json
 
-import play.api.data.validation.ValidationError
-import play.api.libs.json._
+import java.util.UUID
 
 import scala.util.Try
+
+import play.api.data.validation.ValidationError
+import play.api.libs.json._
 
 object Additions {
 
@@ -14,7 +16,7 @@ object Additions {
       object UUIDReads extends Reads[java.util.UUID] {
         def parseUUID(s: String): Option[java.util.UUID] = Try(java.util.UUID.fromString(s)).toOption
 
-        def reads(json: JsValue) = json match {
+        def reads(json: JsValue): JsResult[UUID] = json match {
           case JsString(s) =>
             parseUUID(s)
               .map(JsSuccess(_))
@@ -46,7 +48,7 @@ object Additions {
       * @tparam A  the iterable
       * @return  an empty JsonObject or a JsonObject containing String: A
       */
-    def writeIterable[A <: Iterable[_]](write: (String, A))(implicit writes: Writes[A]) = {
+    def writeIterable[A <: Iterable[_]](write: (String, A))(implicit writes: Writes[A]): JsObject = {
       if (write._2.isEmpty) {
         Json.obj()
       } else {
@@ -56,7 +58,9 @@ object Additions {
   }
 
   /**
-    * Implicit class grabbed from http://stackoverflow.com/questions/21297987/play-scala-how-to-prevent-json-serialization-of-empty-arrays, not tested
+    * Implicit class grabbed from
+    * http://stackoverflow.com/questions/21297987/play-scala-how-to-prevent-json-serialization-of-empty-arrays,
+    * not tested
     * @param path  implicit path parameter
     */
   implicit class PathAdditions(path: JsPath) {

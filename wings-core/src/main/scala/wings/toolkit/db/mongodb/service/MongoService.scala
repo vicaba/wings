@@ -1,19 +1,19 @@
 package wings.toolkit.db.mongodb.service
 
-import org.scalactic.{Bad, Good, One, Or}
+import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
-import reactivemongo.api.commands.WriteResult
+
+import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, Descendant, SortOrderWithKey}
+import wings.toolkit.error.application.Types.RepositoryError
+import wings.toolkit.error.application.Types.RepositoryError.CustomRepositoryError
+
+import org.scalactic.{Bad, Good, One, Or}
 import reactivemongo.api.{DB, QueryOpts, ReadPreference}
-import reactivemongo.bson.BSONDocument
+import reactivemongo.api.commands.WriteResult
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
-import wings.toolkit.db.ClauseValues.SortOrder.{Ascendant, Descendant, SortOrder, SortOrderWithKey}
-import wings.toolkit.error.application.Types.RepositoryError
-import wings.toolkit.error.application.Types.RepositoryError.{CustomRepositoryError, UnknownRepositoryError}
-import wings.virtualobjectagent.infrastructure.messages.event.keys.VirtualObjectOperatedKeys
-
-import scala.concurrent.{ExecutionContext, Future}
 
 abstract class MongoService[E, ID](
     db: DB

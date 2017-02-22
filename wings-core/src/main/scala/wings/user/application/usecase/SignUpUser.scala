@@ -1,13 +1,14 @@
 package wings.user.application.usecase
 
-import org.scalactic.Accumulation._
-import org.scalactic.{Every, Good, Or}
+import scala.concurrent.Future
+
 import wings.toolkit.error.application.Types.AppError
 import wings.user.domain.User
 import wings.user.domain.User.{Email, Name, Password}
 import wings.user.domain.repository.UserRepository
 
-import scala.concurrent.Future
+import org.scalactic.{Every, Good, Or}
+import org.scalactic.Accumulation._
 
 object SignUpUser {
 

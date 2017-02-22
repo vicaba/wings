@@ -1,17 +1,18 @@
 package wings.virtualobject.infrastructure.serialization.json
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
 import play.api.libs.json.{OFormat, OWrites, Reads, _}
+import play.api.libs.json.Reads._
 import play.api.libs.json.Writes._
+
+import wings.toolkit.json.Additions._
 import wings.virtualobject.domain.{ActuateCapability, SenseCapability, VirtualObject}
 import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
-import wings.toolkit.json.Additions._
+
+import org.joda.time.DateTime
 
 object VirtualObjectJson {
 

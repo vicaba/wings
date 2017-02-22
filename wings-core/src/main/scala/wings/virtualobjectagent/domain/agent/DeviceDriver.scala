@@ -34,17 +34,21 @@ trait DeviceDriver extends Actor {
     * @param continuation The continuation Actor to forward a message received from the device to.
     * @return A PartialFunction (Receive) that handles messages going on both directions.
     */
-  def driverState(dc: DeviceConnectionContext, continuation: ActorRef)(implicit t: ClassTag[DeviceMessageType]): Receive = {
+  def driverState(dc: DeviceConnectionContext, continuation: ActorRef)(
+      implicit t: ClassTag[DeviceMessageType]): Receive = {
     case deviceMsg: DeviceMessageType =>
-      logger.debug("{}. Message: {} received from {}, forwarding to architecture with path: {}", DeviceDriver
-        .name, deviceMsg, sender.path, continuation.path)
+      logger.debug("{}. Message: {} received from {}, forwarding to architecture with path: {}",
+                   DeviceDriver.name,
+                   deviceMsg,
+                   sender.path,
+                   continuation.path)
       logger.debug("{}. Class of Message is {}", DeviceDriver.name, deviceMsg.getClass.getName)
       toArchitectureReceive(dc, continuation)(deviceMsg)
     case MsgEnv.ToDevice(msg) =>
       logger.debug("{}. Message: {} received from {}, forwarding to device", DeviceDriver.name, msg, sender.path)
       msg match {
         case command: ManageVirtualObject => onManageVirtualObject(command)
-        case _ => toDeviceReceive(dc)(msg)
+        case _                            => toDeviceReceive(dc)(msg)
       }
   }
 
@@ -70,6 +74,7 @@ trait DeviceDriver extends Actor {
     * @param continuation The continuation Actor towards the inner layers of the Architecture.
     * @return A PartialFunction that knows how to handle this Kind of messages.
     */
-  def toArchitectureReceive(dc: DeviceConnectionContext, continuation: ActorRef): PartialFunction[DeviceMessageType, Unit]
+  def toArchitectureReceive(dc: DeviceConnectionContext,
+                            continuation: ActorRef): PartialFunction[DeviceMessageType, Unit]
 
 }

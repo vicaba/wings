@@ -1,6 +1,5 @@
 package wings.toolkit.db
 
-
 object ClauseValues {
 
   object SortOrder {

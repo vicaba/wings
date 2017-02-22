@@ -8,13 +8,15 @@ import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 
 import scala.concurrent.Future
 
-
 trait VirtualObjectSensedRepository {
 
   def create(newVirtualObjectSensed: VirtualObjectSensed): Future[VirtualObjectSensed Or One[RepositoryError]]
 
   def findAll(): Future[List[VirtualObjectSensed]]
 
-  def findAll(virtualObjectId: VirtualObject.IdType, sortOrder: Option[SortOrder], skip: Option[Int], limit: Option[Int]): Future[List[VirtualObjectSensed]]
+  def findAll(virtualObjectId: VirtualObject.IdType,
+              sortOrder: Option[SortOrder],
+              skip: Option[Int],
+              limit: Option[Int]): Future[List[VirtualObjectSensed]]
 
 }

@@ -17,7 +17,6 @@ import scala.concurrent.Future
   */
 class CanBeAuthenticatedRequest[A](val request: Request[A]) extends WrappedRequest[A](request)
 
-
 /**
   * Unauthenticated request
   * @param request   original request
@@ -32,14 +31,15 @@ class UnauthenticatedRequest[A](override val request: Request[A]) extends CanBeA
   * @param request   original request
   * @tparam A request parser
   */
-class AuthenticatedRequest[A](val user: String, userid: UUID, override val request: Request[A]) extends CanBeAuthenticatedRequest[A](request)
-
+class AuthenticatedRequest[A](val user: String, userid: UUID, override val request: Request[A])
+    extends CanBeAuthenticatedRequest[A](request)
 
 /**
   * The user must be authenticated
   */
 object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Controller {
-  override def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](request: Request[A],
+                              block: (AuthenticatedRequest[A]) => Future[Result]): Future[Result] = {
     // Check if the user is authenticated
     sessionAuthenticate(request).fold {
       Future {
@@ -54,7 +54,8 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
     * @return
     */
   def sessionAuthenticate(request: RequestHeader) = {
-    request.session.get(UserKeys.NameKey)
+    request.session
+      .get(UserKeys.NameKey)
       .flatMap(name => request.session.get(UserKeys.IdKey).map((name, _)))
       .flatMap { case (name, uid) => UUIDHelper.tryFromString(uid).map(uuid => (name, uuid)).toOption }
   }
@@ -66,12 +67,14 @@ object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] with Cont
 object CanBeAuthenticatedAction extends ActionBuilder[CanBeAuthenticatedRequest] {
 
   def invokeBlock[A](request: Request[A], block: (CanBeAuthenticatedRequest[A]) => Future[Result]) = {
-    AuthenticatedAction.sessionAuthenticate(request).fold {
-      block(new UnauthenticatedRequest[A](request))
-    } {
-      case (name, uuid) =>
-        block(new AuthenticatedRequest[A](name, uuid, request))
-    }
+    AuthenticatedAction
+      .sessionAuthenticate(request)
+      .fold {
+        block(new UnauthenticatedRequest[A](request))
+      } {
+        case (name, uuid) =>
+          block(new AuthenticatedRequest[A](name, uuid, request))
+      }
   }
 
   /**
@@ -79,10 +82,9 @@ object CanBeAuthenticatedAction extends ActionBuilder[CanBeAuthenticatedRequest]
     */
   object Fold {
 
-    private def partialFunctionBuilder[T](authenticated: (AuthenticatedRequest[_]) => T)
-                                         (unauthenticated: (UnauthenticatedRequest[_]) => T):
-    PartialFunction[CanBeAuthenticatedRequest[_], T] = {
-      case ar: AuthenticatedRequest[_] => authenticated(ar)
+    private def partialFunctionBuilder[T](authenticated: (AuthenticatedRequest[_]) => T)(
+        unauthenticated: (UnauthenticatedRequest[_]) => T): PartialFunction[CanBeAuthenticatedRequest[_], T] = {
+      case ar: AuthenticatedRequest[_]   => authenticated(ar)
       case ur: UnauthenticatedRequest[_] => unauthenticated(ur)
     }
 
@@ -94,9 +96,8 @@ object CanBeAuthenticatedAction extends ActionBuilder[CanBeAuthenticatedRequest]
       * @tparam T The result type of the functions (function composition)
       * @return the type T
       */
-    def apply[T](request: CanBeAuthenticatedRequest[_])
-                (authenticated: (AuthenticatedRequest[_]) => T)
-                (unauthenticated: (UnauthenticatedRequest[_]) => T): T = {
+    def apply[T](request: CanBeAuthenticatedRequest[_])(authenticated: (AuthenticatedRequest[_]) => T)(
+        unauthenticated: (UnauthenticatedRequest[_]) => T): T = {
       partialFunctionBuilder(authenticated)(unauthenticated)(request)
     }
 

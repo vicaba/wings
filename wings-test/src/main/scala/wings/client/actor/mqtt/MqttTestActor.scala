@@ -8,10 +8,10 @@ import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.MqttConnection
 import wings.client.actor.ActorTestMessages.{LastMessage, MessageSent}
 
-
 object MqttTestActor {
 
-  def props(broker: String, mqttConnection: MqttConnection, testSender: ActorRef) = Props(MqttTestActor(broker, mqttConnection, testSender))
+  def props(broker: String, mqttConnection: MqttConnection, testSender: ActorRef) =
+    Props(MqttTestActor(broker, mqttConnection, testSender))
 
   object Messages {
     case class Subscribe(topic: String)
@@ -23,21 +23,26 @@ object MqttTestActor {
 }
 
 case class MqttTestActor(broker: String, mqttConnection: MqttConnection, testSender: ActorRef)
-  extends ActorPahoMqttAdapter with Stash {
+    extends ActorPahoMqttAdapter
+    with Stash {
 
   import context._
 
   override def preStart(): Unit = {
     mqttConnection.connOpts.setCleanSession(false)
     mqttConnection.client.setCallback(this)
-    mqttConnection.client.connect(mqttConnection.connOpts, null, new IMqttActionListener {
+    mqttConnection.client.connect(
+      mqttConnection.connOpts,
+      null,
+      new IMqttActionListener {
 
-      override def onFailure(iMqttToken: IMqttToken, throwable: Throwable): Unit = {}
+        override def onFailure(iMqttToken: IMqttToken, throwable: Throwable): Unit = {}
 
-      override def onSuccess(iMqttToken: IMqttToken): Unit = {
-        self ! "Connect"
+        override def onSuccess(iMqttToken: IMqttToken): Unit = {
+          self ! "Connect"
+        }
       }
-    })
+    )
   }
 
   override def connectionLost(throwable: Throwable): Unit = {}
@@ -60,7 +65,7 @@ case class MqttTestActor(broker: String, mqttConnection: MqttConnection, testSen
       mqttConnection.client.publish(topic, msg)
       sender ! MessageSent
     case m: MqttMessage => testSender ! m
-    case _ => println("I have received a message that I don't understand")
+    case _              => println("I have received a message that I don't understand")
   }
 
 }

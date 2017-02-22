@@ -13,7 +13,12 @@ import wings.model.virtual.virtualobject.VOTree
 import wings.util.actor.Stash
 import wings.virtualobject.domain.VirtualObject
 import wings.virtualobjectagent.domain.agent.CoreAgentMessages.{ToArchitectureActor, ToDeviceActor}
-import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, CreateVirtualObject, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.messages.command.{
+  ActuateOnVirtualObject,
+  CreateVirtualObject,
+  VirtualObjectBasicDefinition,
+  WatchVirtualObject
+}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
 import wings.virtualobject.domain.repository.VirtualObjectRepository
@@ -45,9 +50,11 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
   val toArchitectureProps: Props
 
-  val virtualObjectRepository: VirtualObjectRepository = inject[VirtualObjectRepository](identified by 'VirtualObjectRepository)
+  val virtualObjectRepository: VirtualObjectRepository =
+    inject[VirtualObjectRepository](identified by 'VirtualObjectRepository)
 
-  val virtualObjectSensedRepository: VirtualObjectSensedRepository = inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
+  val virtualObjectSensedRepository: VirtualObjectSensedRepository =
+    inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
 
   val logger = Logging(context.system, this)
 
@@ -101,8 +108,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
               case None => logger.debug("VirtualObject data for the first time was empty.")
               case Some(vo) =>
                 val toArchitecture = actorOf(toArchitectureProps)
-                val createVo = CreateVirtualObject(virtualObjectId)
-                val endpoints = PipelineEndPoints(toDevice, toArchitecture)
+                val createVo       = CreateVirtualObject(virtualObjectId)
+                val endpoints      = PipelineEndPoints(toDevice, toArchitecture)
                 endpoints ! createVo
                 val tree = VOTree(vo)
                 logger.info("Setup completed, becoming state2. I can handle messages now")
@@ -119,8 +126,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
     val receive: PartialFunction[Any, Unit] = {
       case MsgEnv.ToDevice(msg) => toDeviceReceive(msg)
-      case MsgEnv.ToArch(msg) => toArchReceive(msg)
-      case ToDeviceActor => sender ! toDevice
+      case MsgEnv.ToArch(msg)   => toArchReceive(msg)
+      case ToDeviceActor        => sender ! toDevice
       case Stash.UnStash =>
         println("Unstashing")
         unstashAll()
@@ -131,7 +138,7 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
   }
 
   def state2(voTree: Tree[VirtualObject], endpoints: PipelineEndPoints): Receive = {
-    val toDevice = endpoints.toDevice
+    val toDevice       = endpoints.toDevice
     val toArchitecture = endpoints.toArchitecture
 
     val toDeviceReceive: PartialFunction[Any, Unit] = {
@@ -179,10 +186,10 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
 
     val receive: PartialFunction[Any, Unit] = {
       case MsgEnv.ToDevice(msg) => toDeviceReceive(msg)
-      case MsgEnv.ToArch(msg) => toArchReceive(msg)
-      case ToDeviceActor => sender ! toDevice
-      case ToArchitectureActor => sender ! toArchitecture
-      case Stash.UnStash => unstashAll()
+      case MsgEnv.ToArch(msg)   => toArchReceive(msg)
+      case ToDeviceActor        => sender ! toDevice
+      case ToArchitectureActor  => sender ! toArchitecture
+      case Stash.UnStash        => unstashAll()
     }
 
     receive

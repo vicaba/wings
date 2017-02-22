@@ -5,8 +5,7 @@ import akka.testkit.TestProbe
 import org.scalatest.FreeSpec
 import wings.actor.mqtt.router.MqttRouter
 
-class MqttRouterTest
-  extends FreeSpec {
+class MqttRouterTest extends FreeSpec {
 
   implicit val system = ActorSystem("test-system")
 

@@ -24,7 +24,8 @@ object SignInUser {
       ) {
         (_, _, _)
       } match {
-        case Good((name, email, password)) => userRepository.findByEmailNameAndPassword(email, name, password).map(Good(_))
+        case Good((name, email, password)) =>
+          userRepository.findByEmailNameAndPassword(email, name, password).map(Good(_))
         case bad => Future.successful(Good[Option[User]].orBad(bad.swap.get))
       }
     }

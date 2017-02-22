@@ -1,13 +1,15 @@
 package wings.actor.adapter.mqtt.paho
 
-import akka.actor.Actor
-import org.eclipse.paho.client._
-import org.eclipse.paho.client.mqttv3.{IMqttDeliveryToken, MqttCallback}
-import play.api.libs.json.{Json, JsValue}
-import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
-
 import scala.util.Try
 
+import akka.actor.Actor
+
+import play.api.libs.json.{Json, JsValue}
+
+import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
+
+import org.eclipse.paho.client._
+import org.eclipse.paho.client.mqttv3.{IMqttDeliveryToken, MqttCallback}
 
 /**
   * Wrapper for the Java MQTT message
@@ -19,13 +21,12 @@ import scala.util.Try
   * @param duplicate is a duplicate?
   */
 case class MqttMessage(
-                        topic: String = "",
-                        payload: Array[Byte],
-                        qos: Int = 2,
-                        retained: Boolean = false,
-                        duplicate:
-                        Boolean = false
-                      ) {
+    topic: String = "",
+    payload: Array[Byte],
+    qos: Int = 2,
+    retained: Boolean = false,
+    duplicate: Boolean = false
+) {
 
   /**
     * Converts a Scala MQTT message to a Paho Java MQTT message
@@ -47,7 +48,7 @@ case class MqttMessage(
   */
 object MqttMessage {
 
-  def validateQos(qos: Int) = mqttv3.MqttMessage.validateQos(qos)
+  def validateQos(qos: Int): Unit = mqttv3.MqttMessage.validateQos(qos)
 
 }
 
@@ -131,7 +132,4 @@ object PahoMqttAdapter {
 
   }
 
-
 }
-
-

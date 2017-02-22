@@ -26,7 +26,11 @@ object DependencyInjector {
 
   def coreInjector = new Module {
 
-    bind[URI] identifiedBy 'WebSocketServerWithPath to Config.config.getStringList("websocket.servers-with-path").asScala.map(new URI(_)).head
+    bind[URI] identifiedBy 'WebSocketServerWithPath to Config.config
+      .getStringList("websocket.servers-with-path")
+      .asScala
+      .map(new URI(_))
+      .head
 
     bind[URI] identifiedBy 'HttpServer to Config.config.getStringList("http.servers").asScala.map(new URI(_)).head
 
@@ -40,40 +44,47 @@ object DependencyInjector {
 
     bind[DB] identifiedBy 'mainDb to inject[MongoEnvironment](identified by 'MongoEnvironment).mainDb
 
-
     /**
       * VirtualObject
       */
+    bind[VirtualObjectMongoRepository] identifiedBy 'VirtualObjectMongoService to VirtualObjectMongoRepository(
+      inject[DB](identified by 'mainDb))
 
-    bind[VirtualObjectMongoRepository] identifiedBy 'VirtualObjectMongoService to VirtualObjectMongoRepository(inject[DB](identified by 'mainDb))
+    bind[VirtualObjectRepository] identifiedBy 'VirtualObjectRepository to VirtualObjectRepositoryImpl(
+      inject[VirtualObjectMongoRepository](identified by 'VirtualObjectMongoService))
 
-    bind[VirtualObjectRepository] identifiedBy 'VirtualObjectRepository to VirtualObjectRepositoryImpl(inject[VirtualObjectMongoRepository](identified by 'VirtualObjectMongoService))
+    bind[ShowVirtualObject.UseCase] identifiedBy 'ShowVirtualObjectUseCase to ShowVirtualObject.UseCase(
+      inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
 
-    bind[ShowVirtualObject.UseCase] identifiedBy 'ShowVirtualObjectUseCase to ShowVirtualObject.UseCase(inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
-
-    bind[ListVirtualObject.UseCase] identifiedBy 'ListVirtualObjectUseCase to ListVirtualObject.UseCase(inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
+    bind[ListVirtualObject.UseCase] identifiedBy 'ListVirtualObjectUseCase to ListVirtualObject.UseCase(
+      inject[VirtualObjectRepository](identified by 'VirtualObjectRepository))
 
     /**
       * User
       */
+    bind[UserMongoRepository] identifiedBy 'UserMongoRepository to UserMongoRepository(
+      inject[DB](identified by 'mainDb))
 
-    bind[UserMongoRepository] identifiedBy 'UserMongoRepository to UserMongoRepository(inject[DB](identified by 'mainDb))
+    bind[UserRepository] identifiedBy 'UserRepository to UserRepositoryImpl(
+      inject[UserMongoRepository](identified by 'UserMongoRepository))
 
-    bind[UserRepository] identifiedBy 'UserRepository to UserRepositoryImpl(inject[UserMongoRepository](identified by 'UserMongoRepository))
+    bind[SignInUser.UseCase] identifiedBy 'SignInUserUseCase to SignInUser.UseCase(
+      inject[UserRepository](identified by 'UserRepository))
 
-    bind[SignInUser.UseCase] identifiedBy 'SignInUserUseCase to SignInUser.UseCase(inject[UserRepository](identified by 'UserRepository))
-
-    bind[SignUpUser.UseCase] identifiedBy 'SignUpUserUseCase to SignUpUser.UseCase(inject[UserRepository](identified by 'UserRepository))
+    bind[SignUpUser.UseCase] identifiedBy 'SignUpUserUseCase to SignUpUser.UseCase(
+      inject[UserRepository](identified by 'UserRepository))
 
     /**
       * VirtualObjectSensed
       */
+    bind[VirtualObjectSensedMongoRepository] identifiedBy 'VirtualObjectSensedMongoRepository to VirtualObjectSensedMongoRepository(
+      inject[DB](identified by 'mainDb))
 
-    bind[VirtualObjectSensedMongoRepository] identifiedBy 'VirtualObjectSensedMongoRepository to VirtualObjectSensedMongoRepository(inject[DB](identified by 'mainDb))
+    bind[VirtualObjectSensedRepository] identifiedBy 'VirtualObjectSensedRepository to VirtualObjectSensedRepositoryImpl(
+      inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository))
 
-    bind[VirtualObjectSensedRepository] identifiedBy 'VirtualObjectSensedRepository to VirtualObjectSensedRepositoryImpl(inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository))
-
-    bind[ListVirtualObjectSensed.UseCase] identifiedBy 'ListVirtualObjectSensedUseCase to ListVirtualObjectSensed.UseCase(inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository))
+    bind[ListVirtualObjectSensed.UseCase] identifiedBy 'ListVirtualObjectSensedUseCase to ListVirtualObjectSensed
+      .UseCase(inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository))
 
   }
 

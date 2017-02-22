@@ -6,8 +6,6 @@ import wings.config.DependencyInjector._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
-
 object MongoEnvironmentImpl extends MongoEnvironment {
 
   override val driver1 = MongoDriver() // first pool

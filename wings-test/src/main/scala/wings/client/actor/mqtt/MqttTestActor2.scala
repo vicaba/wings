@@ -20,8 +20,7 @@ object MqttTestActor2 {
   }
 }
 
-case class MqttTestActor2(conn: ActorRef, testSender: ActorRef)
-  extends Actor {
+case class MqttTestActor2(conn: ActorRef, testSender: ActorRef) extends Actor {
 
   val logger = Logging(context.system, this)
 
@@ -41,6 +40,4 @@ case class MqttTestActor2(conn: ActorRef, testSender: ActorRef)
       println(s"Received an unknown message: $a")
   }
 
-
 }
-

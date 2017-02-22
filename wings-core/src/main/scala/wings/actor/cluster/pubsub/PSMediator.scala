@@ -28,7 +28,7 @@ case class PSMediator() extends Actor with ActorUtilities {
 
   def waitingForReferrer: Receive = {
     case Referrer(r) => become(forwarderTo(r))
-    case Ping => sender() ! Ping
+    case Ping        => sender() ! Ping
   }
 
   def forwarderTo(referrer: ActorRef): Receive = {

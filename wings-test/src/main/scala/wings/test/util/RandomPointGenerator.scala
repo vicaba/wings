@@ -2,7 +2,6 @@ package wings.test.util
 
 import play.api.libs.json.{JsObject, Json}
 
-
 object RandomPointGenerator {
 
   case class Point(latitude: Double, longitude: Double)
@@ -16,7 +15,7 @@ object RandomPointGenerator {
   def randomPoint(center: Point, radius: Double): Point = {
     val (x0, y0) = Point.unapply(center).get
 
-    val rd = radius/111300
+    val rd = radius / 111300
 
     val u = Math.random()
     val v = Math.random()
@@ -28,16 +27,16 @@ object RandomPointGenerator {
 
     val xp = x / Math.cos(y0)
 
-    Point(xp +x0 , y + y0)
+    Point(xp + x0, y + y0)
   }
 
   def geoJsonPoint(latitude: Double, longitude: Double): JsObject =
-  Json.obj(
-    "geometry" -> Json.obj(
-      "type" -> "Point",
-      "coordinates" -> List(latitude, longitude)
+    Json.obj(
+      "geometry" -> Json.obj(
+        "type"        -> "Point",
+        "coordinates" -> List(latitude, longitude)
+      )
     )
-  )
 
   def generateRandomJsonPoint(): JsObject = {
     val p = RandomPointGenerator.randomPoint(Point(41.406358, 2.158722), 3000)
@@ -49,7 +48,3 @@ object RandomPointGenerator {
   }
 
 }
-
-
-
-

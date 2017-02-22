@@ -11,7 +11,6 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 /**
   * ShowVirtualObject UseCase
   *
@@ -26,7 +25,7 @@ object ShowVirtualObject {
     def execute(message: ShowVirtualObject.Message): Future[Option[VirtualObject] Or Every[AppError]] = {
       Try(UUID.fromString(message.virtualObjectId)) match {
         case Success(id) => virtualObjectRepository.findById(id).map(Good(_))
-        case Failure(e) => Future.successful(Bad(One(FormatError.UUID)))
+        case Failure(e)  => Future.successful(Bad(One(FormatError.UUID)))
       }
     }
 

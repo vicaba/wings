@@ -1,16 +1,18 @@
 package wings.actor.mqtt.router
 
+import scala.collection.immutable.HashMap
+
 import akka.actor.{Actor, ActorRef, Props, Stash}
 import akka.event.Logging
+
 import wings.actor.adapter.mqtt.paho.MqttMessage
 
-import scala.collection.immutable.HashMap
 
 object MqttRouter {
 
   type Dictionary = Map[String, List[ActorRef]]
 
-  def props(broker: String) = Props(MqttRouter(broker))
+  def props(broker: String): Props = Props(MqttRouter(broker))
 
   trait RoutingMessage
 
@@ -30,9 +32,7 @@ private[router] object MqttMessages {
 
 }
 
-case class MqttRouter(broker: String)
-  extends Actor
-    with Stash {
+case class MqttRouter(broker: String) extends Actor with Stash {
 
   import MqttRouter._
   import context._
@@ -40,7 +40,7 @@ case class MqttRouter(broker: String)
   val logger = Logging(context.system, this)
 
   val conn: ActorRef = context.actorOf(MqttConnection.props(broker, self))
-  val wildcardWkr = context.actorOf(WildcardWorker.props())
+  val wildcardWkr    = context.actorOf(WildcardWorker.props())
 
   def router(routeeMap: Dictionary): Receive = {
     case MqttRouter.Subscribe(topic, ref) =>
@@ -53,24 +53,26 @@ case class MqttRouter(broker: String)
     case MqttRouter.Unsubscribe(topic, ref) =>
       conn ! MqttMessages.Unsubscribe(topic)
       val list = routeeMap.getOrElse(topic, Nil).filter(_ != ref)
-      val map = if (list.isEmpty) routeeMap - topic else routeeMap + (topic -> list)
+      val map  = if (list.isEmpty) routeeMap - topic else routeeMap + (topic -> list)
       become(router(map));
     case p: Publish =>
       conn ! p
       logger.debug("Received publish message: {}", p)
     case mqttMsg: MqttMessage =>
-      logger.debug("Message received at topic: {}.\nTopic exists in map: {}", mqttMsg.topic, routeeMap.get(mqttMsg.topic))
+      logger.debug("Message received at topic: {}.\nTopic exists in map: {}",
+                   mqttMsg.topic,
+                   routeeMap.get(mqttMsg.topic))
       routeeMap.get(mqttMsg.topic).foreach(_.foreach(_ ! mqttMsg))
       wildcardWkr ! WildcardWorker.Work(routeeMap, mqttMsg)
   }
 
-  override def receive = router(HashMap[String, List[ActorRef]]())
+  override def receive: Receive = router(HashMap[String, List[ActorRef]]())
 
 }
 
 private[router] object WildcardWorker {
 
-  def props() = Props(WildcardWorker())
+  def props(): Props = Props(WildcardWorker())
 
   case class Work(dic: MqttRouter.Dictionary, msg: MqttMessage)
 
@@ -84,23 +86,23 @@ private[router] case class WildcardWorker() extends Actor {
     case work: WildcardWorker.Work => onMqttMessage(work)
   }
 
-  def onMqttMessage(work: WildcardWorker.Work) = {
+  def onMqttMessage(work: WildcardWorker.Work): Unit = {
 
-    val msg = work.msg
-    val dic = work.dic
+    val msg   = work.msg
+    val dic   = work.dic
     val topic = msg.topic
 
-    dic.foreach { case (t, refList) =>
-
-      // TODO: Improve condition and regex
-      if (t.contains("*") || t.contains("+")) {
-        val regex = t.replace("+", "(.+)").r
-        logger.debug("topic: {}. regex: {}.", topic, regex)
-        topic match {
-          case regex(all@_*) => all.foreach(part => if (!part.contains("/")) refList.foreach(_ ! msg))
-          case _ =>
+    dic.foreach {
+      case (t, refList) =>
+        // TODO: Improve condition and regex
+        if (t.contains("*") || t.contains("+")) {
+          val regex = t.replace("+", "(.+)").r
+          logger.debug("topic: {}. regex: {}.", topic, regex)
+          topic match {
+            case regex(all @ _ *) => all.foreach(part => if (!part.contains("/")) refList.foreach(_ ! msg))
+            case _                =>
+          }
         }
-      }
 
     }
 

@@ -11,9 +11,7 @@ import wings.user.infrastructure.serialization.json.WebUserJson
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-case class UserMongoRepository(db: DB)(implicit ec: ExecutionContext) extends MongoService[User, User.IdType](db)
-{
+case class UserMongoRepository(db: DB)(implicit ec: ExecutionContext) extends MongoService[User, User.IdType](db) {
 
   override val collection: JSONCollection = db.collection("webUser")
 
@@ -26,16 +24,14 @@ case class UserMongoRepository(db: DB)(implicit ec: ExecutionContext) extends Mo
   override implicit val identityFormat: Format[IdType] =
     Format(play.api.libs.json.Reads.uuidReads, play.api.libs.json.Writes.UuidWrites)
 
-  def findByEmailNameAndPassword
-  (
-    email: User.Email,
-    name: User.Name,
-    password: User.Password
-  ): Future[Option[User]] =
-  {
+  def findByEmailNameAndPassword(
+      email: User.Email,
+      name: User.Name,
+      password: User.Password
+  ): Future[Option[User]] = {
     val criteria = Json.obj(
-      UserKeys.EmailKey -> email.value,
-      UserKeys.NameKey -> name.value,
+      UserKeys.EmailKey    -> email.value,
+      UserKeys.NameKey     -> name.value,
       UserKeys.PasswordKey -> password.value
     )
     findOneByCriteria(criteria)

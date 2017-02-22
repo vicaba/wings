@@ -13,18 +13,17 @@ import wings.virtualobject.infrastructure.keys.{ActuateStateKeys, VirtualObjectK
 
 object VirtualObjectOperatedJson {
 
-
   val VirtualObjectActuatedReads: Reads[VirtualObjectActuated] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).read[UUID] and
       (__ \ VirtualObjectOperatedKeys.VirtualObjectIdKey).read[UUID] and
       (__ \ ActuateStateKeys.StateIdKey).read[String]
-    ) (VirtualObjectActuated.apply _)
+  )(VirtualObjectActuated.apply _)
 
   val VirtualObjectActuatedWrites: OWrites[VirtualObjectActuated] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).write[UUID] and
       (__ \ VirtualObjectKeys.IdKey).write[UUID] and
       (__ \ ActuateStateKeys.StateIdKey).write[String]
-    ) (unlift(VirtualObjectActuated.unapply _))
+  )(unlift(VirtualObjectActuated.unapply _))
 
   val VirtualObjectActuatedFormat = OFormat(VirtualObjectActuatedReads, VirtualObjectActuatedWrites)
 
@@ -33,10 +32,12 @@ object VirtualObjectOperatedJson {
       (__ \ VirtualObjectOperatedKeys.VirtualObjectIdKey).read[UUID] and
       (__ \ VirtualObjectOperatedKeys.ValueKey).read[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).readNullable[String] and
-      (__ \ VirtualObjectOperatedKeys.CreationTimeKey).readNullable[Long].map(_.map { date =>
-        new DateTime(new Instant(date))
-      } getOrElse DateTime.now())
-    ) (VirtualObjectSensed.apply _)
+      (__ \ VirtualObjectOperatedKeys.CreationTimeKey)
+        .readNullable[Long]
+        .map(_.map { date =>
+          new DateTime(new Instant(date))
+        } getOrElse DateTime.now())
+  )(VirtualObjectSensed.apply _)
 
   val VirtualObjectSensedWrites: OWrites[VirtualObjectSensed] = (
     (__ \ VirtualObjectOperatedKeys.IdKey).write[UUID] and
@@ -44,7 +45,7 @@ object VirtualObjectOperatedJson {
       (__ \ VirtualObjectOperatedKeys.ValueKey).write[String] and
       (__ \ VirtualObjectOperatedKeys.UnitKey).writeNullable[String] and
       (__ \ VirtualObjectOperatedKeys.CreationTimeKey).write[DateTime]
-    ) (unlift(VirtualObjectSensed.unapply _))
+  )(unlift(VirtualObjectSensed.unapply _))
 
   val VirtualObjectSensedFormat = OFormat(VirtualObjectSensedReads, VirtualObjectSensedWrites)
 

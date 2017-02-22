@@ -22,7 +22,6 @@ object MqttTopics {
 
   def configOutTopic(voId: UUID): String = configOutTopic(voId.toString)
 
-
   val generalConfigOutTopic: String = "+/i/config/out"
 
   val ConfigOutTopicPattern: Regex = "(.+)/i/config/out".r

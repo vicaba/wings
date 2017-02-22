@@ -9,18 +9,15 @@ import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoR
 
 import scala.concurrent.Future
 
-case class VirtualObjectRepositoryImpl
-(
-  virtualObjectMongoRepository: VirtualObjectMongoRepository
-)
-  extends VirtualObjectRepository {
+case class VirtualObjectRepositoryImpl(
+    virtualObjectMongoRepository: VirtualObjectMongoRepository
+) extends VirtualObjectRepository {
 
   override def findById(id: VirtualObject.IdType): Future[Option[VirtualObject]] =
     virtualObjectMongoRepository.findById(id)
 
   override def findAll(): Future[List[VirtualObject]] =
     virtualObjectMongoRepository.findAll()
-
 
   override def findAll(skip: Option[Int], limit: Option[Int]): Future[List[VirtualObject]] =
     virtualObjectMongoRepository.findAll(None, skip, limit)

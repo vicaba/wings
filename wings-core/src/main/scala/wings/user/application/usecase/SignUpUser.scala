@@ -9,7 +9,6 @@ import wings.user.domain.repository.UserRepository
 
 import scala.concurrent.Future
 
-
 object SignUpUser {
 
   case class Message(userName: String, userEmail: String, userPassword: String, userPasswordConfirmation: String)

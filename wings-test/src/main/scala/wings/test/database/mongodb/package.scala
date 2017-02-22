@@ -12,13 +12,12 @@ import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoR
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
-
 package object mongodb {
 
   val mongoEnv: MongoEnvironment = inject[MongoEnvironment](identified by 'MongoEnvironment)
 
   def cleanMongoDatabase: Future[WriteResult] = {
-    val selector = Json.obj()
+    val selector             = Json.obj()
     val virtualObjectService = VirtualObjectMongoRepository(mongoEnv.mainDb)
     Thread.sleep(2000)
 

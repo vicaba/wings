@@ -8,11 +8,10 @@ import scala.concurrent.Future
 
 trait UserRepository {
 
-  def findByEmailNameAndPassword
-  (
-    email: User.Email,
-    name: User.Name,
-    password: User.Password
+  def findByEmailNameAndPassword(
+      email: User.Email,
+      name: User.Name,
+      password: User.Password
   ): Future[Option[User]]
 
   def create(newUser: User): Future[User Or One[RepositoryError]]

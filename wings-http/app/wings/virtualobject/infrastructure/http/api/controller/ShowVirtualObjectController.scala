@@ -11,15 +11,14 @@ import wings.virtualobject.infrastructure.serialization.json.Implicits._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 /**
   * ShowVirtualObject controller
   */
 @Singleton
-class ShowVirtualObjectController
-  extends Controller {
+class ShowVirtualObjectController extends Controller {
 
-  val showVirtualObjectUseCase: ShowVirtualObject.UseCase = inject[ShowVirtualObject.UseCase](identified by 'ShowVirtualObjectUseCase)
+  val showVirtualObjectUseCase: ShowVirtualObject.UseCase =
+    inject[ShowVirtualObject.UseCase](identified by 'ShowVirtualObjectUseCase)
 
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 
@@ -27,7 +26,7 @@ class ShowVirtualObjectController
     showVirtualObjectUseCase.execute(ShowVirtualObject.Message(id)).map {
       httpErrorHandler.handle(_) {
         case Some(virtualObject) => Ok(Json.toJson(virtualObject));
-        case None => NotFound
+        case None                => NotFound
       }
     } recover { case t: Throwable => InternalServerError }
   }

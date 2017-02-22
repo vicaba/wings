@@ -36,9 +36,11 @@ object Types {
 
     case class ValueObjectConstructionError(valueObjectName: Option[String]) extends ValueObjectError {
 
-      override val message: String = valueObjectName.map {
-        _ + "constraints error"
-      }.getOrElse("ValueObject constraints error")
+      override val message: String = valueObjectName
+        .map {
+          _ + "constraints error"
+        }
+        .getOrElse("ValueObject constraints error")
 
     }
 

@@ -8,12 +8,12 @@ import play.api.libs.json.{JsObject, Json, OFormat, OWrites, Reads, _}
 import wings.virtualobjectagent.domain.messages.command._
 import wings.virtualobjectagent.infrastructure.messages.keys.RegisterVirtualObjectIdKeys
 
-
 object RegisterVirtualObjectIdJson {
 
-  val NameAcquisitionRequestReads: Reads[NameAcquisitionRequest] = (
-    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath) ~>
-      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+  val NameAcquisitionRequestReads: Reads[NameAcquisitionRequest] = ((__ \ RegisterVirtualObjectIdKeys.OperationKey)
+    .read[String]
+    .filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath) ~>
+    (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionRequest(id)
   }
 
@@ -21,7 +21,7 @@ object RegisterVirtualObjectIdJson {
 
     override def writes(o: NameAcquisitionRequest): JsObject =
       Json.obj(
-        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath,
+        RegisterVirtualObjectIdKeys.OperationKey       -> RegisterVirtualObjectIdKeys.NameAcquisitionRequestPath,
         RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
@@ -29,9 +29,10 @@ object RegisterVirtualObjectIdJson {
 
   val NameAcquisitionRequestFormat = OFormat(NameAcquisitionRequestReads, NameAcquisitionRequestWrites)
 
-  val NameAcquisitionAckReads: Reads[NameAcquisitionAck] = (
-    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionAckPath) ~>
-      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+  val NameAcquisitionAckReads: Reads[NameAcquisitionAck] = ((__ \ RegisterVirtualObjectIdKeys.OperationKey)
+    .read[String]
+    .filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionAckPath) ~>
+    (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionAck(id)
   }
 
@@ -39,7 +40,7 @@ object RegisterVirtualObjectIdJson {
 
     override def writes(o: NameAcquisitionAck): JsObject =
       Json.obj(
-        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionAckPath,
+        RegisterVirtualObjectIdKeys.OperationKey       -> RegisterVirtualObjectIdKeys.NameAcquisitionAckPath,
         RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
@@ -47,9 +48,10 @@ object RegisterVirtualObjectIdJson {
 
   val NameAcquisitionAckFormat = OFormat(NameAcquisitionAckReads, NameAcquisitionAckWrites)
 
-  val NameAcquisitionRejectReads: Reads[NameAcquisitionReject] = (
-    (__ \ RegisterVirtualObjectIdKeys.OperationKey).read[String].filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath) ~>
-      (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
+  val NameAcquisitionRejectReads: Reads[NameAcquisitionReject] = ((__ \ RegisterVirtualObjectIdKeys.OperationKey)
+    .read[String]
+    .filter(_ == RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath) ~>
+    (__ \ RegisterVirtualObjectIdKeys.VirtualObjectIdKey).read[UUID]).map { id =>
     NameAcquisitionReject(id)
   }
 
@@ -57,14 +59,13 @@ object RegisterVirtualObjectIdJson {
 
     override def writes(o: NameAcquisitionReject): JsObject =
       Json.obj(
-        RegisterVirtualObjectIdKeys.OperationKey -> RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath,
+        RegisterVirtualObjectIdKeys.OperationKey       -> RegisterVirtualObjectIdKeys.NameAcquisitionRejectPath,
         RegisterVirtualObjectIdKeys.VirtualObjectIdKey -> o.virtualObjectId
       )
 
   }
 
   val NameAcquisitionRejectFormat = OFormat(NameAcquisitionRejectReads, NameAcquisitionRejectWrites)
-
 
   object RegisterVirtualObjectIdReads extends Reads[RegisterVirtualObjectId] {
 

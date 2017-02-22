@@ -6,13 +6,11 @@ import org.scalactic.{Good, One, Or}
 import wings.toolkit.error.application.Types.ValueObjectError.ValueObjectConstructionError
 import wings.user.domain.User.{Email, Name, Password}
 
-
-case class User
-(
-  id: User.IdType,
-  name: Name,
-  email: Email,
-  password: Password
+case class User(
+    id: User.IdType,
+    name: Name,
+    email: Email,
+    password: Password
 )
 
 object User {
@@ -34,7 +32,6 @@ object User {
   }
 
   case class Password(value: String)
-
 
   object Password {
     def fromString(value: String): Password Or One[ValueObjectConstructionError] = Good(new Password(value))

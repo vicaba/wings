@@ -18,7 +18,7 @@ object UUIDHelper {
     }
 
     def toBase64: String = {
-      val encoder = Base64.getUrlEncoder
+      val encoder               = Base64.getUrlEncoder
       val uuidBytes: ByteBuffer = ByteBuffer.allocate(16)
       uuidBytes.putLong(u.getMostSignificantBits)
       uuidBytes.putLong(u.getLeastSignificantBits)

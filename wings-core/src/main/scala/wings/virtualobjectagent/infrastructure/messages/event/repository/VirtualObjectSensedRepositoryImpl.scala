@@ -11,21 +11,20 @@ import wings.virtualobjectagent.infrastructure.messages.event.repository.mongodb
 
 import scala.concurrent.Future
 
-
-case class VirtualObjectSensedRepositoryImpl
-(
-  virtualObjectSensedMongoRepository: VirtualObjectSensedMongoRepository
-)
- extends VirtualObjectSensedRepository
-{
-  override def create(newVirtualObjectSensed: VirtualObjectSensed): Future[Or[VirtualObjectSensed, One[RepositoryError]]] =
+case class VirtualObjectSensedRepositoryImpl(
+    virtualObjectSensedMongoRepository: VirtualObjectSensedMongoRepository
+) extends VirtualObjectSensedRepository {
+  override def create(
+      newVirtualObjectSensed: VirtualObjectSensed): Future[Or[VirtualObjectSensed, One[RepositoryError]]] =
     virtualObjectSensedMongoRepository.create(newVirtualObjectSensed)
 
-  override def findAll(virtualObjectId: VirtualObject.IdType, sortOrder: Option[SortOrder], skip: Option[Int], limit: Option[Int]): Future[List[VirtualObjectSensed]] = {
+  override def findAll(virtualObjectId: VirtualObject.IdType,
+                       sortOrder: Option[SortOrder],
+                       skip: Option[Int],
+                       limit: Option[Int]): Future[List[VirtualObjectSensed]] = {
     val order = sortOrder.map(SortOrderWithKey(VirtualObjectOperatedKeys.CreationTimeKey, _))
     virtualObjectSensedMongoRepository.findAll(virtualObjectId, order, skip, limit)
   }
-
 
   override def findAll(): Future[List[VirtualObjectSensed]] =
     virtualObjectSensedMongoRepository.findAll()

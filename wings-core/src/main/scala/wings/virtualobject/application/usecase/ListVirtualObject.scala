@@ -8,7 +8,6 @@ import wings.virtualobject.domain.repository.VirtualObjectRepository
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 object ListVirtualObject {
 
   case class Message(skip: Option[Int], limit: Option[Int])

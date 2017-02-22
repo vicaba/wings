@@ -22,15 +22,11 @@ import wings.virtualobjectagent.infrastructure.messages.event.serialization.json
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-
-case class VirtualObjectSensedMongoRepository
-(
-  db: DB
-)
-(
-  implicit ec: ExecutionContext
-)
-  extends MongoService[VirtualObjectSensed, UUID](db) {
+case class VirtualObjectSensedMongoRepository(
+    db: DB
+)(
+    implicit ec: ExecutionContext
+) extends MongoService[VirtualObjectSensed, UUID](db) {
 
   override val collection: JSONCollection = db.collection("virtualObjectSensed")
 
@@ -40,45 +36,50 @@ case class VirtualObjectSensedMongoRepository
 
   override def identityOf(o: VirtualObjectSensed): UUID = o.id
 
-  override implicit val entityFormat: OFormat[VirtualObjectSensed] = VirtualObjectOperatedJson.VirtualObjectSensedFormat
+  override implicit val entityFormat: OFormat[VirtualObjectSensed] =
+    VirtualObjectOperatedJson.VirtualObjectSensedFormat
 
-  override implicit val identityFormat: Format[UUID] = Format(play.api.libs.json.Reads.uuidReads, play.api.libs.json.Writes.UuidWrites)
-
+  override implicit val identityFormat: Format[UUID] =
+    Format(play.api.libs.json.Reads.uuidReads, play.api.libs.json.Writes.UuidWrites)
 
   // TODO: TIME CONVERSION GENERALIZATION
   override def create(o: VirtualObjectSensed): Future[Or[VirtualObjectSensed, One[RepositoryError]]] = {
     val document = transform(o)
 
-    bsonCollection.insert(document).map {
-      case wr if wr.ok => Good(o)
-      case wr => Bad(One(CustomRepositoryError(wr.message)))
-    }.recover {
-      case wr: WriteResult => Bad(One(CustomRepositoryError(wr.message)))
-    }
+    bsonCollection
+      .insert(document)
+      .map {
+        case wr if wr.ok => Good(o)
+        case wr          => Bad(One(CustomRepositoryError(wr.message)))
+      }
+      .recover {
+        case wr: WriteResult => Bad(One(CustomRepositoryError(wr.message)))
+      }
   }
 
-  def findAll(virtualObjectId: VirtualObject.IdType, sortOrder: Option[SortOrderWithKey], skip: Option[Int], limit: Option[Int]): Future[List[VirtualObjectSensed]] = {
+  def findAll(virtualObjectId: VirtualObject.IdType,
+              sortOrder: Option[SortOrderWithKey],
+              skip: Option[Int],
+              limit: Option[Int]): Future[List[VirtualObjectSensed]] = {
     val findCriteria = BSONDocument(VirtualObjectOperatedKeys.VirtualObjectIdKey -> virtualObjectId.toString)
 
-    val skipN = skip.getOrElse(0)
+    val skipN  = skip.getOrElse(0)
     val limitN = limit.getOrElse(0)
 
     val v = (sortOrder.map { sort =>
       bsonCollection.find(findCriteria).sort(sortOrderCriteriaBson(sort))
     } getOrElse
-      bsonCollection.find(findCriteria)).
-      options(QueryOpts(skipN, limitN)).
-      cursor[BSONDocument](readPreference = ReadPreference.primary).
-      collect[List]()
+      bsonCollection.find(findCriteria))
+      .options(QueryOpts(skipN, limitN))
+      .cursor[BSONDocument](readPreference = ReadPreference.primary)
+      .collect[List]()
 
     v.map(_.map(transform))
   }
 
   override def findAll(): Future[List[VirtualObjectSensed]] = {
-    val v = bsonCollection.
-      find(BSONDocument()).
-      cursor[BSONDocument](readPreference = ReadPreference.primary).
-      collect[List]()
+    val v =
+      bsonCollection.find(BSONDocument()).cursor[BSONDocument](readPreference = ReadPreference.primary).collect[List]()
 
     v.map(_.map(transform))
 
@@ -108,14 +109,13 @@ case class VirtualObjectSensedMongoRepository
       BSONDateTime(o.creationDate.getMillis)
 
     val convertedBsonDocument =
-      BSONDocument(
-        VirtualObjectOperatedKeys.CreationTimeKey -> bsonCreationDate)
+      BSONDocument(VirtualObjectOperatedKeys.CreationTimeKey -> bsonCreationDate)
 
     doc -- VirtualObjectOperatedKeys.CreationTimeKey ++ convertedBsonDocument
   }
 
   private def sortOrderCriteriaBson(sortOrder: SortOrderWithKey): BSONDocument = sortOrder.sortOrder match {
-    case Ascendant => BSONDocument(sortOrder.key -> 1)
+    case Ascendant  => BSONDocument(sortOrder.key -> 1)
     case Descendant => BSONDocument(sortOrder.key -> -1)
   }
 }

@@ -10,7 +10,7 @@ trait TreeLike[Container[X], Node] {
   def size: Int
 }
 
-trait Tree[Node] extends  TreeLike[Tree, Node] {
+trait Tree[Node] extends TreeLike[Tree, Node] {
 
   val node: Node
 
@@ -20,8 +20,8 @@ trait Tree[Node] extends  TreeLike[Tree, Node] {
 
   protected def newNode(n: Node): Tree[Node] = new Tree[Node] {
     var parent: Option[Tree[Node]] = Some(Tree.this)
-    val node = n
-    lazy val children = ListBuffer[Tree[Node]]()
+    val node                       = n
+    lazy val children              = ListBuffer[Tree[Node]]()
   }
 
   def add(n: Node): Tree[Node] = {
@@ -33,18 +33,17 @@ trait Tree[Node] extends  TreeLike[Tree, Node] {
   def deleteWhere(predicate: (Node) => Boolean): Option[Tree[Node]] = {
     var deleted: Option[Tree[Node]] = None
     getWhere(predicate).foreach { n =>
-      n.parent.foreach {
-        p =>
-          val children = p.children
-          val length = children.length
-          for (i <- 0 until length) {
-            val currentNode = children(i)
-            if (currentNode.node == n.node) {
-              children.remove(i)
-              n.parent = None
-              deleted = Some(n)
-            }
+      n.parent.foreach { p =>
+        val children = p.children
+        val length   = children.length
+        for (i <- 0 until length) {
+          val currentNode = children(i)
+          if (currentNode.node == n.node) {
+            children.remove(i)
+            n.parent = None
+            deleted = Some(n)
           }
+        }
       }
     }
     deleted
@@ -57,14 +56,14 @@ trait Tree[Node] extends  TreeLike[Tree, Node] {
     traverse(this).length
   }
 
-  def getWhere(predicate: (Node) => Boolean): Option[Tree[Node]] = traverse(this) find { tree => predicate(tree.node) }
-
+  def getWhere(predicate: (Node) => Boolean): Option[Tree[Node]] = traverse(this) find { tree =>
+    predicate(tree.node)
+  }
 
   override def toString = {
     s"""[$node${if (children.isEmpty) "" else s", Children: $children"}]"""
   }
 }
-
 
 object Main {
 
@@ -94,4 +93,3 @@ object Main {
     println(s"printing tree: $tree1")
   }
 }
-

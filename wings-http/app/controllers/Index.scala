@@ -4,7 +4,6 @@ import javax.inject.Singleton
 
 import play.api.mvc.{Action, Controller}
 
-
 @Singleton
 class Index extends Controller {
 

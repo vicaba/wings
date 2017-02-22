@@ -15,13 +15,9 @@ import wings.virtualobjectagent.infrastructure.messages.event.keys.VirtualObject
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class MongoService[E, ID]
-(
-  db: DB
-)
-(implicit
- ec: ExecutionContext
-) {
+abstract class MongoService[E, ID](
+    db: DB
+)(implicit ec: ExecutionContext) {
 
   val collection: JSONCollection
 
@@ -54,46 +50,47 @@ abstract class MongoService[E, ID]
   }
 
   def findOneByCriteria(criteria: JsObject): Future[Option[E]] = {
-    collection.
-      find(criteria).
-      one[E]
+    collection.find(criteria).one[E]
   }
 
   def findAll(sortOrder: Option[SortOrderWithKey], skip: Option[Int], limit: Option[Int]): Future[List[E]] = {
-    val skipN = skip.getOrElse(0)
+    val skipN  = skip.getOrElse(0)
     val limitN = limit.getOrElse(0)
 
     (sortOrder.map { sort =>
       collection.find(Json.obj()).sort(sortOrderCriteriaJson(sort))
     } getOrElse
-      collection.find(Json.obj())).
-      options(QueryOpts(skipN, limitN)).
-      cursor[E](readPreference = ReadPreference.primary).
-      collect[List]()
+      collection.find(Json.obj()))
+      .options(QueryOpts(skipN, limitN))
+      .cursor[E](readPreference = ReadPreference.primary)
+      .collect[List]()
   }
 
   def findAll(): Future[List[E]] = findAll(None, None, None)
 
   def create(o: E): Future[E Or One[RepositoryError]] = {
-    collection.insert(o).map {
-      case wr if wr.ok => Good(o)
-      case wr => Bad(One(CustomRepositoryError(wr.message)))
-    }.recover {
-      case wr: WriteResult => Bad(One(CustomRepositoryError(wr.message)))
-    }
+    collection
+      .insert(o)
+      .map {
+        case wr if wr.ok => Good(o)
+        case wr          => Bad(One(CustomRepositoryError(wr.message)))
+      }
+      .recover {
+        case wr: WriteResult => Bad(One(CustomRepositoryError(wr.message)))
+      }
   }
 
   def update(o: E): Future[Either[WriteResult, E]] = {
     collection.update(Json.obj(identityKey -> identityOf(o)), o).map {
       case wr if wr.ok => Right(o)
-      case wr => Left(wr)
+      case wr          => Left(wr)
     }
   }
 
   def delete(id: ID): Future[Either[WriteResult, ID]] = {
     collection.remove(Json.obj(identityKey -> id)) map {
       case le if le.ok => Right(id)
-      case le => Left(le)
+      case le          => Left(le)
     }
   }
 
@@ -102,8 +99,7 @@ abstract class MongoService[E, ID]
   }
 
   protected def sortOrderCriteriaJson(sortOrder: SortOrderWithKey): JsObject = sortOrder.sortOrder match {
-    case Ascendant => Json.obj(sortOrder.key -> 1)
+    case Ascendant  => Json.obj(sortOrder.key -> 1)
     case Descendant => Json.obj(sortOrder.key -> -1)
   }
 }
-

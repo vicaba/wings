@@ -8,41 +8,43 @@ import wings.virtualobjectagent.infrastructure.messages.keys.OperateOnVirtualObj
 
 object OperateOnVirtualObjectJson {
 
-  val WatchVirtualObjectOperationValue = "vo/watch"
+  val WatchVirtualObjectOperationValue     = "vo/watch"
   val ActuateOnVirtualObjectOperationValue = "vo/actuate"
 
-  val WatchVirtualObjectReads: Reads[WatchVirtualObject] = (
-    (__ \ OperateOnVirtualObjectKeys.OperationKey).read[String].filter(_ == WatchVirtualObjectOperationValue) ~>
+  val WatchVirtualObjectReads: Reads[WatchVirtualObject] =
+    ((__ \ OperateOnVirtualObjectKeys.OperationKey).read[String].filter(_ == WatchVirtualObjectOperationValue) ~>
       (__ \ OperateOnVirtualObjectKeys.PathKey).read[String]).map { path =>
-    WatchVirtualObject(path)
-  }
+      WatchVirtualObject(path)
+    }
 
   object WatchVirtualObjectWrites extends OWrites[WatchVirtualObject] {
 
     override def writes(o: WatchVirtualObject): JsObject =
       Json.obj(
         OperateOnVirtualObjectKeys.OperationKey -> WatchVirtualObjectOperationValue,
-        OperateOnVirtualObjectKeys.PathKey -> o.path
+        OperateOnVirtualObjectKeys.PathKey      -> o.path
       )
 
   }
 
   val WatchVirtualObjectFormat = OFormat(WatchVirtualObjectReads, WatchVirtualObjectWrites)
 
-  val ActuateOnVirtualObjectReads: Reads[ActuateOnVirtualObject] = (
-    (__ \ OperateOnVirtualObjectKeys.OperationKey).read[String].filter(_ == ActuateOnVirtualObjectOperationValue) ~>
+  val ActuateOnVirtualObjectReads: Reads[ActuateOnVirtualObject] =
+    ((__ \ OperateOnVirtualObjectKeys.OperationKey).read[String].filter(_ == ActuateOnVirtualObjectOperationValue) ~>
       (__ \ OperateOnVirtualObjectKeys.PathKey).read[String] ~
-      (__ \ OperateOnVirtualObjectKeys.StateIdKey).read[String]).tupled.map { case (a, b) =>
-    ActuateOnVirtualObject(a, b)
-  }
+      (__ \ OperateOnVirtualObjectKeys.StateIdKey).read[String]).tupled.map {
+      case (a, b) =>
+        ActuateOnVirtualObject(a, b)
+    }
 
   object ActuateOnVirtualObjectWrites extends OWrites[ActuateOnVirtualObject] {
 
     override def writes(o: ActuateOnVirtualObject): JsObject =
       Json.obj(
         OperateOnVirtualObjectKeys.OperationKey -> ActuateOnVirtualObjectOperationValue,
-        OperateOnVirtualObjectKeys.PathKey -> o.path,
-        OperateOnVirtualObjectKeys.StateIdKey -> o.stateId)
+        OperateOnVirtualObjectKeys.PathKey      -> o.path,
+        OperateOnVirtualObjectKeys.StateIdKey   -> o.stateId
+      )
 
   }
 

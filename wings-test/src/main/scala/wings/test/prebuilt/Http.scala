@@ -16,7 +16,7 @@ object Http {
 
   object User {
     val username = "david"
-    val email = "d@d.d"
+    val email    = "d@d.d"
     val password = "davidvernet"
   }
 
@@ -24,16 +24,17 @@ object Http {
 
     def userRegistration: WSRequest = {
       val jsonBody = Json.obj(
-        "username" -> User.username,
-        "email" -> User.email,
-        "passwd" -> User.password,
+        "username"   -> User.username,
+        "email"      -> User.email,
+        "passwd"     -> User.password,
         "passwdConf" -> User.password
       )
       val request =
-        httpClient.url("http://127.0.0.1:9000/api/v1/users").
-          withHeaders("Content-Type" -> "application/json").
-          withBody(jsonBody).
-          withMethod("POST")
+        httpClient
+          .url("http://127.0.0.1:9000/api/v1/users")
+          .withHeaders("Content-Type" -> "application/json")
+          .withBody(jsonBody)
+          .withMethod("POST")
       request
     }
 

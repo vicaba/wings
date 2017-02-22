@@ -4,7 +4,12 @@ import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.json.{JsValue, Json}
-import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.messages.command.{
+  ActuateOnVirtualObject,
+  RegisterVirtualObjectId,
+  VirtualObjectBasicDefinition,
+  WatchVirtualObject
+}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
 import play.api.libs.functional.syntax._
@@ -13,14 +18,17 @@ import wings.virtualobjectagent.domain.agent.{DeviceDriver, MsgEnv}
 import scala.util.Try
 
 object WebSocketDriver {
-  def props(virtualObjectId: UUID, out: ActorRef, continuation: ActorRef) = Props(WebSocketDriver(virtualObjectId, out, continuation))
+  def props(virtualObjectId: UUID, out: ActorRef, continuation: ActorRef) =
+    Props(WebSocketDriver(virtualObjectId, out, continuation))
 }
 
-case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: ActorRef) extends Actor with DeviceDriver {
+case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: ActorRef)
+    extends Actor
+    with DeviceDriver {
 
   import context._
 
-  override type DeviceMessageType = String
+  override type DeviceMessageType       = String
   override type DeviceConnectionContext = ActorRef
 
   override def preStart() = {
@@ -43,10 +51,11 @@ case class WebSocketDriver(virtualObjectId: UUID, out: ActorRef, continuation: A
       out ! json.toString
   }
 
-  override def toArchitectureReceive(dc: DeviceConnectionContext, continuation: ActorRef): PartialFunction[DeviceMessageType, Unit] = {
+  override def toArchitectureReceive(dc: DeviceConnectionContext,
+                                     continuation: ActorRef): PartialFunction[DeviceMessageType, Unit] = {
     case msg: String =>
       logger.debug(s"Received $msg")
-      msgToJson(msg).map(validateJson(_).map{continuation ! MsgEnv.ToArch(_)}).recover {
+      msgToJson(msg).map(validateJson(_).map { continuation ! MsgEnv.ToArch(_) }).recover {
         case t: Throwable => t.printStackTrace()
       }
   }

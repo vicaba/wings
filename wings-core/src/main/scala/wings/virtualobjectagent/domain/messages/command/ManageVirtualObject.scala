@@ -7,5 +7,3 @@ sealed trait ManageVirtualObject
 case class CreateVirtualObject(voId: UUID) extends ManageVirtualObject
 
 case class RemoveVirtualObject(voId: UUID) extends ManageVirtualObject
-
-

@@ -13,11 +13,10 @@ import wings.virtualobject.infrastructure.keys.VirtualObjectKeys
 import wings.virtualobject.infrastructure.serialization.json.Implicits._
 import wings.toolkit.json.Additions._
 
-
 object VirtualObjectJson {
 
   val VirtualObjectReads: Reads[VirtualObject] = (
-      (__ \ VirtualObjectKeys.IdKey).read[UUID] and
+    (__ \ VirtualObjectKeys.IdKey).read[UUID] and
       (__ \ VirtualObjectKeys.ParentIdKey).readNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).readNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).read[String] and
@@ -26,10 +25,10 @@ object VirtualObjectJson {
       (__ \ VirtualObjectKeys.DeletionTimeKey).readNullable[DateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).readNullable[SenseCapability] and
       (__ \ VirtualObjectKeys.ActuateCapabilityKey).readNullable[ActuateCapability]
-    )(VirtualObject.apply _)
+  )(VirtualObject.apply _)
 
   val VirtualObjectWrites: OWrites[VirtualObject] = (
-      (__ \ VirtualObjectKeys.IdKey).write[UUID] and
+    (__ \ VirtualObjectKeys.IdKey).write[UUID] and
       (__ \ VirtualObjectKeys.ParentIdKey).writeNullable[UUID] and
       (__ \ VirtualObjectKeys.ChildrenKey).writeNullable[Array[String]] and
       (__ \ VirtualObjectKeys.PathKey).write[String] and
@@ -38,8 +37,8 @@ object VirtualObjectJson {
       (__ \ VirtualObjectKeys.DeletionTimeKey).writeNullable[DateTime] and
       (__ \ VirtualObjectKeys.SenseCapabilityKey).writeNullable[SenseCapability] and
       (__ \ VirtualObjectKeys.ActuateCapabilityKey).writeNullable[ActuateCapability]
-    )(unlift(VirtualObject.unapply _))
+  )(unlift(VirtualObject.unapply _))
 
-   val VirtualObjectFormat = OFormat(VirtualObjectReads, VirtualObjectWrites)
+  val VirtualObjectFormat = OFormat(VirtualObjectReads, VirtualObjectWrites)
 
 }

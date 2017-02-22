@@ -21,7 +21,7 @@ object VirtualObjectBasicDefinitionJson {
       (__ \ VirtualObjectBasicDefinitionKeys.MetadataKey).readNullable[JsObject].map(_.getOrElse(Json.obj())) and
       (__ \ VirtualObjectBasicDefinitionKeys.SenseCapabilityKey).readNullable[SenseCapability] and
       (__ \ VirtualObjectBasicDefinitionKeys.ActuateCapabilityKey).readNullable[ActuateCapability]
-    ) (VirtualObjectBasicDefinition.apply _)
+  )(VirtualObjectBasicDefinition.apply _)
 
   val VirtualObjectBasicDefinitionWrites: OWrites[VirtualObjectBasicDefinition] = (
     (__ \ VirtualObjectBasicDefinitionKeys.IdKey).write[UUID] and
@@ -31,8 +31,9 @@ object VirtualObjectBasicDefinitionJson {
       (__ \ VirtualObjectBasicDefinitionKeys.MetadataKey).writeEmptyJsonAsNullable and
       (__ \ VirtualObjectBasicDefinitionKeys.SenseCapabilityKey).writeNullable[SenseCapability] and
       (__ \ VirtualObjectBasicDefinitionKeys.ActuateCapabilityKey).writeNullable[ActuateCapability]
-    ) (unlift(VirtualObjectBasicDefinition.unapply _))
+  )(unlift(VirtualObjectBasicDefinition.unapply _))
 
-  val VirtualObjectBasicDefinitionFormat = OFormat(VirtualObjectBasicDefinitionReads, VirtualObjectBasicDefinitionWrites)
+  val VirtualObjectBasicDefinitionFormat =
+    OFormat(VirtualObjectBasicDefinitionReads, VirtualObjectBasicDefinitionWrites)
 
 }

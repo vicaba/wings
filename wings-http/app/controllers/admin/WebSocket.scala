@@ -62,15 +62,12 @@ class WebSocket @Inject() (implicit system: ActorSystem, materializer: Materiali
 
 
 }
-*/
+ */
 
-class WebSocket @Inject()
-(
-  implicit system: ActorSystem,
-  materializer: Materializer
-)
-extends Controller
-{
+class WebSocket @Inject()(
+    implicit system: ActorSystem,
+    materializer: Materializer
+) extends Controller {
 
   def apply() = WebSocket.acceptOrResult[String, String] { req =>
     // TODO: Add authentication

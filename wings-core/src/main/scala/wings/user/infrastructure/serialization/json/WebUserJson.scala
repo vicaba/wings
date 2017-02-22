@@ -14,14 +14,20 @@ object WebUserJson {
       (__ \ UserKeys.EmailKey).read[String].map(User.Name(_)) and
       (__ \ UserKeys.NameKey).read[String].map(User.Email(_)) and
       (__ \ UserKeys.PasswordKey).read[String].map(User.Password(_))
-    )(User.apply _)
+  )(User.apply _)
 
   val WebUserWrites: OWrites[User] = (
     (__ \ UserKeys.IdKey).write[UUID] and
-      (__ \ UserKeys.EmailKey).write[String].contramap { o: User.Name => o.value} and
-      (__ \ UserKeys.NameKey).write[String].contramap { o: User.Email => o.value} and
-      (__ \ UserKeys.PasswordKey).write[String].contramap { o: User.Password => o.value}
-    )(unlift(User.unapply _))
+      (__ \ UserKeys.EmailKey).write[String].contramap { o: User.Name =>
+        o.value
+      } and
+      (__ \ UserKeys.NameKey).write[String].contramap { o: User.Email =>
+        o.value
+      } and
+      (__ \ UserKeys.PasswordKey).write[String].contramap { o: User.Password =>
+        o.value
+      }
+  )(unlift(User.unapply _))
 
   val WebUserFormat = OFormat(WebUserReads, WebUserWrites)
 

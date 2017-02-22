@@ -9,13 +9,9 @@ import wings.user.infrastructure.repository.mongodb.UserMongoRepository
 
 import scala.concurrent.Future
 
-
-case class UserRepositoryImpl
-(
-  webUserMongoRepository: UserMongoRepository
-)
-extends UserRepository
-{
+case class UserRepositoryImpl(
+    webUserMongoRepository: UserMongoRepository
+) extends UserRepository {
 
   override def findByEmailNameAndPassword(email: Email, name: Name, password: Password): Future[Option[User]] =
     webUserMongoRepository.findByEmailNameAndPassword(email, name, password)

@@ -17,7 +17,11 @@ import wings.enrichments.UUIDHelper
 import wings.test.prebuilt.{Http, WebSocket}
 import wings.test.util.RandomPointGenerator
 import wings.test.util.RandomPointGenerator.Point
-import wings.virtualobjectagent.domain.messages.command.{NameAcquisitionRequest, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.messages.command.{
+  NameAcquisitionRequest,
+  VirtualObjectBasicDefinition,
+  WatchVirtualObject
+}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobject.domain.{ActuateCapability, ActuateState, SenseCapability}
 import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
@@ -25,7 +29,6 @@ import wings.virtualobjectagent.infrastructure.messages.serialization.json.Impli
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-
 
 object Main {
 
@@ -63,7 +66,7 @@ object Main {
 
   object WebSocketGlobals {
 
-    val voId = "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
+    val voId     = "73f86a2e-1004-4011-8a8f-3f78cdd6113c"
     val voIdUUID = UUIDHelper.tryFromString("73f86a2e-1004-4011-8a8f-3f78cdd6113c").get
 
     object Messages {
@@ -94,34 +97,34 @@ object Main {
     val numberOfSenders = 200
 
     val uuidList = 0 until numberOfSenders map (_ => UUID.randomUUID())
-    val router = system.actorOf(MqttRouter.props(inject[URI](identified by 'MqttBroker).toString))
+    val router   = system.actorOf(MqttRouter.props(inject[URI](identified by 'MqttBroker).toString))
     val actorList = uuidList.map { uuid =>
-
       Thread.sleep(20)
 
       (uuid, system.actorOf(MqttTestActor2.props(router, TestProbe().ref)))
 
     }
 
-    actorList.foreach { case (uuid, actorRef) =>
+    actorList.foreach {
+      case (uuid, actorRef) =>
+        Thread.sleep(5)
 
-      Thread.sleep(5)
-
-      actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
-      actorRef ! MqttTestActor2.Messages.Publish(
-        MqttGlobals.generalConfigOutTopic(uuid), Json.toJson(NameAcquisitionRequest(uuid)).toString()
-      )
+        actorRef ! Subscribe(MqttGlobals.generalConfigInTopic(uuid))
+        actorRef ! MqttTestActor2.Messages.Publish(
+          MqttGlobals.generalConfigOutTopic(uuid),
+          Json.toJson(NameAcquisitionRequest(uuid)).toString()
+        )
 
     }
 
-    actorList.foreach { case (uuid, actorRef) =>
+    actorList.foreach {
+      case (uuid, actorRef) =>
+        Thread.sleep(20)
 
-      Thread.sleep(20)
-
-      actorRef ! MqttTestActor2.Messages.Publish(
-        MqttGlobals.configOutTopic(uuid),
-        Json.toJson(MqttGlobals.Messages.metadata(uuid))
-      )
+        actorRef ! MqttTestActor2.Messages.Publish(
+          MqttGlobals.configOutTopic(uuid),
+          Json.toJson(MqttGlobals.Messages.metadata(uuid))
+        )
 
     }
 
@@ -133,7 +136,9 @@ object Main {
 
     val userRegisteredResponse: WSResponse = Await.result(Http.Request.userRegistration.execute(), 300.seconds)
 
-    val webSocketActor = WebSocket.getConnection(inject[URI](identified by 'WebSocketServerWithPath), userRegisteredResponse, receiverProbe.ref)(system)
+    val webSocketActor = WebSocket.getConnection(inject[URI](identified by 'WebSocketServerWithPath),
+                                                 userRegisteredResponse,
+                                                 receiverProbe.ref)(system)
 
     webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
       Json.toJson(NameAcquisitionRequest(WebSocketGlobals.voIdUUID)).toString()
@@ -149,30 +154,29 @@ object Main {
 
     println("WebSocket has sent metadata")
 
-    actorList.foreach { case (uuid, actorRef) =>
-
-      webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
-        Json.toJson(WebSocketGlobals.Messages.watch(uuid.toString)).toString
-      )
+    actorList.foreach {
+      case (uuid, actorRef) =>
+        webSocketActor ! ActorJettyWebSocketAdapter.Messages.Send(
+          Json.toJson(WebSocketGlobals.Messages.watch(uuid.toString)).toString
+        )
 
     }
 
     // Schedule MQTT clients to send sensed messages every period of time
     println("Starting to schedule")
 
-    actorList.foreach { case (uuid, actorRef) =>
-
-      system.scheduler.scheduleOnce(5 seconds, actorRef,
-        MqttTestActor2.Messages.Publish.apply(
-          MqttGlobals.dataOutTopic(uuid),
-          Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
+    actorList.foreach {
+      case (uuid, actorRef) =>
+        system.scheduler.scheduleOnce(
+          5 seconds,
+          actorRef,
+          MqttTestActor2.Messages.Publish.apply(MqttGlobals.dataOutTopic(uuid),
+                                                Json.toJson(MqttGlobals.Messages.sensedValue(uuid))))
     }
 
     println("Done")
     assert(receiverProbe.receiveN(numberOfSenders + 20, 9 seconds).length == numberOfSenders)
 
-
   }
-
 
 }

@@ -2,7 +2,6 @@ package wings.virtualobjectagent.domain.messages.command
 
 import wings.virtualobject.domain.VirtualObject
 
-
 sealed trait RegisterVirtualObjectId
 
 case class NameAcquisitionRequest(virtualObjectId: VirtualObject.IdType) extends RegisterVirtualObjectId

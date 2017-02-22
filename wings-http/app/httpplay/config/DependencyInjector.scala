@@ -3,7 +3,6 @@ package httpplay.config
 import httpplay.error.{DefaultHttpErrorHandler, HttpErrorHandler}
 import scaldi.Module
 
-
 object DependencyInjector {
 
   val _httpInjector = new Module {
@@ -12,5 +11,5 @@ object DependencyInjector {
 
   }
 
-  implicit val httpInjector =  wings.config.DependencyInjector.coreInjector :: _httpInjector
+  implicit val httpInjector = wings.config.DependencyInjector.coreInjector :: _httpInjector
 }

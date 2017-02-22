@@ -8,22 +8,27 @@ import play.api.libs.json.{JsValue, Json}
 import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
 import wings.virtualobjectagent.domain.agent.CoreAgent
 import wings.virtualobjectagent.domain.agent.CoreAgentMessages.ToDeviceActor
-import wings.virtualobjectagent.domain.messages.command.{NameAcquisitionAck, NameAcquisitionRequest, RegisterVirtualObjectId}
+import wings.virtualobjectagent.domain.messages.command.{
+  NameAcquisitionAck,
+  NameAcquisitionRequest,
+  RegisterVirtualObjectId
+}
 
 import scala.concurrent.duration._
 import scala.util.Try
 
 object WebSocketHandler {
-  def props(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef) = Props(WebSocketHandler(agentProps, webSocketOutputHandler))
+  def props(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef) =
+    Props(WebSocketHandler(agentProps, webSocketOutputHandler))
 }
 
 case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutputHandler: ActorRef)
-  extends Actor with Stash {
+    extends Actor
+    with Stash {
 
   import context._
 
   val logger = Logging(context.system, this)
-
 
   override def preStart() = {
     logger.debug("WebSocketHandler Deployed")
@@ -38,10 +43,13 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
       msgToJson(msg).map(validateJson(_).map {
         case cnf: NameAcquisitionRequest =>
           // TODO: Perform name resolution here
-          webSocketOutputHandler ! Json.toJson(NameAcquisitionAck(cnf.virtualObjectId)).toString() // Send an ACK temporarily
+          webSocketOutputHandler ! Json
+            .toJson(NameAcquisitionAck(cnf.virtualObjectId))
+            .toString() // Send an ACK temporarily
           // TODO: Save Actor UUID to user
           val coreAgent = context.actorOf(agentProps(cnf.virtualObjectId, webSocketOutputHandler), CoreAgent.name)
-          val tickToQueryForToDeviceActor = context.system.scheduler.schedule(0.millis, 500.millis, coreAgent, ToDeviceActor)
+          val tickToQueryForToDeviceActor =
+            context.system.scheduler.schedule(0.millis, 500.millis, coreAgent, ToDeviceActor)
           become(waitForFirstToDeviceMessage(tickToQueryForToDeviceActor))
       })
     case _ => stash()
@@ -60,7 +68,7 @@ case class WebSocketHandler(agentProps: (UUID, ActorRef) => Props, webSocketOutp
 
   def bridgeReceive(toDevice: ActorRef): Receive = {
     case msg: String => toDevice ! msg; logger.debug("Forwarding message to Device: {}", msg)
-    case _ => logger.debug("WebSocket Handler received an unknown message")
+    case _           => logger.debug("WebSocket Handler received an unknown message")
   }
 
   def msgToJson(s: String): Try[JsValue] = Try(Json.parse(s))

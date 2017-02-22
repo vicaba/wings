@@ -8,18 +8,16 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
-
 object Testing {
 
   def main(args: Array[String]): Unit = {
 
-    val virtualObjectSensedRepository: VirtualObjectSensedRepository = inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
+    val virtualObjectSensedRepository: VirtualObjectSensedRepository =
+      inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
 
     Thread.sleep(400)
 
     val f = virtualObjectSensedRepository.findAll().map { list =>
-
       println(list)
 
     }

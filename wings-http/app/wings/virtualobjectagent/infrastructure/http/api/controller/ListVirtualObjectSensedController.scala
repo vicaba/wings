@@ -17,10 +17,10 @@ import scala.concurrent.ExecutionContext.Implicits._
   * ListVirtualObjectSensedController
   */
 @Singleton
-class ListVirtualObjectSensedController
- extends Controller {
+class ListVirtualObjectSensedController extends Controller {
 
-  val listVirtualObjectSensedUseCase: ListVirtualObjectSensed.UseCase = inject[ListVirtualObjectSensed.UseCase](identified by 'ListVirtualObjectSensedUseCase)
+  val listVirtualObjectSensedUseCase: ListVirtualObjectSensed.UseCase =
+    inject[ListVirtualObjectSensed.UseCase](identified by 'ListVirtualObjectSensedUseCase)
 
   val httpErrorHandler: HttpErrorHandler = inject[HttpErrorHandler](identified by 'HttpErrorHandler)
 

@@ -3,25 +3,35 @@ package wings.actor.mqtt
 import java.util.UUID
 
 import akka.actor.{Actor, ActorRef, Props}
-import org.eclipse.paho.client.mqttv3._
+
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.libs.json.{Json, JsResult, JsValue}
+
+import wings.actor.adapter.mqtt.paho.ActorPahoMqttAdapter
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
-import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.mqtt.router.MqttRouter
-import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
+import wings.virtualobjectagent.domain.agent.DeviceDriver
+import wings.virtualobjectagent.domain.messages.command.{
+  ActuateOnVirtualObject,
+  RegisterVirtualObjectId,
+  VirtualObjectBasicDefinition,
+  WatchVirtualObject
+}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
-import wings.virtualobjectagent.domain.agent.{DeviceDriver, MsgEnv}
+
+import org.eclipse.paho.client.mqttv3._
+
 
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 
 object MqttDriver {
-  def props(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef) = Props(MqttDriver(virtualObjectId, conn, continuation))
+  def props(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef): Props =
+    Props(MqttDriver(virtualObjectId, conn, continuation))
 }
 
 case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: ActorRef)
-  extends Actor
+    extends Actor
     with DeviceDriver
     with ActorPahoMqttAdapter {
 
@@ -69,14 +79,13 @@ case class MqttDriver(virtualObjectId: UUID, conn: ActorRef, continuation: Actor
   override def toDeviceReceive(dc: ActorRef): PartialFunction[Any, Unit] = {
     case voActuate: ActuateOnVirtualObject =>
       val json = Json.toJson(voActuate).toString()
-      val msg = MqttMessage(ConfigInTopic, json.getBytes, 2, false, false)
+      val msg  = MqttMessage(ConfigInTopic, json.getBytes, 2, false, false)
       conn ! MqttRouter.Publish(msg)
     case sv: VirtualObjectSensed =>
       val json = Json.toJson(sv).toString()
-      val msg = MqttMessage(DataInTopic, json.getBytes, 2, false, false)
+      val msg  = MqttMessage(DataInTopic, json.getBytes, 2, false, false)
       conn ! MqttRouter.Publish(msg)
   }
-
 
   override def toArchitectureReceive(dc: ActorRef, continuation: ActorRef): PartialFunction[DeviceMessageType, Unit] = {
     case msg: MqttMessage =>

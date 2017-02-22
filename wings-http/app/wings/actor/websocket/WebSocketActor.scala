@@ -17,10 +17,7 @@ object WebSocketActor {
   *
   * @param out an actor reference representing the other side of the connection, usually the browser client
   */
-class WebSocketActor(val virtualObjectId: UUID, out: ActorRef)
-  extends Actor
-    with CoreAgent
-  with ActorUtilities {
+class WebSocketActor(val virtualObjectId: UUID, out: ActorRef) extends Actor with CoreAgent with ActorUtilities {
 
   override val toDeviceProps: Props = WebSocketDriver.props(virtualObjectId, out, self)
 

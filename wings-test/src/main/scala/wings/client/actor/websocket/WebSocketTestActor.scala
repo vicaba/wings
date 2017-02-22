@@ -11,11 +11,17 @@ import wings.client.actor.websocket.ActorJettyWebSocketAdapter.Messages._
 import scala.util.Try
 
 object WebSocketTestActor {
-  def props(client: WebSocketClient, serverUri: URI, wsRequest: ClientUpgradeRequest, testSender: ActorRef): Props = Props(WebSocketTestActor(client, serverUri, wsRequest, testSender))
+  def props(client: WebSocketClient, serverUri: URI, wsRequest: ClientUpgradeRequest, testSender: ActorRef): Props =
+    Props(WebSocketTestActor(client, serverUri, wsRequest, testSender))
 }
 
-case class WebSocketTestActor(client: WebSocketClient, serverUri: URI, wsRequest: ClientUpgradeRequest, testSender: ActorRef)
-  extends Actor with Stash with ActorJettyWebSocketAdapter {
+case class WebSocketTestActor(client: WebSocketClient,
+                              serverUri: URI,
+                              wsRequest: ClientUpgradeRequest,
+                              testSender: ActorRef)
+    extends Actor
+    with Stash
+    with ActorJettyWebSocketAdapter {
 
   import context._
 
@@ -48,13 +54,11 @@ case class WebSocketTestActor(client: WebSocketClient, serverUri: URI, wsRequest
       deallocateWebSocketResources(session)
       sender ! MessageSent
     case Text(text) => testSender ! text
-    case _ =>
+    case _          =>
   }
 
   private def deallocateWebSocketResources(session: Session): Unit = {
     Try(session.close()) recover { case t: Throwable => println(t) }
   }
-
-
 
 }

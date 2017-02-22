@@ -2,8 +2,7 @@ package wings.actor.mqtt
 
 import java.util.UUID
 
-import akka.actor.{ActorRef, Actor}
-import akka.actor.Actor.Receive
+import akka.actor.{Actor, ActorRef}
 
 /**
   * Created by vicaba on 04/12/15.

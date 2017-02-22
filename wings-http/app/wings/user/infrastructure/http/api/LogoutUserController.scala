@@ -12,13 +12,10 @@ import wings.user.application.usecase.SignUpUser.Message
 
 import scala.concurrent.Future
 
-
 @Singleton
-class LogoutUserController
-  extends Controller {
+class LogoutUserController extends Controller {
 
-  def apply() = Action.async(parse.anyContent) {
-    implicit request =>
-      Future.successful(Ok.withNewSession)
+  def apply() = Action.async(parse.anyContent) { implicit request =>
+    Future.successful(Ok.withNewSession)
   }
 }

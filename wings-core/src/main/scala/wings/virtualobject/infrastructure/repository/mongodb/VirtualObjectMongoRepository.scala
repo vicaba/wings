@@ -11,15 +11,11 @@ import wings.virtualobject.infrastructure.serialization.json.VirtualObjectJson
 
 import scala.concurrent.ExecutionContext
 
-
-case class VirtualObjectMongoRepository
-(
-  db: DB
-)
-(
-  implicit ec: ExecutionContext
-)
-  extends MongoService[VirtualObject, VirtualObject.IdType](db) {
+case class VirtualObjectMongoRepository(
+    db: DB
+)(
+    implicit ec: ExecutionContext
+) extends MongoService[VirtualObject, VirtualObject.IdType](db) {
 
   override val collection: JSONCollection = db.collection("virtualObject")
 
@@ -29,6 +25,7 @@ case class VirtualObjectMongoRepository
 
   override implicit val entityFormat: OFormat[VirtualObject] = VirtualObjectJson.VirtualObjectFormat
 
-  override implicit val identityFormat: Format[IdType] = Format(play.api.libs.json.Reads.uuidReads, play.api.libs.json.Writes.UuidWrites)
+  override implicit val identityFormat: Format[IdType] =
+    Format(play.api.libs.json.Reads.uuidReads, play.api.libs.json.Writes.UuidWrites)
 
 }

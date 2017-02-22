@@ -13,7 +13,7 @@ import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef) = Props(ArchitectureDriver(virtualObjectId, continuation))
-  val name = "ArchitectureDriver"
+  val name                                                 = "ArchitectureDriver"
 }
 
 case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) extends Actor {
@@ -23,7 +23,11 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
   val logger = Logging(context.system, this)
 
   override def preStart(): Unit = {
-    val mediator = context.actorOf(PSMediator.props().withDeploy(Deploy(scope = RemoteScope(AddressFromURIString("akka.tcp://PubSubCluster@127.0.0.1:3000")))), "pubsub")
+    val mediator = context.actorOf(
+      PSMediator
+        .props()
+        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString("akka.tcp://PubSubCluster@127.0.0.1:3000")))),
+      "pubsub")
     mediator ! Referrer(self)
     logger.debug("Architecture Driver deployed")
     become(continuationState(mediator))
@@ -61,9 +65,9 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
     }
 
     val receive: PartialFunction[Any, Unit] = {
-      case MsgEnv.ToArch(msg) => toArchReceive(msg)
+      case MsgEnv.ToArch(msg)   => toArchReceive(msg)
       case PublishedMsg(_, msg) => toDeviceReceive(msg)
-      case a: Any => println(s"Message not known $a")
+      case a: Any               => println(s"Message not known $a")
     }
 
     receive
@@ -73,8 +77,10 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
   def onVoManagementCommand(manageVirtualObject: ManageVirtualObject, pubSubMediator: ActorRef) = {
     def actuatePathOf(virtualObjectId: String) = virtualObjectId + "/a"
     manageVirtualObject match {
-      case CreateVirtualObject(virtualObjectId) => pubSubMediator ! Subscribe(actuatePathOf(virtualObjectId.toString), self)
-      case RemoveVirtualObject(virtualObjectId) => pubSubMediator ! Unsubscribe(actuatePathOf(virtualObjectId.toString), self)
+      case CreateVirtualObject(virtualObjectId) =>
+        pubSubMediator ! Subscribe(actuatePathOf(virtualObjectId.toString), self)
+      case RemoveVirtualObject(virtualObjectId) =>
+        pubSubMediator ! Unsubscribe(actuatePathOf(virtualObjectId.toString), self)
     }
   }
 

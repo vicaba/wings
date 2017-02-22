@@ -4,11 +4,12 @@ import akka.actor._
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator._
 import akka.event.Logging
+
 import wings.actor.cluster.pubsub.PSMediator._
 import wings.actor.util.ActorUtilities
 
 object PSMediator {
-  def props() = Props(PSMediator())
+  def props(): Props = Props(PSMediator())
   case class PublishedMsg(topic: String, msg: Any)
   case class PublishMsg(topic: String, msg: Any)
   case class Referrer(referrer: ActorRef)
@@ -24,7 +25,7 @@ case class PSMediator() extends Actor with ActorUtilities {
   val logger = Logging(context.system, this)
 
   become(waitingForReferrer)
-  val mediator = DistributedPubSub(context.system).mediator
+  val mediator: ActorRef = DistributedPubSub(context.system).mediator
 
   def waitingForReferrer: Receive = {
     case Referrer(r) => become(forwarderTo(r))

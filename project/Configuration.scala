@@ -1,7 +1,6 @@
 import sbt.{Tests, _}
 import sbt.Keys._
 
-
 object Configuration {
 
   val settings = Seq(
@@ -33,4 +32,3 @@ object Configuration {
   )
 
 }
-

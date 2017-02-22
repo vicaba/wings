@@ -7,7 +7,6 @@ import akka.event.Logging
 
 import wings.actor.adapter.mqtt.paho.MqttMessage
 
-
 object MqttRouter {
 
   type Dictionary = Map[String, List[ActorRef]]

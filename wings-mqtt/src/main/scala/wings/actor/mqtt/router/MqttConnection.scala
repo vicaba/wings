@@ -26,7 +26,7 @@ case class MqttConnection(broker: String, router: ActorRef) extends Actor with A
 
   val logger = Logging(context.system, this)
 
-  val id: UUID     = UUID.randomUUID()
+  val id: UUID                       = UUID.randomUUID()
   val topicCounter: Map[String, Int] = Map[String, Int]()
 
   def connectToBroker(): IMqttToken = {

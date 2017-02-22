@@ -2,29 +2,29 @@ package wings.config
 
 import java.net.URI
 
-import reactivemongo.api.DB
-import scaldi.Module
+import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import wings.toolkit.db.mongodb.service.{MongoEnvironment, MongoEnvironmentImpl}
 import wings.user.application.usecase.{SignInUser, SignUpUser}
 import wings.user.domain.repository.UserRepository
 import wings.user.infrastructure.repository.UserRepositoryImpl
 import wings.user.infrastructure.repository.mongodb.UserMongoRepository
-import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
-import wings.virtualobjectagent.infrastructure.messages.event.repository.VirtualObjectSensedRepositoryImpl
-import wings.virtualobjectagent.infrastructure.messages.event.repository.mongodb.VirtualObjectSensedMongoRepository
 import wings.virtualobject.application.usecase.{ListVirtualObject, ShowVirtualObject}
 import wings.virtualobject.domain.repository.VirtualObjectRepository
 import wings.virtualobject.infrastructure.repository.VirtualObjectRepositoryImpl
 import wings.virtualobject.infrastructure.repository.mongodb.VirtualObjectMongoRepository
 import wings.virtualobjectagent.application.usecase.ListVirtualObjectSensed
-import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
+import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
+import wings.virtualobjectagent.infrastructure.messages.event.repository.VirtualObjectSensedRepositoryImpl
+import wings.virtualobjectagent.infrastructure.messages.event.repository.mongodb.VirtualObjectSensedMongoRepository
 
-import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext.Implicits.global
+import reactivemongo.api.DB
+import scaldi.Module
 
 object DependencyInjector {
 
-  def coreInjector = new Module {
+  def coreInjector: Module = new Module {
 
     bind[URI] identifiedBy 'WebSocketServerWithPath to Config.config
       .getStringList("websocket.servers-with-path")
@@ -77,17 +77,21 @@ object DependencyInjector {
     /**
       * VirtualObjectSensed
       */
-    bind[VirtualObjectSensedMongoRepository] identifiedBy 'VirtualObjectSensedMongoRepository to VirtualObjectSensedMongoRepository(
-      inject[DB](identified by 'mainDb))
+    bind[VirtualObjectSensedMongoRepository] identifiedBy 'VirtualObjectSensedMongoRepository to
+      VirtualObjectSensedMongoRepository(
+        inject[DB](identified by 'mainDb)
+      )
 
-    bind[VirtualObjectSensedRepository] identifiedBy 'VirtualObjectSensedRepository to VirtualObjectSensedRepositoryImpl(
-      inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository))
+    bind[VirtualObjectSensedRepository] identifiedBy 'VirtualObjectSensedRepository to
+      VirtualObjectSensedRepositoryImpl(
+        inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository)
+      )
 
     bind[ListVirtualObjectSensed.UseCase] identifiedBy 'ListVirtualObjectSensedUseCase to ListVirtualObjectSensed
       .UseCase(inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository))
 
   }
 
-  implicit val implicitCoreInjector = coreInjector
+  implicit val implicitCoreInjector: Module = coreInjector
 
 }

@@ -22,7 +22,6 @@ import wings.virtualobjectagent.infrastructure.messages.serialization.json.Impli
 
 import org.eclipse.paho.client.mqttv3._
 
-
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 
 object MqttDriver {

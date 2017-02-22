@@ -27,6 +27,6 @@ class PartialFunctionBuilder[A, B] {
 }
 
 trait ComposableActor extends Actor {
-  protected lazy val receiveBuilder = new PartialFunctionBuilder[Any, Unit]
-  final def receive                 = receiveBuilder.result()
+  protected lazy val receiveBuilder    = new PartialFunctionBuilder[Any, Unit]
+  final def receive: receiveBuilder.PF = receiveBuilder.result()
 }

@@ -9,14 +9,14 @@ object Configuration {
     version := "1.0",
     // Compiler options
     scalacOptions ++= Seq(
-      "-deprecation", // Warnings deprecation
+      // "-deprecation", // Warnings deprecation
       "-feature", // Advise features
       "-unchecked", // More warnings. Strict
       "-Xlint", // More warnings when compiling
-      "-Xfatal-warnings", // Warnings became errors
+      // "-Xfatal-warnings", // Warnings became errors
       "-Ywarn-dead-code",
-      "-Ywarn-unused",
-      "-Ywarn-unused-import",
+      // "-Ywarn-unused",
+      // "-Ywarn-unused-import",
       "-Xcheckinit" // Check against early initialization
     ),
     scalacOptions in run in Compile -= "-Xcheckinit", // Remove it in production because it's expensive

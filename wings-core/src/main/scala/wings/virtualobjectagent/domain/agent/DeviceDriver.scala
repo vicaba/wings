@@ -76,7 +76,6 @@ trait DeviceDriver extends Actor {
     * @param continuation The continuation Actor towards the inner layers of the Architecture.
     * @return A PartialFunction that knows how to handle this Kind of messages.
     */
-  def toArchitectureReceive(dc: DeviceConnectionContext,
-                            continuation: ActorRef): PartialFunction[DeviceMessageType, Unit]
+  def toArchitectureReceive(dc: DeviceConnectionContext, continuation: ActorRef): PartialFunction[DeviceMessageType, Unit]
 
 }

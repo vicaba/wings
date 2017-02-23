@@ -72,7 +72,7 @@ class WebSocket @Inject()(
     materializer: Materializer
 ) extends Controller {
 
-  def apply(): WebSocket = WebSocket.acceptOrResult[String, String] { req =>
+  def apply(): play.api.mvc.WebSocket = WebSocket.acceptOrResult[String, String] { req =>
     // TODO: Add authentication
     val coreAgentProps = (voId: UUID, out: ActorRef) => WebSocketActor.props(voId)(out)
     Future.successful(Right(ActorFlow.actorRef(out => WebSocketHandler.props(coreAgentProps, out), Int.MaxValue)))

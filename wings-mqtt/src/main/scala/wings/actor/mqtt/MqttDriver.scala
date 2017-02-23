@@ -7,20 +7,16 @@ import akka.actor.{Actor, ActorRef, Props}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, JsResult, JsValue}
 
-import wings.actor.adapter.mqtt.paho.ActorPahoMqttAdapter
+import wings.actor.adapter.mqtt.paho.{ActorPahoMqttAdapter, MqttMessage}
 import wings.actor.adapter.mqtt.paho.PahoMqttAdapter._
 import wings.actor.mqtt.router.MqttRouter
-import wings.virtualobjectagent.domain.agent.DeviceDriver
-import wings.virtualobjectagent.domain.messages.command.{
-  ActuateOnVirtualObject,
-  RegisterVirtualObjectId,
-  VirtualObjectBasicDefinition,
-  WatchVirtualObject
-}
+import wings.virtualobjectagent.domain.agent.{DeviceDriver, MsgEnv}
+import wings.virtualobjectagent.domain.messages.command.{ActuateOnVirtualObject, RegisterVirtualObjectId, VirtualObjectBasicDefinition, WatchVirtualObject}
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
 import wings.virtualobjectagent.infrastructure.messages.serialization.json.Implicits._
 
 import org.eclipse.paho.client.mqttv3._
+
 
 case class MqttConnection(client: IMqttAsyncClient, persistence: MqttClientPersistence, connOpts: MqttConnectOptions)
 

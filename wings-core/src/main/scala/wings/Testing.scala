@@ -28,7 +28,7 @@ object Testing {
 
     println(f)
 
-    Await.ready(f, 5 seconds)
+    Await.ready(f, 5.seconds)
 
   }
 

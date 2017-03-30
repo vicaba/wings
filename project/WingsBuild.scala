@@ -1,3 +1,4 @@
+/*
 import play.sbt._
 import play.sbt.PlayImport._
 import play.sbt.routes.RoutesKeys._
@@ -141,3 +142,4 @@ object WingsBuild extends Build {
 
   addCommandAlias("prep", ";c;tc;s;ts;ft") // All the needed tasks before running the test
 }
+*/

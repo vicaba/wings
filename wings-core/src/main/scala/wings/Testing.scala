@@ -19,7 +19,6 @@ object Testing {
 
     val f = virtualObjectSensedRepository.findAll().map { list =>
       println(list)
-
     }
 
     f.recover {

@@ -2,9 +2,10 @@ package wings.config
 
 import java.net.URI
 
+import akka.actor.Address
+
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import wings.toolkit.db.mongodb.service.{MongoEnvironment, MongoEnvironmentImpl}
 import wings.user.application.usecase.{SignInUser, SignUpUser}
 import wings.user.domain.repository.UserRepository
@@ -18,19 +19,22 @@ import wings.virtualobjectagent.application.usecase.ListVirtualObjectSensed
 import wings.virtualobjectagent.domain.messages.event.repository.VirtualObjectSensedRepository
 import wings.virtualobjectagent.infrastructure.messages.event.repository.VirtualObjectSensedRepositoryImpl
 import wings.virtualobjectagent.infrastructure.messages.event.repository.mongodb.VirtualObjectSensedMongoRepository
-
 import reactivemongo.api.DB
 import scaldi.Module
 
-object DependencyInjector {
+object DependencyInjector
+{
 
-  def coreInjector: Module = new Module {
+  def coreInjector: Module = new Module
+  {
+
+    bind[Address] identifiedBy 'PubSubAddress to Address("akka.tcp", "PubSubCluster", "127.0.0.1", 3000)
 
     bind[URI] identifiedBy 'WebSocketServerWithPath to Config.config
-      .getStringList("websocket.servers-with-path")
-      .asScala
-      .map(new URI(_))
-      .head
+                                                       .getStringList("websocket.servers-with-path")
+                                                       .asScala
+                                                       .map(new URI(_))
+                                                       .head
 
     bind[URI] identifiedBy 'HttpServer to Config.config.getStringList("http.servers").asScala.map(new URI(_)).head
 
@@ -87,8 +91,10 @@ object DependencyInjector {
         inject[VirtualObjectSensedMongoRepository](identified by 'VirtualObjectSensedMongoRepository)
       )
 
-    bind[ListVirtualObjectSensed.UseCase] identifiedBy 'ListVirtualObjectSensedUseCase to ListVirtualObjectSensed
-      .UseCase(inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository))
+    bind[ListVirtualObjectSensed.UseCase] identifiedBy 'ListVirtualObjectSensedUseCase to
+      ListVirtualObjectSensed.UseCase(
+        inject[VirtualObjectSensedRepository](identified by 'VirtualObjectSensedRepository)
+      )
 
   }
 

@@ -9,8 +9,11 @@ import akka.remote.RemoteScope
 
 import wings.actor.cluster.pubsub.PSMediator
 import wings.actor.cluster.pubsub.PSMediator.{PublishedMsg, PublishMsg, Referrer}
+import wings.config.DependencyInjector._
 import wings.virtualobjectagent.domain.messages.command._
 import wings.virtualobjectagent.domain.messages.event.VirtualObjectSensed
+
+import scaldi.Injectable._
 
 object ArchitectureDriver {
   def props(virtualObjectId: UUID, continuation: ActorRef): Props =
@@ -24,12 +27,16 @@ case class ArchitectureDriver(virtualObjectId: UUID, continuation: ActorRef) ext
 
   val logger = Logging(context.system, this)
 
+  val pubSubAddress: Address =
+    inject[Address](identified by 'PubSubAddress)
+
   override def preStart(): Unit = {
     val mediator = context.actorOf(
       PSMediator
         .props()
-        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString("akka.tcp://PubSubCluster@127.0.0.1:3000")))),
+        .withDeploy(Deploy(scope = RemoteScope(pubSubAddress))),
       "pubsub")
+    Address("akka.tcp", "PubSubCluster", "127.0.0.1", 3000)
     mediator ! Referrer(self)
     logger.debug("Architecture Driver deployed")
     become(continuationState(mediator))

@@ -64,12 +64,10 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   }
 
   def receive: PartialFunction[Any, Unit] = {
-    case msg @ MqttMessage(topic, payload, qos, retained, duplicate) =>
+    case msg @ MqttMessage(topic, _, _, _, _) =>
       topic match {
         case MqttTopics.ConfigOutTopicPattern(id) =>
           onConfigOutTopic(msg)
-          count = count + 1
-          logger.info("Deployed Actors: {}", count)
         case m => logger.debug("Received non matching topic message from topic: {}", m)
       }
     case _ => logger.debug("Mqtt Master has received an unknown message")
@@ -82,6 +80,7 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
   def onConfigOutTopic(mqttMsg: paho.MqttMessage): Try[JsResult[Unit]] = {
 
     Try(Json.parse(mqttMsg.payloadAsString())).map { msg =>
+
       msg.validate[RegisterVirtualObjectId].map {
         case NameAcquisitionRequest(virtualObjectId) =>
           logger.info("MqttMaster has received a NameAcquisitionRequest")
@@ -95,6 +94,8 @@ case class MqttMaster() extends Actor with ActorPahoMqttAdapter {
                                           s"MqttActor-${virtualObjectId.toString}")
               registerVirtualObject(virtualObjectId, actor)
               mqttConnection ! MqttRouter.Publish(ackMessage(virtualObjectId))
+              count = count + 1
+              logger.info("Deployed Actors: {}", count)
           }
 
       }

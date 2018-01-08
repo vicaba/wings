@@ -84,6 +84,28 @@ lazy val mqttDependencies = Seq(
     eclipsePaho
   ))
 
+lazy val coap = Project(
+  id = "wings-coap",
+  base = file("wings-coap"),
+  settings = commonSettings,
+  dependencies = Seq(core)
+).settings(coapDependencies: _*)
+                .enablePlugins(JavaAppPackaging)
+
+lazy val coapDependencies = Seq(
+  libraryDependencies ++= Seq(
+    akkaActor,
+    akkaRemote,
+    akkaCluster,
+    akkaClusterTools,
+    akkaClusterMetrics,
+    playReactiveMongo,
+    playJson,
+    slf4j,
+    californium
+  ))
+
+
 lazy val clusterSeed = Project(
   id = "wings-clusterseed",
   base = file("wings-clusterseed"),

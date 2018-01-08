@@ -34,6 +34,8 @@ object Dependencies {
 
   val eclipsePaho: ModuleID = "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0"
 
+  val californium: ModuleID = "org.eclipse.californium" % "californium-core" % "2.0.0-M3"
+
   val jettyWebSocket: ModuleID = "org.eclipse.jetty.websocket" % "websocket-client" % "9.3.11.v20160721"
 
   val typesafeConfig: ModuleID = "com.typesafe" % "config" % "1.3.0"

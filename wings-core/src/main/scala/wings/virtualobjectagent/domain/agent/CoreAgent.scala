@@ -130,10 +130,8 @@ trait CoreAgent extends Actor with Stash with ActorUtilities {
       case MsgEnv.ToDevice(msg) => toDeviceReceive(msg)
       case MsgEnv.ToArch(msg)   => toArchReceive(msg)
       case ToDeviceActor        => sender ! toDevice
-      case Stash.UnStash =>
-        println("Unstashing")
-        unstashAll()
-      case a: Any => println("All. Received Any")
+      case Stash.UnStash        => unstashAll()
+      case a: Any => println("Received Any")
     }
 
     receive

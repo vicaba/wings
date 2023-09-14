@@ -5,7 +5,7 @@ Distributed application bridging Internet of Things and Web of Things featuring 
 Related scientific manuscripts: 
 * [Prototyping a Web-of-Energy Architecture for Smart Integration of Sensor Networks in Smart Grids Domain](https://www.mdpi.com/1424-8220/18/2/400)
 
-This project is organized in a monorepo style and aggregates several sub-projects. The main sub-projects are:
+This project is organized in a monorepo/multi-project style and aggregates several sub-projects. The main sub-projects are:
 
 * wings-core
 * wings-http

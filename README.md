@@ -19,7 +19,7 @@ This project contains the core logic, mainly business logic. It defines several 
 
 ## wings-http
 
-This project contains adapters for WebSocket and HTTP via the PlayFramework 2. PlayFramework 2 handles initial WebSocket connections and transforms them into actors by creating an actor per connection (IoT device or client),
+This project contains adapters for WebSocket and HTTP via the PlayFramework 2. PlayFramework 2 handles initial WebSocket connections and transforms them into actors by creating an actor per connection (IoT device or client).
 It also contains the HTTP client to upgrade HTTP connections to WebSocket connections and to display, via HTML, CSS and Javascript, a dashboard and a map.
 
 ## wings-mqtt
